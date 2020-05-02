@@ -3,9 +3,9 @@ from flask_restful import Resource, Api
 from app import create_app
 
 config_name = os.getenv('APP_SETTINGS')
-app = create_app(config_name)
+application = create_app(config_name)
 
-api = Api(app)
+api = Api(application)
 
 class HelloWorld(Resource):
     def get(self):
@@ -14,4 +14,4 @@ class HelloWorld(Resource):
 api.add_resource(HelloWorld, '/')
 
 if __name__ == '__main__':
-    app.run()
+    application.run()
