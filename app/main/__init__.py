@@ -1,12 +1,9 @@
 from flask import Flask
 from flask_cors import CORS
-from dotenv import load_dotenv
 from app.main.config import app_config
 from app.main.db import db
 
 import json
-
-load_dotenv(".env")
 
 
 def create_app(config_name):
