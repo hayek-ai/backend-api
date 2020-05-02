@@ -11,6 +11,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     PROPAGATE_EXCEPTIONS = True
 
+
 class DevelopmentConfig(Config):
     """Configurations for Development."""
     DEBUG = True
@@ -23,11 +24,6 @@ class TestingConfig(Config):
     DEBUG = True
 
 
-class StagingConfig(Config):
-    """Configurations for staging."""
-    DEBUG = True
-
-
 class ProductionConfig(Config):
     """Configurations for Production."""
     DEBUG = False
@@ -37,6 +33,5 @@ class ProductionConfig(Config):
 app_config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
-    'staging': StagingConfig,
     'production': ProductionConfig
 }
