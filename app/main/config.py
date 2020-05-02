@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 
+# Not sure if this is supposed to be here or in the app
 load_dotenv(".env")
 
 

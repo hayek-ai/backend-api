@@ -1,8 +1,5 @@
-import os
 import unittest
 
-from flask import current_app
-from application import app
 from app.main.config import TestingConfig, DevelopmentConfig, ProductionConfig
 
 
