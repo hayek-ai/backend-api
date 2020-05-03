@@ -108,3 +108,5 @@ venv.bak/
 !.elasticbeanstalk/*.global.yml
 
 .idea
+
+*/.DS_Store

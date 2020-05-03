@@ -1,14 +1,7 @@
-import pytest
 from app.main import create_app
 
 
-@pytest.fixture
-def client():
-    app = create_app('testing')
+def flask_test_client(environment="testing"):
+    app = create_app(environment)
     return app.test_client()
 
-
-@pytest.fixture
-def runner():
-    app = create_app('testing')
-    return app.test_cli_runner()
