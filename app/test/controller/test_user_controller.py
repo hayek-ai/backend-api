@@ -1,7 +1,9 @@
 import unittest
 import json
+import io
 from app.test.conftest import flask_test_client, services_for_test
 from app.main.libs.strings import gettext
+from app.main.libs.s3 import S3
 from app.main.service.user_service import UserService
 from app.main.db import db
 
@@ -11,6 +13,15 @@ class TestUserController(unittest.TestCase):
         self.client = flask_test_client(services_for_test(user=UserService()))
         self.service = UserService()
         db.create_all()
+
+    def login(self, username, password) -> str:
+        """Logs user in and returns accessToken"""
+        response = self.client.post('/login', data=json.dumps(dict(
+            emailOrUsername=username,
+            password=password
+        )), content_type='application/json')
+        login_data = json.loads(response.data)
+        return login_data["accessToken"]
 
     def test_register_user_post(self):
         response = self.client.post('/register', data=json.dumps(dict(
@@ -94,12 +105,7 @@ class TestUserController(unittest.TestCase):
         self.service.save_new_user("email2@email.com", "username2", "password")
 
         # login
-        response = self.client.post('/login', data=json.dumps(dict(
-            emailOrUsername="username1",
-            password="password"
-        )), content_type='application/json')
-        login_data = json.loads(response.data)
-        access_token = login_data["accessToken"]
+        access_token = self.login("username1", "password")
 
         # try to get user without authorization header -- error
         response = self.client.get('/user/1')
@@ -134,12 +140,7 @@ class TestUserController(unittest.TestCase):
         self.service.save_new_user("email2@email.com", "username2", "password")
 
         # login
-        response = self.client.post('/login', data=json.dumps(dict(
-            emailOrUsername="username",
-            password="password"
-        )), content_type='application/json')
-        login_data = json.loads(response.data)
-        access_token = login_data["accessToken"]
+        access_token = self.login("username", "password")
 
         # try to edit user without authorization header -- error
         response = self.client.put("/user/1", data=json.dumps(dict(
@@ -234,6 +235,53 @@ class TestUserController(unittest.TestCase):
         )), content_type='application/json')
         data = json.loads(response.data)
         assert data["errors"][0]["detail"] == gettext("incorrect_fields")
+        assert response.status_code == 400
+
+    def test_image_upload_post(self):
+        self.service.save_new_user("email@email.com", "username", "password")
+
+        data = {
+            'file': (io.BytesIO(b"abcdef"), 'test.jpg')
+        }
+
+        # login
+        access_token = self.login("username", "password")
+
+        response = self.client.post(
+            '/upload-profile-image',
+            data=data,
+            follow_redirects=True,
+            content_type='multipart/form-data',
+            headers={'Authorization': 'Bearer {}'.format(access_token)}
+        )
+        data = json.loads(response.data)
+        assert data["imageUrl"] == f"{S3.S3_ENDPOINT_URL}/user_images/username-profile-image.jpg"
+        assert response.status_code == 201
+
+        # invalid file extension
+        data = {
+            'file': (io.BytesIO(b"abcdef"), 'test.pdf')
+        }
+        response = self.client.post(
+            '/upload-profile-image',
+            data=data,
+            follow_redirects=True,
+            content_type="multipart/form-data",
+            headers={'Authorization': 'Bearer {}'.format(access_token)}
+        )
+        data = json.loads(response.data)
+        assert data['errors'][0]['detail'] == gettext("invalid_file_extension")
+        assert response.status_code == 400
+
+        # invalid form
+        response = self.client.post(
+            '/upload-profile-image',
+            data=None,
+            follow_redirects=True,
+            content_type="multipart/form-data",
+            headers={'Authorization': 'Bearer {}'.format(access_token)}
+        )
+        data = json.loads(response.data)
         assert response.status_code == 400
 
     def tearDown(self):
