@@ -51,6 +51,11 @@ docker run --name hayek_test_db -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=m
 docker run --name hayek_development_db -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=michael 
 -e POSTGRES_DB=hayek_development_db -p 5432:5432 -d postgres
 ```
+Connect application to databases in .env file.  Example:
+```
+DEV_DATABASE_URI="postgresql://michael:postgres@localhost:5432/hayek_development_db"
+TEST_DATABASE_URI="postgresql://michael:postgres@localhost:5432/hayek_test_db"
+```
 Before development, start development db.  Before testing, spin up testing db. Example:
 ```
 docker start hayek_test_db
