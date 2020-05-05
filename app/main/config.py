@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 
-# Not sure if this is supposed to be here or in the app
 load_dotenv(".env")
 
 
@@ -10,23 +9,24 @@ class Config(object):
     DEBUG = False
     CSRF_ENABLED = True
     SECRET = os.getenv('SECRET')
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = os.getenv('PROD_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     PROPAGATE_EXCEPTIONS = True
 
 
 class DevelopmentConfig(Config):
     """Configurations for Development."""
-    DEBUG = True
     ENV = 'development'
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = os.getenv('DEV_DATABASE_URI')
 
 
 class TestingConfig(Config):
     """Configurations for Testing ,with a separate test database."""
     ENV = 'testing'
-    TESTING = True
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/test_db'
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = os.getenv('TEST_DATABASE_URI')
 
 
 class ProductionConfig(Config):

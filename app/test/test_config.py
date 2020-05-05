@@ -10,7 +10,7 @@ class TestTestingConfig(unittest.TestCase):
         self.assertTrue(config['CSRF_ENABLED'])
         self.assertTrue(config['SECRET'] == 'dev-secret')
         self.assertTrue(
-            config['SQLALCHEMY_DATABASE_URI'] == 'postgresql://localhost/test_db'
+            config['SQLALCHEMY_DATABASE_URI'] == "postgresql://michael:postgres@localhost:5432/hayek_test_db"
         )
         self.assertFalse(config['SQLALCHEMY_TRACK_MODIFICATIONS'])
         self.assertTrue(config['PROPAGATE_EXCEPTIONS'])
@@ -24,7 +24,7 @@ class TestDevelopmentConfig(unittest.TestCase):
         self.assertTrue(config['CSRF_ENABLED'])
         self.assertTrue(config['SECRET'] == 'dev-secret')
         self.assertTrue(
-            config['SQLALCHEMY_DATABASE_URI'] == 'postgresql://localhost/flask_api'
+            config['SQLALCHEMY_DATABASE_URI'] == "postgresql://michael:postgres@localhost:5432/hayek_development_db"
         )
         self.assertFalse(config['SQLALCHEMY_TRACK_MODIFICATIONS'])
         self.assertTrue(config['PROPAGATE_EXCEPTIONS'])

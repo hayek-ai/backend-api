@@ -11,5 +11,5 @@ class TestEndpointsConfiguration(unittest.TestCase):
             endpoints.append(str(rule))
         self.endpoints = endpoints
 
-    def test_hello_endpoint_configured(self):
-        assert '/hello' in self.endpoints
+    def test_register_endpoint_configured(self):
+        assert '/register' in self.endpoints

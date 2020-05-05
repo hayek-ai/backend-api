@@ -3,11 +3,13 @@ from app.main import create_app
 import app
 
 
-def services_for_test(register_user=None):
-    return {'register_user': register_user or create_autospec(app.main.RegisterUserService, spec_set=True, instance=True)}
+def services_for_test(user=None):
+    return {'user': user or create_autospec(app.main.UserService, spec_set=True, instance=True)}
 
 
 def flask_test_client(services=None, environment="testing"):
-    app = create_app(services or services_for_test(), environment)
-    return app.test_client()
+    application = create_app(services or services_for_test(), environment)
+    # If you try to perform database operations outside an application context, you get an error
+    application.app_context().push()
+    return application.test_client()
 

@@ -1,10 +1,10 @@
 import os
 from app.main import create_app
-from app.main.service.register_user_service import RegisterUserService
+from app.main.service.user_service import UserService
 
 
 def create_services():
-    services = {'register_user': RegisterUserService()}
+    services = {"user": UserService()}
     return services
 
 
