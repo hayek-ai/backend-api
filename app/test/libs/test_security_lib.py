@@ -1,5 +1,4 @@
 import unittest
-import json
 from app.main.libs.security import encrypt_password, check_encrypted_password
 
 
