@@ -43,8 +43,21 @@ Also need to install wkhtmltopdf for pdfkit:
 
     $ brew install caskroom/cask/wkhtmltopdf
 
+Create docker images of test and development Postgres databases. Example:
+```
+docker run --name hayek_test_db -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=michael 
+-e POSTGRES_DB=hayek_test_db -p 5432:5432 -d postgres
+
+docker run --name hayek_development_db -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=michael 
+-e POSTGRES_DB=hayek_development_db -p 5432:5432 -d postgres
+```
+Before development, start development db.  Before testing, spin up testing db. Example:
+```
+docker start hayek_test_db
+```
+
 Build Command
 
 ```
-gunicorn app:app
+gunicorn application:app
 ```
