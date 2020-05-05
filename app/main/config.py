@@ -12,6 +12,7 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.getenv('PROD_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     PROPAGATE_EXCEPTIONS = True
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
 
 class DevelopmentConfig(Config):

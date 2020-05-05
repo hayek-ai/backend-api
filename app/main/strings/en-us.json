@@ -1,9 +1,12 @@
 {
   "empty": "Must not be empty.",
   "incorrect_fields": "Incorrect fields.",
+  "not_found": "{} not found.",
 
   "email_exists": "A user with that email address already exists",
   "username_exists": "A user with that username already exists",
   "email_invalid": "Must be a valid email address.",
-  "username_invalid": "Username cannot contain spaces or special symbols (use the underscore '_' instead of spaces).  It also cannot be more than 20 characters long."
+  "username_invalid": "Username cannot contain spaces or special symbols (use the underscore '_' instead of spaces).  It also cannot be more than 20 characters long.",
+  "user_invalid_credentials": "Invalid credentials.",
+  "unauthorized_user_edit": "Users are only permitted to edit their own account details."
 }

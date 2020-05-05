@@ -13,3 +13,5 @@ class TestEndpointsConfiguration(unittest.TestCase):
 
     def test_register_endpoint_configured(self):
         assert '/register' in self.endpoints
+        assert '/login' in self.endpoints
+        assert '/user/<username_or_id>' in self.endpoints

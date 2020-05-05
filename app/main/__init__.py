@@ -10,7 +10,7 @@ from app.main.db import db
 from app.main.ma import ma
 
 # Controllers
-from app.main.controller.user_controller import UserRegister, User
+from app.main.controller.user_controller import UserRegister, UserLogin, User
 
 # Services
 from app.main.service.user_service import UserService
@@ -37,6 +37,7 @@ def create_app(services, config_name):
     ma.init_app(app)
 
     api.add_resource(UserRegister, '/register', resource_class_kwargs={'service': services["user"]})
+    api.add_resource(UserLogin, '/login', resource_class_kwargs={'service': services["user"]})
     api.add_resource(User, '/user/<username_or_id>', resource_class_kwargs={'service': services["user"]})
 
     return app
