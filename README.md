@@ -29,14 +29,16 @@ Install dependencies
 pip3 install -r requirements.txt
 ```
 
-Create docker images of test and development Postgres databases. Example:
+Create docker images of test and development Postgres databases. 
+Make sure they are running on different ports so that you can run both at the same time.
+Example:
 
 ```
 docker run --name hayek_test_db \
     -e POSTGRES_PASSWORD=postgres \
     -e POSTGRES_USER=michael \
     -e POSTGRES_DB=hayek_test_db \
-    -p 5432:5432 \
+    -p 5431:5432 \
     -d postgres
 
 docker run --name hayek_development_db \
@@ -50,14 +52,15 @@ docker run --name hayek_development_db \
 Connect application to databases in .env file.  Example:
 
 ```
+TEST_DATABASE_URI="postgresql://michael:postgres@localhost:5431/hayek_test_db"
 DEV_DATABASE_URI="postgresql://michael:postgres@localhost:5432/hayek_development_db"
-TEST_DATABASE_URI="postgresql://michael:postgres@localhost:5432/hayek_test_db"
 ```
 
-Before development, start development db.  Before testing, spin up testing db. Example:
+Before testing & development, start up both databases. Example:
 
 ```
 docker start hayek_test_db
+docker start hayek_development_db
 ```
 
 Build Command
