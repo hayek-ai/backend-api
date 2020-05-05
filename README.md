@@ -29,21 +29,8 @@ Install dependencies
 pip3 install -r requirements.txt
 ```
 
-Also need to install wkhtmltopdf for pdfkit:
-
-- Debian/Ubuntu:
-
-.. code-block:: bash
-
-    $ sudo apt-get install wkhtmltopdf
-
-- macOS:
-
-.. code-block:: bash
-
-    $ brew install caskroom/cask/wkhtmltopdf
-
 Create docker images of test and development Postgres databases. Example:
+
 ```
 docker run --name hayek_test_db -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=michael 
 -e POSTGRES_DB=hayek_test_db -p 5432:5432 -d postgres
@@ -51,12 +38,16 @@ docker run --name hayek_test_db -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=m
 docker run --name hayek_development_db -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=michael 
 -e POSTGRES_DB=hayek_development_db -p 5432:5432 -d postgres
 ```
+
 Connect application to databases in .env file.  Example:
+
 ```
 DEV_DATABASE_URI="postgresql://michael:postgres@localhost:5432/hayek_development_db"
 TEST_DATABASE_URI="postgresql://michael:postgres@localhost:5432/hayek_test_db"
 ```
+
 Before development, start development db.  Before testing, spin up testing db. Example:
+
 ```
 docker start hayek_test_db
 ```
