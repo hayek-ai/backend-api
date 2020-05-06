@@ -1,7 +1,4 @@
 from passlib.context import CryptContext
-import re
-
-from app.main.libs.strings import gettext
 
 pwd_context = CryptContext(
     schemes=["pbkdf2_sha256"],
@@ -16,4 +13,3 @@ def encrypt_password(password: str) -> str:
 
 def check_encrypted_password(password: str, hashed: str) -> bool:
     return pwd_context.verify(password, hashed)
-

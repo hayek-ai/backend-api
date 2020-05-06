@@ -1,10 +1,10 @@
-from app.main.ma import ma
-
-from app.main.libs.util import camelcase
-from app.main.libs.strings import gettext
-from app.main.model.user import UserModel
 from marshmallow import Schema, fields, validates, ValidationError
 from marshmallow.validate import Length
+
+from app.main.libs.strings import get_text
+from app.main.libs.util import camelcase
+from app.main.ma import ma
+from app.main.model.user import UserModel
 
 
 class UserSchema(ma.SQLAlchemyAutoSchema):
@@ -29,7 +29,7 @@ class UserRegisterSchema(Schema):
                        '@', '$', '%', '/', '\\', '=', '+', '-', '*', "'", '"']
 
         if any(char in special_sym for char in value):
-            raise ValidationError(gettext("username_invalid"))
+            raise ValidationError(get_text("username_invalid"))
 
 
 class UserLoginSchema(Schema):

@@ -1,11 +1,12 @@
 import datetime
-import json
+
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_restful import Resource, request
 
-from app.main.libs.strings import gettext
 from app.main.libs.s3 import S3
+from app.main.libs.strings import get_text
+from app.main.libs.util import get_error
 from app.main.schema.user_schema import user_schema, user_register_schema, user_login_schema
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
 
 class UserRegister(Resource):
@@ -22,34 +23,16 @@ class UserRegister(Resource):
         user_json = request.get_json()
         errors = self.user_register_schema.validate(user_json)
         if errors:
-            return {"errors": [
-                {
-                    "status": 400,
-                    "detail": gettext("incorrect_fields"),
-                    **errors
-                }
-            ]}, 400
-        
+            return get_error(400, get_text("incorrect_fields"), **errors)
+
         user = self.user_service.get_user_by_email(user_json['email'])
         if user:
-            return {"errors": [
-                {
-                    "status": 409,
-                    "detail": gettext("email_exists"),
-                    "field": "email"
-                }
-            ]}, 409
-        
+            return get_error(409, get_text("email_exists"), field="email")
+
         user = self.user_service.get_user_by_username(user_json['username'])
         if user:
-            return {"errors": [
-                {
-                    "status": 409,
-                    "detail": gettext("username_exists"),
-                    "field": "username"
-                }
-            ]}, 409
-        
+            return get_error(409, get_text("username_exists"), field="username")
+
         try:
             new_user = self.user_service.save_new_user(
                 user_json["email"],
@@ -59,17 +42,11 @@ class UserRegister(Resource):
             expires = datetime.timedelta(days=30)
             access_token = create_access_token(identity=new_user.id, expires_delta=expires, fresh=True)
             return {
-                "user": self.user_schema.dump(new_user),
-                "accessToken": access_token
-            }, 201
+                       "user": self.user_schema.dump(new_user),
+                       "accessToken": access_token
+                   }, 201
         except Exception as e:
-            return {"errors": [
-                {
-                    "status": 500,
-                    "detail": str(e),
-                    "field": "general"
-                }
-            ]}, 500
+            return get_error(500, str(e), field="general")
 
 
 class User(Resource):
@@ -83,16 +60,11 @@ class User(Resource):
             user = self.user_service.get_user_by_id(username_or_id)
         else:
             user = self.user_service.get_user_by_username(username_or_id)
-        
+
         if user:
             return self.user_schema.dump(user), 200
         else:
-            return {"errors": [
-                {
-                    "status": 404,
-                    "detail": gettext("not_found").format("User")
-                }
-            ]}, 404
+            return get_error(404, get_text("not_found").format("User"))
 
     @jwt_required
     def put(self, username_or_id):
@@ -101,20 +73,11 @@ class User(Resource):
         else:
             user = self.user_service.get_user_by_username(username_or_id)
         if not user:
-            return {"errors": [
-                {
-                    "status": 404,
-                    "detail": gettext("not_found").format("User")
-                }
-            ]}, 404
+            return get_error(404, get_text("not_found").format("User"))
+
         # users are only permitted to edit their own account details.
         if user.id != get_jwt_identity():
-            return {"errors": [
-                {
-                    "status": 403,
-                    "detail": gettext("unauthorized_user_edit")
-                }
-            ]}, 403
+            return get_error(403, get_text("unauthorized_user_edit"))
 
         user_details = request.get_json()
         if "bio" in user_details:
@@ -139,13 +102,7 @@ class UserLogin(Resource):
         credentials = request.get_json()
         errors = self.user_login_schema.validate(credentials)
         if errors:
-            return {"errors": [
-                {
-                    "status": 400,
-                    "detail": gettext("incorrect_fields"),
-                    **errors
-                }
-            ]}, 400
+            return get_error(400, get_text("incorrect_fields"), **errors)
 
         # allow user to login with email or username
         user = self.user_service.get_user_by_email(credentials["emailOrUsername"])
@@ -160,13 +117,7 @@ class UserLogin(Resource):
                        "accessToken": access_token,
                    }, 200
 
-        return {"errors": [
-            {
-                "status": 401,
-                "detail": gettext("user_invalid_credentials"),
-                "field": "general"
-            }
-        ]}, 401
+        return get_error(401, get_text("user_invalid_credentials"), field="general")
 
 
 class UploadProfileImage(Resource):
@@ -178,12 +129,7 @@ class UploadProfileImage(Resource):
         user_id = get_jwt_identity()
         user = self.user_service.get_user_by_id(user_id)
         if not user:
-            return {"errors": [
-                {
-                    "status": 404,
-                    "detail": gettext("not_found").format("user")
-                }
-            ]}, 404
+            return get_error(404, get_text("not_found").format("user"))
 
         try:
             # get file and rename
@@ -192,12 +138,8 @@ class UploadProfileImage(Resource):
             image_extension = image_file.filename.split('.')[len(image_file.filename.split(".")) - 1]
             valid_extensions = ['jpg', 'png', 'jpeg']
             if image_extension not in valid_extensions:
-                return {"errors": [
-                    {
-                        "status": 400,
-                        "detail": gettext("invalid_file_extension")
-                    }
-                ]}, 400
+                return get_error(400, get_text("invalid_file_extension"))
+
             filename = f"{user.username}-profile-image.{image_extension}"
 
             # update user profile image
@@ -214,9 +156,4 @@ class UploadProfileImage(Resource):
             )
             return {"imageUrl": user.image_url}, 201
         except Exception as e:
-            return {"errors": [
-                {
-                    "status": 400,
-                    "detail": str(e)
-                }
-            ]}, 400
+            return get_error(400, str(e))

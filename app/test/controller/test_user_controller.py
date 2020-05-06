@@ -2,7 +2,7 @@ import unittest
 import json
 import io
 from app.test.conftest import flask_test_client, services_for_test
-from app.main.libs.strings import gettext
+from app.main.libs.strings import get_text
 from app.main.libs.s3 import S3
 from app.main.service.user_service import UserService
 from app.main.db import db
@@ -53,7 +53,7 @@ class TestUserController(unittest.TestCase):
             password="password"
         )), content_type="application/json")
         data = json.loads(response.data)
-        assert data["errors"][0]["detail"] == gettext("email_exists")
+        assert data["errors"][0]["detail"] == get_text("email_exists")
         assert response.status_code == 409
 
         # username must be unique (case insensitive)
@@ -63,7 +63,7 @@ class TestUserController(unittest.TestCase):
             password="password"
         )), content_type="application/json")
         data = json.loads(response.data)
-        assert data["errors"][0]["detail"] == gettext("username_exists")
+        assert data["errors"][0]["detail"] == get_text("username_exists")
         assert response.status_code == 409
 
         # invalid email
@@ -73,7 +73,7 @@ class TestUserController(unittest.TestCase):
             password='password'
         )), content_type='application/json')
         data = json.loads(response.data)
-        assert data["errors"][0]["detail"] == gettext("incorrect_fields")
+        assert data["errors"][0]["detail"] == get_text("incorrect_fields")
         assert data["errors"][0]["email"] == ['Not a valid email address.']
         assert response.status_code == 400
 
@@ -84,8 +84,8 @@ class TestUserController(unittest.TestCase):
             password='password'
         )), content_type='application/json')
         data = json.loads(response.data)
-        assert data["errors"][0]["detail"] == gettext("incorrect_fields")
-        assert data["errors"][0]["username"] == [gettext("username_invalid")]
+        assert data["errors"][0]["detail"] == get_text("incorrect_fields")
+        assert data["errors"][0]["username"] == [get_text("username_invalid")]
         assert response.status_code == 400
 
         # invalid username (with special characters)
@@ -95,8 +95,8 @@ class TestUserController(unittest.TestCase):
             password='password'
         )), content_type='application/json')
         data = json.loads(response.data)
-        assert data["errors"][0]["detail"] == gettext("incorrect_fields")
-        assert data["errors"][0]["username"] == [gettext("username_invalid")]
+        assert data["errors"][0]["detail"] == get_text("incorrect_fields")
+        assert data["errors"][0]["username"] == [get_text("username_invalid")]
         assert response.status_code == 400
 
     def test_get_user(self):
@@ -132,7 +132,7 @@ class TestUserController(unittest.TestCase):
             '/user/nonexistent-user', headers={'Authorization': 'Bearer {}'.format(access_token)}
         )
         data = json.loads(response.data)
-        assert data["errors"][0]["detail"] == gettext("not_found").format("User")
+        assert data["errors"][0]["detail"] == get_text("not_found").format("User")
         assert response.status_code == 404
 
     def test_edit_user_put(self):
@@ -156,7 +156,7 @@ class TestUserController(unittest.TestCase):
             headers={'Authorization': 'Bearer {}'.format(access_token)}
         )
         data = json.loads(response.data)
-        assert data["errors"][0]["detail"] == gettext("unauthorized_user_edit")
+        assert data["errors"][0]["detail"] == get_text("unauthorized_user_edit")
         assert response.status_code == 403
 
         # handle user not found
@@ -166,7 +166,7 @@ class TestUserController(unittest.TestCase):
            headers={'Authorization': 'Bearer {}'.format(access_token)}
         )
         data = json.loads(response.data)
-        assert data["errors"][0]["detail"] == gettext("not_found").format("User")
+        assert data["errors"][0]["detail"] == get_text("not_found").format("User")
         assert response.status_code == 404
 
         # update bio
@@ -217,7 +217,7 @@ class TestUserController(unittest.TestCase):
             password="password"
         )), content_type='application/json')
         data = json.loads(response.data)
-        assert data["errors"][0]["detail"] == gettext("user_invalid_credentials")
+        assert data["errors"][0]["detail"] == get_text("user_invalid_credentials")
         assert response.status_code == 401
 
         # invalid password
@@ -226,7 +226,7 @@ class TestUserController(unittest.TestCase):
             password="wrong_password"
         )), content_type="application/json")
         data = json.loads(response.data)
-        assert data["errors"][0]["detail"] == gettext("user_invalid_credentials")
+        assert data["errors"][0]["detail"] == get_text("user_invalid_credentials")
         assert response.status_code == 401
 
         # incorrect input fields
@@ -234,7 +234,7 @@ class TestUserController(unittest.TestCase):
             wrong="wrong"
         )), content_type='application/json')
         data = json.loads(response.data)
-        assert data["errors"][0]["detail"] == gettext("incorrect_fields")
+        assert data["errors"][0]["detail"] == get_text("incorrect_fields")
         assert response.status_code == 400
 
     def test_image_upload_post(self):
@@ -270,7 +270,7 @@ class TestUserController(unittest.TestCase):
             headers={'Authorization': 'Bearer {}'.format(access_token)}
         )
         data = json.loads(response.data)
-        assert data['errors'][0]['detail'] == gettext("invalid_file_extension")
+        assert data['errors'][0]['detail'] == get_text("invalid_file_extension")
         assert response.status_code == 400
 
         # invalid form
