@@ -9,5 +9,9 @@
   "email_invalid": "Must be a valid email address.",
   "username_invalid": "Username cannot contain spaces or special symbols (use the underscore '_' instead of spaces).  It also cannot be more than 20 characters long.",
   "user_invalid_credentials": "Invalid credentials.",
-  "unauthorized_user_edit": "Users are only permitted to edit their own account details."
+  "unauthorized_user_edit": "Users are only permitted to edit their own account details.",
+
+  "mailgun_failed_load_api_key": "Failed to load MailGun API key.",
+  "mailgun_failed_load_domain": "Failed to load MailGun domain.",
+  "mailgun_error_send_email": "Error in sending confirmation email, user registration failed."
 }

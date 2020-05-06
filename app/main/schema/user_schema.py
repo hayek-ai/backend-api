@@ -2,14 +2,14 @@ from app.main.ma import ma
 
 from app.main.libs.util import camelcase
 from app.main.libs.strings import gettext
-from app.main.model.user import User
+from app.main.model.user import UserModel
 from marshmallow import Schema, fields, validates, ValidationError
 from marshmallow.validate import Length
 
 
 class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        model = User
+        model = UserModel
         load_only = ("password_hash", "email", "is_admin", "connected_stripe_acct_id", "stripe_cust_id")
 
     @classmethod

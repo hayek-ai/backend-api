@@ -16,6 +16,7 @@ class TestUserService(unittest.TestCase):
         assert new_user.username == "username"
         assert new_user.email == "email@email.com"
         assert new_user.password_hash != "password"
+        assert str(type(new_user.most_recent_confirmation)) == "<class 'app.main.model.confirmation.ConfirmationModel'>"
 
     def test_get_all_users(self):
         self.service.save_new_user("user1@email.com", "user1", "password")
@@ -74,6 +75,11 @@ class TestUserService(unittest.TestCase):
         # make sure case insensitive
         user = self.service.get_user_by_email("USER2@email.com")
         assert user.username == "user2"
+
+    def test_send_confirmation_email(self):
+        self.service.save_new_user("michaelmcguiness123@gmail.com", "user1", "password")
+        response = self.service.send_confirmation_email(1)
+        assert response.status_code == 200
 
     def tearDown(self):
         db.session.remove()

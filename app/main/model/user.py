@@ -2,9 +2,9 @@ import datetime
 
 from app.main.db import db
 from app.main.libs.security import encrypt_password, check_encrypted_password
+from app.main.model.confirmation import ConfirmationModel
 
-
-class User(db.Model):
+class UserModel(db.Model):
     """User Model for storing user-related details"""
     __tablename__ = "users"
 
@@ -37,16 +37,22 @@ class User(db.Model):
     review_star_total = db.Column(db.Integer, default=0)
     num_reviews = db.Column(db.Integer, default=0)
 
+    confirmation = db.relationship("ConfirmationModel", lazy="dynamic", cascade="all, delete-orphan")
+
     @property
-    def password(self):
+    def password(self) -> None:
         raise AttributeError('password: write-only field')
 
     @password.setter
-    def password(self, password):
+    def password(self, password) -> bool:
         self.password_hash = encrypt_password(password)
 
     def check_password(self, password):
         return check_encrypted_password(password, self.password_hash)
+
+    @property
+    def most_recent_confirmation(self) -> "ConfirmationModel":
+        return self.confirmation.order_by(db.desc(ConfirmationModel.expire_at)).first()
 
     def __repr__(self):
         return "<User '{}'>".format(self.username)
