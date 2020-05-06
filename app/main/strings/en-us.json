@@ -17,5 +17,7 @@
   "incorrect_confirmation_code": "That confirmation code is incorrect.",
   "confirmation_resend_successful": "Confirmation email successfully resent.",
 
-  "error_sending_email": "There was an error trying to send the email."
+  "error_sending_email": "There was an error trying to send the email.",
+
+  "invalid_position_type": "Position type can be either 'long' or 'short' "
   }

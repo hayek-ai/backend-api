@@ -13,6 +13,7 @@ class ConfirmationModel(db.Model):
     code = db.Column(db.String(6), nullable=False)
     expire_at = db.Column(db.Integer, nullable=False)
     is_confirmed = db.Column(db.Boolean, nullable=False)
+
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     user = db.relationship("UserModel")
 

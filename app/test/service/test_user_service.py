@@ -10,13 +10,19 @@ class TestUserService(unittest.TestCase):
         self.app = flask_test_client()
         db.create_all()
 
-    def test_save_new_user_returns_dict(self) -> None:
+    def test_save_new_user(self) -> None:
         new_user = self.service.save_new_user("email@email.com", "username", "password")
 
         assert new_user.username == "username"
         assert new_user.email == "email@email.com"
         assert new_user.password_hash != "password"
+        assert new_user.is_analyst is False
         assert str(type(new_user.most_recent_confirmation)) == "<class 'app.main.model.confirmation.ConfirmationModel'>"
+
+        # try creating analyst
+        new_analyst = self.service\
+            .save_new_user("email2@email.com", "analyst", "password", is_analyst=True)
+        assert new_analyst.is_analyst is True
 
     def test_get_all_users(self) -> None:
         self.service.save_new_user("user1@email.com", "user1", "password")

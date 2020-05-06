@@ -12,10 +12,12 @@ from app.main.ma import ma
 # Controllers
 from app.main.controller.user_controller import UserRegister, UserLogin, User, UploadProfileImage
 from app.main.controller.confirmation_controller import Confirmation, ResendConfirmation
+from app.main.controller.idea_controller import NewIdea
 
 # Services
 from app.main.service.user_service import UserService
 from app.main.service.confirmation_service import ConfirmationService
+from app.main.service.idea_service import IdeaService
 
 
 def create_app(services, config_name):
@@ -56,4 +58,8 @@ def create_app(services, config_name):
                      resource_class_kwargs={
                          'user_service': services["user"],
                          'confirmation_service': services["confirmation"]})
+    api.add_resource(NewIdea, '/new-idea',
+                     resource_class_kwargs={
+                         'user_service': services["user"],
+                         'idea_service': services['idea']})
     return app

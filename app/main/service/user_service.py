@@ -7,11 +7,12 @@ from app.main.model.confirmation import ConfirmationModel
 
 
 class UserService:
-    def save_new_user(self, email: str, username: str, password: str) -> "UserModel":
+    def save_new_user(self, email: str, username: str, password: str, is_analyst=False) -> "UserModel":
         new_user = UserModel(
             email=email,
             username=username,
             password=password,
+            is_analyst=is_analyst,
             image_url="https://hayek-image-assets.s3.amazonaws.com/user_images/no-img.svg"
         )
         self.save_changes(new_user)

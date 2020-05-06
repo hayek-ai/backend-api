@@ -3,9 +3,9 @@ import datetime
 from app.main.db import db
 from app.main.libs.security import encrypt_password, check_encrypted_password
 from app.main.model.confirmation import ConfirmationModel
+from app.main.model.idea import IdeaModel
 
 class UserModel(db.Model):
-    """User Model for storing user-related details"""
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -38,6 +38,7 @@ class UserModel(db.Model):
     num_reviews = db.Column(db.Integer, default=0)
 
     confirmation = db.relationship("ConfirmationModel", lazy="dynamic", cascade="all, delete-orphan")
+    ideas = db.relationship("IdeaModel", lazy="dynamic", cascade="all, delete-orphan")
 
     @property
     def password(self) -> None:
