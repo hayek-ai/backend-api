@@ -1,6 +1,7 @@
-from flask_restful import Resource, request
+from flask_restful import Resource
 
 from app.main.libs.strings import get_text
+from app.main.libs.util import get_error
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 
@@ -16,36 +17,16 @@ class Confirmation(Resource):
         user = self.user_service.get_user_by_id(user_id)
         confirmation = user.most_recent_confirmation
         if not confirmation:
-            return {"errors": [
-                {
-                    "status": 404,
-                    "detail": get_text("not_found").format("confirmation"),
-                }
-            ]}, 404
+            return get_error(404, get_text("not_found").format("confirmation"))
 
         if confirmation.is_expired:
-            return {"errors": [
-                {
-                    "status": 400,
-                    "detail": get_text("confirmation_code_expired"),
-                }
-            ]}, 400
+            return get_error(400, get_text("confirmation_code_expired"))
 
         if user.is_confirmed:
-            return {"errors": [
-                {
-                    "status": 400,
-                    "detail": get_text("user_already_confirmed"),
-                }
-            ]}, 400
+            return get_error(400, get_text("user_already_confirmed"))
 
         if confirmation_code != confirmation.code:
-            return {"errors": [
-                {
-                    "status": 400,
-                    "detail": get_text("incorrect_confirmation_code"),
-                }
-            ]}, 400
+            return get_error(400, get_text("incorrect_confirmation_code"))
 
         confirmation.is_confirmed = True
         self.confirmation_service.save_changes(confirmation)
@@ -66,12 +47,8 @@ class ResendConfirmation(Resource):
         user_id = get_jwt_identity()
         user = self.user_service.get_user_by_id(user_id)
         if user.is_confirmed:
-            return {"errors": [
-                {
-                    "status": 400,
-                    "detail": get_text("user_already_confirmed")
-                }
-            ]}, 400
+            return get_error(400, get_text("user_already_confirmed"))
+
         try:
             # make sure most recent confirmation expired and send new confirmation email
             confirmation = user.most_recent_confirmation
@@ -81,10 +58,4 @@ class ResendConfirmation(Resource):
                 self.confirmation_service.send_confirmation_email(user_id)
                 return {"message": get_text("confirmation_resend_successful")}, 201
         except Exception as e:
-            return {"errors": [
-                {
-                    "status": 500,
-                    "detail": str(e)
-                }
-            ]}, 500
-
+            return get_error(500, str(e))

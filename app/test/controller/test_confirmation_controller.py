@@ -1,7 +1,7 @@
 import unittest
 import json
 from app.test.conftest import flask_test_client, services_for_test
-from app.main.libs.strings import gettext
+from app.main.libs.strings import get_text
 from app.main.service.user_service import UserService
 from app.main.service.confirmation_service import ConfirmationService
 from app.main.db import db
@@ -36,7 +36,7 @@ class TestConfirmationController(unittest.TestCase):
             f'/user/confirm/{000}',
             headers={'Authorization': 'Bearer {}'.format(access_token)})
         data = json.loads(response.data)
-        assert data['errors'][0]['detail'] == gettext("incorrect_confirmation_code")
+        assert data['errors'][0]['detail'] == get_text("incorrect_confirmation_code")
         assert response.status_code == 400
         assert user.is_confirmed is False
 
@@ -46,7 +46,7 @@ class TestConfirmationController(unittest.TestCase):
             f'/user/confirm/{code}',
             headers={'Authorization': 'Bearer {}'.format(access_token)})
         data = json.loads(response.data)
-        assert data['errors'][0]['detail'] == gettext("confirmation_code_expired")
+        assert data['errors'][0]['detail'] == get_text("confirmation_code_expired")
         assert response.status_code == 400
         assert user.is_confirmed is False
 
@@ -55,7 +55,7 @@ class TestConfirmationController(unittest.TestCase):
             '/resend-confirmation',
             headers={'Authorization': 'Bearer {}'.format(access_token)})
         data = json.loads(response.data)
-        assert data["message"] == gettext("confirmation_resend_successful")
+        assert data["message"] == get_text("confirmation_resend_successful")
         assert response.status_code == 201
 
         # confirmation works normally
@@ -64,7 +64,7 @@ class TestConfirmationController(unittest.TestCase):
             f'/user/confirm/{new_code}',
             headers={'Authorization': 'Bearer {}'.format(access_token)})
         data = json.loads(response.data)
-        assert data["message"] == gettext("user_confirmed")
+        assert data["message"] == get_text("user_confirmed")
         assert response.status_code == 200
         assert user.is_confirmed is True
 
@@ -73,7 +73,7 @@ class TestConfirmationController(unittest.TestCase):
             f'/user/confirm/{code}',
             headers={'Authorization': 'Bearer {}'.format(access_token)})
         data = json.loads(response.data)
-        assert data["errors"][0]['detail'] == gettext("user_already_confirmed")
+        assert data["errors"][0]['detail'] == get_text("user_already_confirmed")
         assert response.status_code == 400
         assert user.is_confirmed is True
 
