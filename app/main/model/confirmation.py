@@ -12,7 +12,7 @@ class ConfirmationModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(6), nullable=False)
     expire_at = db.Column(db.Integer, nullable=False)
-    confirmed = db.Column(db.Boolean, nullable=False)
+    is_confirmed = db.Column(db.Boolean, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     user = db.relationship("UserModel")
 
@@ -20,5 +20,9 @@ class ConfirmationModel(db.Model):
         super().__init__(**kwargs)
         self.user_id = user_id
         self.expire_at = int(time()) + CONFIRMATION_EXPIRATION_DELTA
-        self.confirmed = False
+        self.is_confirmed = False
         self.code = f"{random.randint(100000, 999999)}"
+
+    @property
+    def is_expired(self) -> bool:
+        return time() > self.expire_at

@@ -11,9 +11,11 @@ from app.main.ma import ma
 
 # Controllers
 from app.main.controller.user_controller import UserRegister, UserLogin, User, UploadProfileImage
+from app.main.controller.confirmation_controller import Confirmation, ResendConfirmation
 
 # Services
 from app.main.service.user_service import UserService
+from app.main.service.confirmation_service import ConfirmationService
 
 
 def create_app(services, config_name):
@@ -36,9 +38,22 @@ def create_app(services, config_name):
     db.init_app(app)
     ma.init_app(app)
 
-    api.add_resource(UserRegister, '/register', resource_class_kwargs={'service': services["user"]})
-    api.add_resource(UserLogin, '/login', resource_class_kwargs={'service': services["user"]})
-    api.add_resource(UploadProfileImage, '/upload-profile-image', resource_class_kwargs={'service': services["user"]})
-    api.add_resource(User, '/user/<username_or_id>', resource_class_kwargs={'service': services["user"]})
-
+    api.add_resource(UserRegister, '/register',
+                     resource_class_kwargs={
+                        'user_service': services["user"],
+                        'confirmation_service': services["confirmation"]})
+    api.add_resource(UserLogin, '/login',
+                     resource_class_kwargs={'service': services["user"]})
+    api.add_resource(UploadProfileImage, '/upload-profile-image',
+                     resource_class_kwargs={'service': services["user"]})
+    api.add_resource(User, '/user/<username_or_id>',
+                     resource_class_kwargs={'service': services["user"]})
+    api.add_resource(Confirmation, '/user/confirm/<string:confirmation_code>',
+                     resource_class_kwargs={
+                         'user_service': services["user"],
+                         'confirmation_service': services["confirmation"]})
+    api.add_resource(ResendConfirmation, '/resend-confirmation',
+                     resource_class_kwargs={
+                         'user_service': services["user"],
+                         'confirmation_service': services["confirmation"]})
     return app

@@ -1,7 +1,7 @@
 import datetime
 
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_restful import Resource, request
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
 from app.main.libs.s3 import S3
 from app.main.libs.strings import get_text
@@ -11,7 +11,8 @@ from app.main.schema.user_schema import user_schema, user_register_schema, user_
 
 class UserRegister(Resource):
     def __init__(self, **kwargs):
-        self.user_service = kwargs['service']
+        self.user_service = kwargs['user_service']
+        self.confirmation_service = kwargs['confirmation_service']
         self.user_schema = user_schema
         self.user_register_schema = user_register_schema
 
@@ -39,11 +40,13 @@ class UserRegister(Resource):
                 user_json["username"],
                 user_json["password"]
             )
+            email_success = bool(self.confirmation_service.send_confirmation_email(new_user.id))
             expires = datetime.timedelta(days=30)
             access_token = create_access_token(identity=new_user.id, expires_delta=expires, fresh=True)
             return {
                        "user": self.user_schema.dump(new_user),
-                       "accessToken": access_token
+                       "accessToken": access_token,
+                       "confirmationEmailSent": email_success
                    }, 201
         except Exception as e:
             return get_error(500, str(e), field="general")

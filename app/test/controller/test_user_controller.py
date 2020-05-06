@@ -9,7 +9,7 @@ from app.main.db import db
 
 
 class TestUserController(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.client = flask_test_client(services_for_test(user=UserService()))
         self.service = UserService()
         db.create_all()
@@ -23,7 +23,7 @@ class TestUserController(unittest.TestCase):
         login_data = json.loads(response.data)
         return login_data["accessToken"]
 
-    def test_register_user_post(self):
+    def test_register_user_post(self) -> None:
         response = self.client.post('/register', data=json.dumps(dict(
             email='email@email.com',
             username='username',
@@ -37,6 +37,7 @@ class TestUserController(unittest.TestCase):
         assert new_user["isAnalyst"] is False
         assert new_user["isConfirmed"] is False
         assert response.status_code == 201
+        assert data["confirmationEmailSent"] is True
 
         # underscores are valid in username
         response = self.client.post('/register', data=json.dumps(dict(
@@ -99,7 +100,7 @@ class TestUserController(unittest.TestCase):
         assert data["errors"][0]["username"] == [get_text("username_invalid")]
         assert response.status_code == 400
 
-    def test_get_user(self):
+    def test_get_user(self) -> None:
         # create users
         self.service.save_new_user("email1@email.com", "username1", "password")
         self.service.save_new_user("email2@email.com", "username2", "password")
@@ -113,7 +114,8 @@ class TestUserController(unittest.TestCase):
 
         # get by id
         response = self.client.get(
-            '/user/1', headers={'Authorization': 'Bearer {}'.format(access_token)}
+            '/user/1',
+            headers={'Authorization': 'Bearer {}'.format(access_token)}
         )
         user = json.loads(response.data)
         assert user["username"] == "username1"
@@ -121,7 +123,8 @@ class TestUserController(unittest.TestCase):
 
         # get by username
         response = self.client.get(
-            '/user/username2', headers={'Authorization': 'Bearer {}'.format(access_token)}
+            '/user/username2',
+            headers={'Authorization': 'Bearer {}'.format(access_token)}
         )
         user = json.loads(response.data)
         assert user["username"] == "username2"
@@ -129,13 +132,14 @@ class TestUserController(unittest.TestCase):
 
         # user not found
         response = self.client.get(
-            '/user/nonexistent-user', headers={'Authorization': 'Bearer {}'.format(access_token)}
+            '/user/nonexistent-user',
+            headers={'Authorization': 'Bearer {}'.format(access_token)}
         )
         data = json.loads(response.data)
         assert data["errors"][0]["detail"] == get_text("not_found").format("User")
         assert response.status_code == 404
 
-    def test_edit_user_put(self):
+    def test_edit_user_put(self) -> None:
         self.service.save_new_user("email@email.com", "username", "password")
         self.service.save_new_user("email2@email.com", "username2", "password")
 
@@ -188,7 +192,7 @@ class TestUserController(unittest.TestCase):
         assert updated_user["prefersDarkmode"] is True
         assert response.status_code == 201
 
-    def test_login_user_post(self):
+    def test_login_user_post(self) -> None:
         self.service.save_new_user("email@email.com", "username", "password")
 
         # login with username
@@ -237,7 +241,7 @@ class TestUserController(unittest.TestCase):
         assert data["errors"][0]["detail"] == get_text("incorrect_fields")
         assert response.status_code == 400
 
-    def test_image_upload_post(self):
+    def test_image_upload_post(self) -> None:
         self.service.save_new_user("email@email.com", "username", "password")
 
         data = {
@@ -284,6 +288,6 @@ class TestUserController(unittest.TestCase):
         data = json.loads(response.data)
         assert response.status_code == 400
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         db.session.remove()
         db.drop_all()

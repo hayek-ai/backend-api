@@ -18,7 +18,7 @@ class TestUserService(unittest.TestCase):
         assert new_user.password_hash != "password"
         assert str(type(new_user.most_recent_confirmation)) == "<class 'app.main.model.confirmation.ConfirmationModel'>"
 
-    def test_get_all_users(self):
+    def test_get_all_users(self) -> None:
         self.service.save_new_user("user1@email.com", "user1", "password")
         self.service.save_new_user("user2@email.com", "user2", "password")
         self.service.save_new_user("user3@email.com", "user3", "password")
@@ -29,7 +29,7 @@ class TestUserService(unittest.TestCase):
         assert users[1].username == "user2"
         assert users[2].username == "user3"
 
-    def test_get_user_by_id(self):
+    def test_get_user_by_id(self) -> None:
         self.service.save_new_user("user1@email.com", "user1", "password")
         self.service.save_new_user("user2@email.com", "user2", "password")
 
@@ -42,7 +42,7 @@ class TestUserService(unittest.TestCase):
         user = self.service.get_user_by_id(3)
         assert user is None
 
-    def test_get_user_by_username(self):
+    def test_get_user_by_username(self) -> None:
         self.service.save_new_user("user1@email.com", "user1", "password")
         self.service.save_new_user("user2@email.com", "user2", "password")
 
@@ -59,7 +59,7 @@ class TestUserService(unittest.TestCase):
         user = self.service.get_user_by_username("USER1")
         assert user.username == "user1"
 
-    def test_get_user_by_email(self):
+    def test_get_user_by_email(self) -> None:
         self.service.save_new_user("user1@email.com", "user1", "password")
         self.service.save_new_user("user2@email.com", "user2", "password")
 
@@ -76,11 +76,6 @@ class TestUserService(unittest.TestCase):
         user = self.service.get_user_by_email("USER2@email.com")
         assert user.username == "user2"
 
-    def test_send_confirmation_email(self):
-        self.service.save_new_user("michaelmcguiness123@gmail.com", "user1", "password")
-        response = self.service.send_confirmation_email(1)
-        assert response.status_code == 200
-
-    def tearDown(self):
+    def tearDown(self) -> None:
         db.session.remove()
         db.drop_all()

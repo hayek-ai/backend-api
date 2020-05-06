@@ -3,6 +3,7 @@
   "incorrect_fields": "Incorrect fields.",
   "not_found": "{} not found.",
   "invalid_file_extension": "File extension is invaild.",
+  "env_fail": "Couldn't load {} from ENV.",
 
   "email_exists": "A user with that email address already exists",
   "username_exists": "A user with that username already exists",
@@ -10,8 +11,11 @@
   "username_invalid": "Username cannot contain spaces or special symbols (use the underscore '_' instead of spaces).  It also cannot be more than 20 characters long.",
   "user_invalid_credentials": "Invalid credentials.",
   "unauthorized_user_edit": "Users are only permitted to edit their own account details.",
+  "user_confirmed": "User has been confirmed successfully.",
+  "user_already_confirmed": "User is already confirmed.",
+  "confirmation_code_expired": "That confirmation code has expired.",
+  "incorrect_confirmation_code": "That confirmation code is incorrect.",
+  "confirmation_resend_successful": "Confirmation email successfully resent.",
 
-  "mailgun_failed_load_api_key": "Failed to load MailGun API key.",
-  "mailgun_failed_load_domain": "Failed to load MailGun domain.",
-  "mailgun_error_send_email": "Error in sending confirmation email, user registration failed."
-}
+  "error_sending_email": "There was an error trying to send the email."
+  }
