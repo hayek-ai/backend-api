@@ -1,4 +1,3 @@
-import datetime
 import json
 from flask_restful import Resource, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
@@ -8,7 +7,6 @@ from app.main.libs.strings import get_text
 from app.main.libs.util import get_error
 from app.main.schema.idea_schema import (
     idea_schema,
-    idea_list_schema,
     new_idea_schema,
     idea_with_report_schema)
 
@@ -68,13 +66,16 @@ class Idea(Resource):
 class DownloadReport(Resource):
     def __init__(self, **kwargs):
         self.idea_service = kwargs["idea_service"]
+        self.download_service = kwargs["download_service"]
         self.idea_with_report_schema = idea_with_report_schema
 
     @jwt_required
     def get(self, idea_id: int):
+        user_id = get_jwt_identity()
         idea = self.idea_service.get_idea_by_id(idea_id)
         if not idea:
             return get_error(404, get_text("not_found").format("Idea"))
+        self.download_service.save_new_download(user_id=user_id, idea_id=idea.id)
         idea.num_downloads = idea.num_downloads + 1
         self.idea_service.save_changes(idea)
         return self.idea_with_report_schema.dump(idea), 200

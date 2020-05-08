@@ -3,6 +3,7 @@ import json
 from app.test.conftest import flask_test_client, services_for_test, mock_mailgun_send_email
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService
+from app.main.service.download_service import DownloadService
 from app.main.db import db
 from app.main.libs.util import create_image_file
 
@@ -11,9 +12,11 @@ mock_mailgun_send_email()
 
 class TestIdeaController(unittest.TestCase):
     def setUp(self) -> None:
-        self.client = flask_test_client(services_for_test(user=UserService(), idea=IdeaService()))
+        self.client = flask_test_client(services_for_test(
+            user=UserService(), idea=IdeaService(), download=DownloadService()))
         self.user_service = UserService()
         self.idea_service = IdeaService()
+        self.download_service = DownloadService()
         db.create_all()
 
     def create_analyst(self, email, username) -> str:
@@ -212,6 +215,16 @@ class TestIdeaController(unittest.TestCase):
         assert response_data["thesisSummary"] == "Test Thesis Summary"
         assert response_data["fullReport"] == "Test Full Report"
         assert "exhibits" in response_data
+        assert response_data["numDownloads"] == 1
+        download = self.download_service.get_download_by_id(1)
+        assert download.user_id == 1
+        assert download.idea_id == idea_id
+        count = self.download_service.get_idea_download_count(idea_id)
+        assert count == 1
+        count = self.download_service.get_user_download_count(1)
+        assert count == 1
+        count = self.download_service.get_analyst_download_count(1)
+        assert count == 1
 
     def tearDown(self) -> None:
         db.session.remove()

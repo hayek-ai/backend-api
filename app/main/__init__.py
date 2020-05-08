@@ -18,6 +18,7 @@ from app.main.controller.idea_controller import NewIdea, Idea, DownloadReport
 from app.main.service.user_service import UserService
 from app.main.service.confirmation_service import ConfirmationService
 from app.main.service.idea_service import IdeaService
+from app.main.service.download_service import DownloadService
 
 
 def create_app(services, config_name):
@@ -65,5 +66,7 @@ def create_app(services, config_name):
     api.add_resource(Idea, '/idea/<int:idea_id>',
                      resource_class_kwargs={'idea_service': services['idea']})
     api.add_resource(DownloadReport, '/idea/<int:idea_id>/download',
-                     resource_class_kwargs={'idea_service': services['idea']})
+                     resource_class_kwargs={
+                         'idea_service': services['idea'],
+                         'download_service': services['download']})
     return app
