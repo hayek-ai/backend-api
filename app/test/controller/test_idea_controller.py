@@ -1,10 +1,13 @@
 import unittest
 import json
-from app.test.conftest import flask_test_client, services_for_test
+from app.test.conftest import flask_test_client, services_for_test, mock_mailgun_send_email
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService
 from app.main.db import db
 from app.main.libs.util import create_image_file
+
+mock_mailgun_send_email()
+
 
 class TestIdeaController(unittest.TestCase):
     def setUp(self) -> None:

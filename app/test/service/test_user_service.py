@@ -5,6 +5,10 @@ from app.main.db import db
 from app.test.conftest import flask_test_client
 from app.main.libs.s3 import S3
 from app.main.libs.util import create_image_file
+from app.test.conftest import mock_mailgun_send_email
+
+mock_mailgun_send_email()
+
 
 class TestUserService(unittest.TestCase):
     def setUp(self) -> None:
@@ -22,7 +26,7 @@ class TestUserService(unittest.TestCase):
         assert str(type(new_user.most_recent_confirmation)) == "<class 'app.main.model.confirmation.ConfirmationModel'>"
 
         # try creating analyst
-        new_analyst = self.service\
+        new_analyst = self.service \
             .save_new_user("email2@email.com", "analyst", "password", is_analyst=True)
         assert new_analyst.is_analyst is True
 

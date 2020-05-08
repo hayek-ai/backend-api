@@ -8,6 +8,10 @@ from app.main.db import db
 from app.test.conftest import flask_test_client
 from app.main.libs.s3 import S3
 from app.main.libs.util import create_image_file
+from app.test.conftest import mock_mailgun_send_email
+
+mock_mailgun_send_email()
+
 
 class TestIdeaService(unittest.TestCase):
     def setUp(self) -> None:
@@ -17,7 +21,7 @@ class TestIdeaService(unittest.TestCase):
         db.create_all()
 
     def test_save_new_idea(self) -> None:
-        analyst = self.user_service\
+        analyst = self.user_service \
             .save_new_user("email@email.com", "analyst", "password", is_analyst=True)
 
         exhibit1 = create_image_file("testexhibit1.png", "image/png")
@@ -67,7 +71,7 @@ class TestIdeaService(unittest.TestCase):
         assert response_dict["title"] == "Title"
 
     def test_get_idea_by_id(self) -> None:
-        analyst = self.user_service\
+        analyst = self.user_service \
             .save_new_user("email@email.com", "analyst", "password", is_analyst=True)
 
         new_idea_dict = self.idea_service.save_new_idea(
@@ -88,7 +92,7 @@ class TestIdeaService(unittest.TestCase):
         assert idea is None
 
     def test_query_ideas(self) -> None:
-        analyst1 = self.user_service\
+        analyst1 = self.user_service \
             .save_new_user("email1@email.com", "analyst1", "password", is_analyst=True)
         idea1_dict = self.idea_service.save_new_idea(
             analyst_id=analyst1.id,
@@ -101,7 +105,7 @@ class TestIdeaService(unittest.TestCase):
         )
         idea1 = idea1_dict["idea"]
 
-        analyst2 = self.user_service\
+        analyst2 = self.user_service \
             .save_new_user("email2@email.com", "analyst2", "password", is_analyst=True)
         idea2_dict = self.idea_service.save_new_idea(
             analyst_id=analyst2.id,
