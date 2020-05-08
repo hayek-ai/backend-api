@@ -1,20 +1,14 @@
 import unittest
 
-import requests_mock
-
 from app.main.libs.email import Email
+from app.test.conftest import mock_mailgun_send_email
 
-MAILGUN_URL = 'https://api.mailgun.net/v3/sandboxc3e6b65541ae41bc8bf153f612aa0b0d.mailgun.org/messages'
+mock_mailgun_send_email()
 
 
 class TestEmailLib(unittest.TestCase):
     @classmethod
-    @requests_mock.Mocker()
-    def test_send_email(cls, mock_requests):
-        mock_requests.post(
-            MAILGUN_URL,
-            text='resp')
-
+    def test_send_email(cls):
         email = "michaelmcguiness123@gmail.com"
         subject = "Test Subject"
         text = "Test Text"

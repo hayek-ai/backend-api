@@ -1,6 +1,10 @@
 from unittest.mock import create_autospec
-from app.main import create_app
+
+import requests
+import requests_mock
+
 import app
+from app.main import create_app
 
 
 def services_for_test(user=None, confirmation=None, idea=None):
@@ -17,3 +21,10 @@ def flask_test_client(services=None, environment="testing"):
     application.app_context().push()
     return application.test_client()
 
+
+def mock_mailgun_send_email():
+    adapter = requests_mock.Adapter()
+    MAILGUN_URL = 'https://api.mailgun.net/v3/sandboxc3e6b65541ae41bc8bf153f612aa0b0d.mailgun.org/messages'
+    adapter.register_uri('POST', MAILGUN_URL, text='resp')
+    session = requests.Session()
+    session.mount('https://', adapter)

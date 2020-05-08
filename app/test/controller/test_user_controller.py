@@ -1,11 +1,14 @@
-import unittest
 import json
-from app.test.conftest import flask_test_client, services_for_test
-from app.main.libs.strings import get_text
+import unittest
+
+from app.main.db import db
 from app.main.libs.s3 import S3
+from app.main.libs.strings import get_text
 from app.main.libs.util import create_image_file
 from app.main.service.user_service import UserService
-from app.main.db import db
+from app.test.conftest import flask_test_client, services_for_test, mock_mailgun_send_email
+
+mock_mailgun_send_email()
 
 
 class TestUserController(unittest.TestCase):
