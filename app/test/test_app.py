@@ -11,7 +11,7 @@ class TestEndpointsConfiguration(unittest.TestCase):
             endpoints.append(str(rule))
         self.endpoints = endpoints
 
-    def test_register_endpoint_configured(self):
+    def test_endpoints_are_configured(self):
         assert '/register' in self.endpoints
         assert '/login' in self.endpoints
         assert '/upload-profile-image' in self.endpoints
