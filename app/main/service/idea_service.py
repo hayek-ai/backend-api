@@ -1,33 +1,88 @@
 import datetime
-from typing import List
+import json
+from typing import List, TextIO
 from sqlalchemy import or_, and_, func
 
+from app.main.libs.s3 import S3
+from app.main.libs.stock import Stock, StockException
+from app.main.libs.strings import get_text
 from app.main.db import db
 from app.main.model.user import UserModel
 from app.main.model.idea import IdeaModel
+from app.main.service.user_service import UserService
 
 
 class IdeaService:
     def save_new_idea(self, analyst_id: int, symbol: str, position_type: str,
-                      price_target: float, company_name: str, market_cap: int,
-                      sector: str, entry_price: float, last_price: float,
-                      thesis_summary: str, full_report: str, exhibits=None):
+                      price_target: float, entry_price: float, thesis_summary: str,
+                      full_report: str, exhibits=[], exhibit_title_map=None):
+        analyst = UserService.get_user_by_id(analyst_id)
+        stock_data = {}
+        try:
+            stock_data.update(Stock.fetch_company_info(symbol))
+            stock_data.update(Stock.fetch_stock_quote(symbol))
+        except StockException as e:
+            return {"error": str(e)}
+
+        # make sure the price isn't too far off from what API says before committing
+        if abs(float(entry_price) - stock_data["latestPrice"])/stock_data["latestPrice"] > 0.01:
+            return {"error": get_text("incorrect_price")}
+
+        exhibit_dict_list = []
+        for image_file in exhibits:
+            title = exhibit_title_map[image_file.filename]
+            image_extension = image_file.filename.split('.')[len(image_file.filename.split(".")) - 1]
+            suffix = datetime.datetime.now().strftime("%y%m%d-%H%M%S")
+            title_for_url = title.replace(" ", "-")
+            filename = f"{analyst.username}-{symbol}-{title_for_url}-{suffix}.{image_extension}"
+            response_dict = self.upload_exhibit(title, filename, image_file)
+            if "error" in response_dict:
+                return {"error": response_dict["error"]}
+            exhibit_dict_list.append(response_dict)
+
+        exhibit_dict_list = json.dumps(exhibit_dict_list)
+
         new_idea = IdeaModel(
             analyst_id=analyst_id,
             symbol=symbol.upper(),
             position_type=position_type.lower(),
             price_target=price_target,
-            company_name=company_name,
-            market_cap=market_cap,
-            sector=sector.lower(),
+            company_name=stock_data["companyName"],
+            market_cap=stock_data["marketCap"],
+            sector=stock_data["sector"].lower(),
             entry_price=entry_price,
-            last_price=last_price,
+            last_price=stock_data["latestPrice"],
             thesis_summary=thesis_summary,
             full_report=full_report,
-            exhibits=exhibits
+            exhibits=exhibit_dict_list
         )
         self.save_changes(new_idea)
-        return new_idea
+
+        # update analyst idea count
+        analyst.num_ideas = analyst.num_ideas + 1
+        self.save_changes(analyst)
+        return {"idea": new_idea}
+
+    @classmethod
+    def upload_exhibit(cls, title: str, filename, image: TextIO):
+        client = S3.get_client()
+        try:
+            # upload file to S3 bucket
+            client.put_object(
+                ACL="public-read",
+                Body=image,
+                Bucket=S3.S3_BUCKET,
+                Key=f"report_exhibits/{filename}",
+                ContentType=image.content_type
+            )
+        except Exception as e:
+            return {"error": str(e)}
+
+        exhibit_dict = {
+            "url": f"{S3.S3_ENDPOINT_URL}/report_exhibits/{filename}",
+            "title": title
+        }
+        return exhibit_dict
 
     @classmethod
     def get_idea_by_id(cls, idea_id: int) -> "IdeaModel":
@@ -65,26 +120,25 @@ class IdeaService:
         sector_filter = []
         if "sector" in query_string:
             sector_list = query_string['sector']
-            if len(sector_list) > 0:
-                for sector in sector_list:
-                    sector_filter.append(func.lower(IdeaModel.sector) == sector.lower())
+            for sector in sector_list:
+                sector = sector.strip().lower()
+                sector_filter.append(func.lower(IdeaModel.sector) == sector)
 
         market_cap_filter = []
         if "marketCap" in query_string:
             market_cap_list = query_string["marketCap"]
-            if len(market_cap_list) > 0:
-                for market_cap in market_cap_list:
-                    market_cap = market_cap.strip().lower()
-                    if market_cap == "mega":
-                        market_cap_filter.append(IdeaModel.market_cap >= 200000000000)
-                    if market_cap == "large":
-                        market_cap_filter.append(IdeaModel.market_cap.between(10000000000, 200000000000))
-                    if market_cap == "medium":
-                        market_cap_filter.append(IdeaModel.market_cap.between(2000000000, 10000000000))
-                    if market_cap == "small":
-                        market_cap_filter.append(IdeaModel.market_cap.between(300000000, 2000000000))
-                    if market_cap == "micro":
-                        market_cap_filter.append(IdeaModel.market_cap <= 300000000)
+            for market_cap in market_cap_list:
+                market_cap = market_cap.strip().lower()
+                if market_cap == "mega":
+                    market_cap_filter.append(IdeaModel.market_cap >= 200000000000)
+                if market_cap == "large":
+                    market_cap_filter.append(IdeaModel.market_cap.between(10000000000, 200000000000))
+                if market_cap == "medium":
+                    market_cap_filter.append(IdeaModel.market_cap.between(2000000000, 10000000000))
+                if market_cap == "small":
+                    market_cap_filter.append(IdeaModel.market_cap.between(300000000, 2000000000))
+                if market_cap == "micro":
+                    market_cap_filter.append(IdeaModel.market_cap <= 300000000)
 
         filters = and_(
             or_(*analyst_filter),

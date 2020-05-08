@@ -4,6 +4,7 @@
   "not_found": "{} not found.",
   "invalid_file_extension": "File extension is invaild.",
   "env_fail": "Couldn't load {} from ENV.",
+  "error_sending_email": "There was an error trying to send the email.",
 
   "email_exists": "A user with that email address already exists",
   "username_exists": "A user with that username already exists",
@@ -17,7 +18,7 @@
   "incorrect_confirmation_code": "That confirmation code is incorrect.",
   "confirmation_resend_successful": "Confirmation email successfully resent.",
 
-  "error_sending_email": "There was an error trying to send the email.",
-
-  "invalid_position_type": "Position type can be either 'long' or 'short' "
+  "not_an_analyst": "Only analysts can upload ideas.",
+  "invalid_position_type": "Position type can be either 'long' or 'short'",
+  "incorrect_price": "That price doesn't match our records"
   }

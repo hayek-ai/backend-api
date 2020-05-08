@@ -5,9 +5,15 @@ from app.main.libs.strings import get_text
 from app.main.libs.util import camelcase
 from app.main.ma import ma
 from app.main.model.idea import IdeaModel
+from app.main.schema.user_schema import UserSchema
 
 
 class IdeaSchema(ma.SQLAlchemyAutoSchema):
+    analyst = ma.Nested(lambda: UserSchema(only=(
+        'id', 'username', "image_url", "num_ideas", "analyst_rank",
+        "analyst_rank_percentile", 'avg_return', 'success_rate',
+        'avg_holding_period', "review_star_total", "num_reviews")))
+
     class Meta:
         model = IdeaModel
         include_fk = True
@@ -19,17 +25,17 @@ class IdeaSchema(ma.SQLAlchemyAutoSchema):
 
 class NewIdeaSchema(Schema):
     symbol = fields.Str(required=True, validate=Length(min=1, max=10))
-    position_type = fields.Str(required=True, validate=Length(min=1))
-    price_target = fields.Float(required=True, validate=Range(min=0))
-    entry_price = fields.Float(required=True, validate=Range(min=0))
-    last_price = fields.Float(required=True, validate=Range(min=0))
-    thesis_summary = fields.Str(required=True, validate=Length(min=1))
-    full_report = fields.Str(required=True, validate=Length(min=1))
+    positionType = fields.Str(required=True, validate=Length(min=1))
+    priceTarget = fields.Float(required=True, validate=Range(min=0))
+    entryPrice = fields.Float(required=True, validate=Range(min=0))
+    thesisSummary = fields.Str(required=True, validate=Length(min=1))
+    fullReport = fields.Str(required=True, validate=Length(min=1))
+    exhibitTitleMap = fields.Str()
 
-    @validates('position_type')
+    @validates('positionType')
     def must_be_long_or_short(self, value):
         position_type = value.strip().lower()
-        if position_type != "long" or position_type != "short":
+        if position_type != "long" and position_type != "short":
             raise ValidationError(get_text("invalid_position_type"))
 
 

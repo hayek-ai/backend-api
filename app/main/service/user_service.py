@@ -1,7 +1,8 @@
-from typing import List
+from typing import List, TextIO
 from sqlalchemy import func
 
 from app.main.db import db
+from app.main.libs.s3 import S3
 from app.main.model.user import UserModel
 from app.main.model.confirmation import ConfirmationModel
 
@@ -35,6 +36,27 @@ class UserService:
     @classmethod
     def get_user_by_email(cls, email: str) -> "UserModel":
         return UserModel.query.filter(func.lower(UserModel.email) == email.lower()).first()
+
+    def change_user_image(self, user_id: int, image: TextIO, filename: str) -> str:
+        client = S3.get_client()
+
+        try:
+            # upload file to s3 bucket
+            client.put_object(
+                ACL="public-read",
+                Body=image,
+                Bucket=S3.S3_BUCKET,
+                Key=f"user_images/{filename}",
+                ContentType=image.content_type
+            )
+        except Exception as e:
+            return {"error": str(e)}
+
+        # update user profile image
+        user = self.get_user_by_id(user_id)
+        user.image_url = f"{S3.S3_ENDPOINT_URL}/user_images/{filename}"
+        self.save_changes(user)
+        return {"imageUrl": user.image_url}
 
     @classmethod
     def save_changes(cls, data) -> None:

@@ -3,7 +3,6 @@ import datetime
 from flask_restful import Resource, request
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
-from app.main.libs.s3 import S3
 from app.main.libs.strings import get_text
 from app.main.libs.util import get_error
 from app.main.schema.user_schema import user_schema, user_register_schema, user_login_schema
@@ -136,27 +135,15 @@ class UploadProfileImage(Resource):
 
         try:
             # get file and rename
-            image_file = request.files['file']
-            client = S3.get_client()
-            image_extension = image_file.filename.split('.')[len(image_file.filename.split(".")) - 1]
+            image = request.files['file']
+            image_extension = image.filename.split('.')[len(image.filename.split(".")) - 1]
             valid_extensions = ['jpg', 'png', 'jpeg']
             if image_extension not in valid_extensions:
                 return get_error(400, get_text("invalid_file_extension"))
-
             filename = f"{user.username}-profile-image.{image_extension}"
-
-            # update user profile image
-            user.image_url = f"{S3.S3_ENDPOINT_URL}/user_images/{filename}"
-            self.user_service.save_changes(user)
-
-            # upload file to s3 bucket
-            client.put_object(
-                ACL="public-read",
-                Body=image_file,
-                Bucket=S3.S3_BUCKET,
-                Key=f"user_images/{filename}",
-                ContentType=image_file.content_type
-            )
-            return {"imageUrl": user.image_url}, 201
+            response_dict = self.user_service.change_user_image(user_id, image, filename)
+            if "error" in response_dict:
+                return get_error(500, response_dict["error"])
+            return response_dict, 201
         except Exception as e:
             return get_error(400, str(e))

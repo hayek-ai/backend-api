@@ -1,10 +1,13 @@
 import unittest
 import datetime
+import io
+import json
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService
 from app.main.db import db
 from app.test.conftest import flask_test_client
-
+from app.main.libs.s3 import S3
+from app.main.libs.util import create_image_file
 
 class TestIdeaService(unittest.TestCase):
     def setUp(self) -> None:
@@ -16,33 +19,39 @@ class TestIdeaService(unittest.TestCase):
     def test_save_new_idea(self) -> None:
         analyst = self.user_service\
             .save_new_user("email@email.com", "analyst", "password", is_analyst=True)
-        new_idea = self.idea_service.save_new_idea(
+
+        exhibit1 = create_image_file("testexhibit1.png", "image/png")
+        exhibit2 = create_image_file("testexhibit2.jpg", "image/jpg")
+
+        new_idea_dict = self.idea_service.save_new_idea(
             analyst_id=analyst.id,
             symbol="AAPL",
             position_type="long",
             price_target=400,
-            company_name="Apple, Inc.",
-            market_cap=1303162664400,
-            sector="Technology",
-            entry_price=300.66,
-            last_price=300.66,
+            entry_price=303.74,
             thesis_summary="My Thesis Summary",
             full_report="My Full Report",
-            exhibits="Serialized list of URLs to S3 image assets"
+            exhibits=[exhibit1, exhibit2],
+            exhibit_title_map={"testexhibit1.png": "Exhibit 1", "testexhibit2.jpg": "Exhibit 2"}
         )
-
+        new_idea = new_idea_dict["idea"]
         assert new_idea.analyst_id == analyst.id
         assert new_idea.symbol == "AAPL"
         assert new_idea.position_type == "long"
         assert new_idea.price_target == 400
         assert new_idea.company_name == "Apple, Inc."
-        assert new_idea.market_cap == 1303162664400
+        assert new_idea.market_cap > 500000000000
         assert new_idea.sector == "technology"
-        assert new_idea.entry_price == 300.66
-        assert new_idea.last_price == 300.66
+        assert new_idea.entry_price == 303.74
+        # entry price withing 1% of last price
+        assert abs(new_idea.last_price - new_idea.entry_price) / new_idea.last_price < 0.01
         assert new_idea.thesis_summary == "My Thesis Summary"
         assert new_idea.full_report == "My Full Report"
-        assert new_idea.exhibits == "Serialized list of URLs to S3 image assets"
+        exhibits = json.loads(new_idea.exhibits)
+        assert f"{S3.S3_ENDPOINT_URL}/report_exhibits/" in exhibits[0]["url"]
+        assert exhibits[0]["title"] == "Exhibit 1"
+        assert f"{S3.S3_ENDPOINT_URL}/report_exhibits/" in exhibits[1]["url"]
+        assert exhibits[1]["title"] == "Exhibit 2"
         assert new_idea.score == 0
         assert new_idea.num_upvotes == 0
         assert new_idea.num_downvotes == 0
@@ -51,25 +60,28 @@ class TestIdeaService(unittest.TestCase):
         assert new_idea.created_at < datetime.datetime.utcnow()
         assert str(type(new_idea.analyst)) == "<class 'app.main.model.user.UserModel'>"
 
+    def test_upload_exhibit(self):
+        image = create_image_file("test.png", "image/png")
+        response_dict = self.idea_service.upload_exhibit("Title", "test.png", image)
+        assert response_dict["url"] == f"{S3.S3_ENDPOINT_URL}/report_exhibits/test.png"
+        assert response_dict["title"] == "Title"
+
     def test_get_idea_by_id(self) -> None:
         analyst = self.user_service\
             .save_new_user("email@email.com", "analyst", "password", is_analyst=True)
-        new_idea = self.idea_service.save_new_idea(
+
+        new_idea_dict = self.idea_service.save_new_idea(
             analyst_id=analyst.id,
             symbol="AAPL",
             position_type="long",
             price_target=400,
-            company_name="Apple, Inc.",
-            market_cap=1303162664400,
-            sector="Technology",
-            entry_price=300.66,
-            last_price=300.66,
+            entry_price=303.74,
             thesis_summary="My Thesis Summary",
-            full_report="My Full Report",
-            exhibits="Serialized list of URLs to S3 image assets"
+            full_report="My Full Report"
         )
-        idea = self.idea_service.get_idea_by_id(new_idea.id)
-        assert idea.id == new_idea.id
+        new_idea = new_idea_dict["idea"]
+        idea_in_db = self.idea_service.get_idea_by_id(new_idea.id)
+        assert idea_in_db.id == new_idea.id
 
         # if idea doesn't exist
         idea = self.idea_service.get_idea_by_id(3)
@@ -78,36 +90,29 @@ class TestIdeaService(unittest.TestCase):
     def test_query_ideas(self) -> None:
         analyst1 = self.user_service\
             .save_new_user("email1@email.com", "analyst1", "password", is_analyst=True)
-        idea1 = self.idea_service.save_new_idea(
+        idea1_dict = self.idea_service.save_new_idea(
             analyst_id=analyst1.id,
             symbol="AAPL",
             position_type="long",
             price_target=400,
-            company_name="Apple, Inc.",
-            market_cap=1303162664400,
-            sector="Technology",
-            entry_price=300.66,
-            last_price=300.66,
+            entry_price=303.74,
             thesis_summary="My Thesis Summary",
             full_report="My Full Report",
-            exhibits="Serialized list of URLs to S3 image assets"
         )
+        idea1 = idea1_dict["idea"]
+
         analyst2 = self.user_service\
             .save_new_user("email2@email.com", "analyst2", "password", is_analyst=True)
-        idea2 = self.idea_service.save_new_idea(
+        idea2_dict = self.idea_service.save_new_idea(
             analyst_id=analyst2.id,
             symbol="GM",
             position_type="short",
             price_target=10,
-            company_name="General Motors Company",
-            market_cap=31000000000,
-            sector="Industrials",
-            entry_price=21.89,
-            last_price=21.89,
+            entry_price=22.44,
             thesis_summary="My Thesis Summary",
             full_report="My Full Report",
-            exhibits="Serialized list of URLs to S3 image assets"
         )
+        idea2 = idea2_dict["idea"]
 
         # no filters
         ideas = self.idea_service.query_ideas()
@@ -124,12 +129,12 @@ class TestIdeaService(unittest.TestCase):
         assert ideas[0].symbol == "GM"
 
         # filter by sector
-        ideas = self.idea_service.query_ideas(query_string={"sector": ["Industrials"]})
+        ideas = self.idea_service.query_ideas(query_string={"sector": ["Consumer Discretionary"]})
         assert len(ideas) == 1
         assert ideas[0].symbol == "GM"
 
         # filter by multiple sectors
-        ideas = self.idea_service.query_ideas(query_string={"sector": ["Industrials", "Technology"]})
+        ideas = self.idea_service.query_ideas(query_string={"sector": ["Consumer Discretionary", "Technology"]})
         assert len(ideas) == 2
         assert ideas[0].symbol == "GM"
         assert ideas[1].symbol == "AAPL"

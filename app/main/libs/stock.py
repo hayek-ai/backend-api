@@ -38,7 +38,7 @@ class Stock:
         company_info = response.json()
 
         # rename sectors
-        sectorMap = {
+        sector_map = {
             "Electronic Technology": "Technology",
             "Technology Services": "Technology",
             "Distribution Services": "Communication Services",
@@ -62,18 +62,18 @@ class Stock:
             "Government": "Miscellaneous"
         }
 
-        # tagmap used for more granularity in labeling some sectors
+        # tag_map used for more granularity in labeling some sectors
         # if sector is mislabeled by IEX, use tagMap to fix
-        tagMap = {
+        tag_map = {
             "Aerospace & Defense": "Industrials",
             "Real Estate Development": "Real Estate",
             "Real Estate Investment Trusts": "Real Estate"
         }
 
-        company_info["sector"] = sectorMap[company_info["sector"]]
+        company_info["sector"] = sector_map[company_info["sector"]]
         for tag in company_info["tags"]:
-            if tag in tagMap:
-                company_info["sector"] = tagMap[tag]
+            if tag in tag_map:
+                company_info["sector"] = tag_map[tag]
 
         return company_info
 

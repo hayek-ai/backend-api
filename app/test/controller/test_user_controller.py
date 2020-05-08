@@ -1,9 +1,9 @@
 import unittest
 import json
-import io
 from app.test.conftest import flask_test_client, services_for_test
 from app.main.libs.strings import get_text
 from app.main.libs.s3 import S3
+from app.main.libs.util import create_image_file
 from app.main.service.user_service import UserService
 from app.main.db import db
 
@@ -244,9 +244,10 @@ class TestUserController(unittest.TestCase):
     def test_image_upload_post(self) -> None:
         self.service.save_new_user("email@email.com", "username", "password")
 
-        data = {
-            'file': (io.BytesIO(b"abcdef"), 'test.jpg')
-        }
+        image = create_image_file("test.jpg", "image/jpg")
+        data = dict(
+            file=(image, "test.jpg")
+        )
 
         # login
         access_token = self.login("username", "password")
@@ -264,7 +265,7 @@ class TestUserController(unittest.TestCase):
 
         # invalid file extension
         data = {
-            'file': (io.BytesIO(b"abcdef"), 'test.pdf')
+            'file': (create_image_file("test.pdf", "application/pdf"), "test.pdf")
         }
         response = self.client.post(
             '/upload-profile-image',
@@ -285,7 +286,6 @@ class TestUserController(unittest.TestCase):
             content_type="multipart/form-data",
             headers={'Authorization': 'Bearer {}'.format(access_token)}
         )
-        data = json.loads(response.data)
         assert response.status_code == 400
 
     def tearDown(self) -> None:

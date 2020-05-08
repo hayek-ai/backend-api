@@ -1,8 +1,10 @@
 import unittest
+import io
 from app.main.service.user_service import UserService
 from app.main.db import db
 from app.test.conftest import flask_test_client
-
+from app.main.libs.s3 import S3
+from app.main.libs.util import create_image_file
 
 class TestUserService(unittest.TestCase):
     def setUp(self) -> None:
@@ -81,6 +83,15 @@ class TestUserService(unittest.TestCase):
         # make sure case insensitive
         user = self.service.get_user_by_email("USER2@email.com")
         assert user.username == "user2"
+
+    def test_change_user_image(self) -> None:
+        user = self.service.save_new_user("user@email.com", "username", "password")
+        image = create_image_file("test.jpg", "image/jpg")
+        response_dict = self.service.change_user_image(user.id, image, "test.jpg")
+        assert response_dict["imageUrl"] == f"{S3.S3_ENDPOINT_URL}/user_images/test.jpg"
+
+        # make sure changes have been saved to user
+        assert user.image_url == response_dict["imageUrl"]
 
     def tearDown(self) -> None:
         db.session.remove()
