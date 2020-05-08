@@ -37,7 +37,7 @@ class TestIdeaController(unittest.TestCase):
             'symbol': "AAPL",
             "positionType": "long",
             "priceTarget": 400,
-            "entryPrice": 306.37,
+            "entryPrice": 309.93,
             "thesisSummary": "Test Thesis Summary",
             "fullReport": "Test Full Report",
             'exhibits': (exhibit1, "testexhibit1.png"),
@@ -60,7 +60,7 @@ class TestIdeaController(unittest.TestCase):
         assert response_data["companyName"] == "Apple, Inc."
         assert response_data["marketCap"] > 500000000000  # $500bn
         assert response_data["sector"].lower() == "technology"
-        assert response_data["entryPrice"] == 306.37
+        assert response_data["entryPrice"] == 309.93
         # entry price withing 1% of last price
         assert abs(response_data["lastPrice"] - response_data["entryPrice"]) / response_data["lastPrice"] < 0.01
         assert response_data["closedDate"] is None
@@ -82,7 +82,7 @@ class TestIdeaController(unittest.TestCase):
             'symbol': "AAPL",
             "positionType": "long",
             "priceTarget": 400,
-            "entryPrice": 306.37,
+            "entryPrice": 309.93,
             "thesisSummary": "Test Thesis Summary",
             "fullReport": "Test Full Report"
         }
@@ -155,7 +155,7 @@ class TestIdeaController(unittest.TestCase):
             'symbol': "AAPL",
             "positionType": "long",
             "priceTarget": 400,
-            "entryPrice": 306.37,
+            "entryPrice": 309.93,
             "thesisSummary": "Test Thesis Summary",
             "fullReport": "Test Full Report",
             'exhibits': (exhibit1, "testexhibit1.png"),
@@ -188,7 +188,7 @@ class TestIdeaController(unittest.TestCase):
             'symbol': "AAPL",
             "positionType": "long",
             "priceTarget": 400,
-            "entryPrice": 306.37,
+            "entryPrice": 309.93,
             "thesisSummary": "Test Thesis Summary",
             "fullReport": "Test Full Report",
             'exhibits': (exhibit1, "testexhibit1.png"),

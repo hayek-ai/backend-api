@@ -22,10 +22,11 @@ class IdeaModel(db.Model):
     num_downvotes = db.Column(db.Integer, default=0)
     num_comments = db.Column(db.Integer, default=0)
     num_downloads = db.Column(db.Integer, default=0)
+    thesis_summary = db.Column(db.String, nullable=False)
+    full_report = db.Column(db.String, nullable=False)
+    exhibits = db.Column(db.String)
 
     analyst_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     analyst = db.relationship("UserModel")
 
-    thesis_summary = db.Column(db.String, nullable=False)
-    full_report = db.Column(db.String, nullable=False)
-    exhibits = db.Column(db.String)
+
