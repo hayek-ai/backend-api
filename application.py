@@ -4,6 +4,7 @@ from app.main.service.user_service import UserService
 from app.main.service.confirmation_service import ConfirmationService
 from app.main.service.idea_service import IdeaService
 from app.main.service.download_service import DownloadService
+from app.main.service.follow_service import FollowService
 
 
 def create_services():
@@ -11,7 +12,8 @@ def create_services():
         "user": UserService(),
         "confirmation": ConfirmationService(),
         "idea": IdeaService(),
-        "download": DownloadService()
+        "download": DownloadService(),
+        "follow": FollowService()
     }
     return services
 

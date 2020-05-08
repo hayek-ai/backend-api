@@ -1,13 +1,7 @@
-import datetime
-import json
-from typing import List
-from sqlalchemy import or_, and_, func
-
 from app.main.db import db
-from app.main.model.user import UserModel
 from app.main.model.idea import IdeaModel
 from app.main.model.download import DownloadModel
-from sqlalchemy import or_, and_, func
+from sqlalchemy import and_
 
 
 class DownloadService:

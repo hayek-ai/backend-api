@@ -24,6 +24,7 @@ class UserModel(db.Model):
     # Analyst Data
     connected_stripe_acct_id = db.Column(db.String(80), unique=True)
     num_followers = db.Column(db.Integer, default=0)
+    num_following = db.Column(db.Integer, default=0)
     analyst_rank = db.Column(db.Integer, default=0)
     analyst_rank_percentile = db.Column(db.Float, default=0.0)
     num_ideas = db.Column(db.Integer, default=0)

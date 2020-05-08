@@ -1,12 +1,12 @@
 import unittest
 import datetime
-import json
 from app.main.db import db
 from app.test.conftest import flask_test_client
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService
 from app.main.service.download_service import DownloadService
 from app.main.model.idea import IdeaModel
+
 
 class TestDownloadService(unittest.TestCase):
     def setUp(self) -> None:
