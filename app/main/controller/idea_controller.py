@@ -6,15 +6,18 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from app.main.libs.strings import get_text
 from app.main.libs.util import get_error
-from app.main.schema.idea_schema import idea_schema, idea_list_schema, new_idea_schema
+from app.main.schema.idea_schema import (
+    idea_schema,
+    idea_list_schema,
+    new_idea_schema,
+    idea_with_report_schema)
 
 
 class NewIdea(Resource):
     def __init__(self, **kwargs):
         self.user_service = kwargs['user_service']
         self.idea_service = kwargs['idea_service']
-        self.idea_schema = idea_schema
-        self.idea_list_schema = idea_list_schema
+        self.idea_with_report_schema = idea_with_report_schema
         self.new_idea_schema = new_idea_schema
 
     @jwt_required
@@ -46,6 +49,32 @@ class NewIdea(Resource):
         )
         if "error" in new_idea_dict:
             return get_error(400, new_idea_dict["error"])
-        return self.idea_schema.dump(new_idea_dict["idea"]), 201
+        return self.idea_with_report_schema.dump(new_idea_dict["idea"]), 201
 
 
+class Idea(Resource):
+    def __init__(self, **kwargs):
+        self.idea_service = kwargs['idea_service']
+        self.idea_schema = idea_schema
+
+    @jwt_required
+    def get(self, idea_id: int):
+        idea = self.idea_service.get_idea_by_id(idea_id)
+        if not idea:
+            return get_error(404, get_text("not_found").format("Idea"))
+        return self.idea_schema.dump(idea), 200
+
+
+class DownloadReport(Resource):
+    def __init__(self, **kwargs):
+        self.idea_service = kwargs["idea_service"]
+        self.idea_with_report_schema = idea_with_report_schema
+
+    @jwt_required
+    def get(self, idea_id: int):
+        idea = self.idea_service.get_idea_by_id(idea_id)
+        if not idea:
+            return get_error(404, get_text("not_found").format("Idea"))
+        idea.num_downloads = idea.num_downloads + 1
+        self.idea_service.save_changes(idea)
+        return self.idea_with_report_schema.dump(idea), 200

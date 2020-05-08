@@ -12,7 +12,7 @@ from app.main.ma import ma
 # Controllers
 from app.main.controller.user_controller import UserRegister, UserLogin, User, UploadProfileImage
 from app.main.controller.confirmation_controller import Confirmation, ResendConfirmation
-from app.main.controller.idea_controller import NewIdea
+from app.main.controller.idea_controller import NewIdea, Idea, DownloadReport
 
 # Services
 from app.main.service.user_service import UserService
@@ -62,4 +62,8 @@ def create_app(services, config_name):
                      resource_class_kwargs={
                          'user_service': services["user"],
                          'idea_service': services['idea']})
+    api.add_resource(Idea, '/idea/<int:idea_id>',
+                     resource_class_kwargs={'idea_service': services['idea']})
+    api.add_resource(DownloadReport, '/idea/<int:idea_id>/download',
+                     resource_class_kwargs={'idea_service': services['idea']})
     return app

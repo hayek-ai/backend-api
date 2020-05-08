@@ -37,7 +37,7 @@ class TestIdeaController(unittest.TestCase):
             'symbol': "AAPL",
             "positionType": "long",
             "priceTarget": 400,
-            "entryPrice": 304.11,
+            "entryPrice": 306.37,
             "thesisSummary": "Test Thesis Summary",
             "fullReport": "Test Full Report",
             'exhibits': (exhibit1, "testexhibit1.png"),
@@ -60,7 +60,7 @@ class TestIdeaController(unittest.TestCase):
         assert response_data["companyName"] == "Apple, Inc."
         assert response_data["marketCap"] > 500000000000  # $500bn
         assert response_data["sector"].lower() == "technology"
-        assert response_data["entryPrice"] == 304.11
+        assert response_data["entryPrice"] == 306.37
         # entry price withing 1% of last price
         assert abs(response_data["lastPrice"] - response_data["entryPrice"]) / response_data["lastPrice"] < 0.01
         assert response_data["closedDate"] is None
@@ -82,7 +82,7 @@ class TestIdeaController(unittest.TestCase):
             'symbol': "AAPL",
             "positionType": "long",
             "priceTarget": 400,
-            "entryPrice": 304.11,
+            "entryPrice": 306.37,
             "thesisSummary": "Test Thesis Summary",
             "fullReport": "Test Full Report"
         }
@@ -146,6 +146,72 @@ class TestIdeaController(unittest.TestCase):
             headers={"Authorization": "Bearer {}".format(access_token)}
         )
         assert response.status_code == 400
+
+    def test_get_idea(self) -> None:
+        access_token = self.create_analyst("email@email.com", "username")
+        exhibit1 = create_image_file("testexhibit1.png", "image/png")
+        exhibit2 = create_image_file("testexhibit2.jpg", "image/jpg")
+        data = {
+            'symbol': "AAPL",
+            "positionType": "long",
+            "priceTarget": 400,
+            "entryPrice": 306.37,
+            "thesisSummary": "Test Thesis Summary",
+            "fullReport": "Test Full Report",
+            'exhibits': (exhibit1, "testexhibit1.png"),
+            'exhibits': (exhibit2, "testexhibit2.jpg"),
+            "exhibitTitleMap": '{"testexhibit1.png": "Exhibit 1", "testexhibit2.jpg": "Exhibit 2"}'
+        }
+        response = self.client.post(
+            '/new-idea',
+            data=data,
+            follow_redirects=True,
+            content_type="multipart/form-data",
+            headers={"Authorization": "Bearer {}".format(access_token)}
+        )
+        response_data = json.loads(response.data)
+        idea_id = response_data["id"]
+        response = self.client.get(
+            f'/idea/{idea_id}',
+            headers={"Authorization": "Bearer {}".format(access_token)})
+        response_data = json.loads(response.data)
+        assert response_data["symbol"] == "AAPL"
+        assert response_data["thesisSummary"] == "Test Thesis Summary"
+        assert "fullReport" not in response_data
+        assert "exhibits" not in response_data
+
+    def test_download_report(self) -> None:
+        access_token = self.create_analyst("email@email.com", "username")
+        exhibit1 = create_image_file("testexhibit1.png", "image/png")
+        exhibit2 = create_image_file("testexhibit2.jpg", "image/jpg")
+        data = {
+            'symbol': "AAPL",
+            "positionType": "long",
+            "priceTarget": 400,
+            "entryPrice": 306.37,
+            "thesisSummary": "Test Thesis Summary",
+            "fullReport": "Test Full Report",
+            'exhibits': (exhibit1, "testexhibit1.png"),
+            'exhibits': (exhibit2, "testexhibit2.jpg"),
+            "exhibitTitleMap": '{"testexhibit1.png": "Exhibit 1", "testexhibit2.jpg": "Exhibit 2"}'
+        }
+        response = self.client.post(
+            '/new-idea',
+            data=data,
+            follow_redirects=True,
+            content_type="multipart/form-data",
+            headers={"Authorization": "Bearer {}".format(access_token)}
+        )
+        response_data = json.loads(response.data)
+        idea_id = response_data["id"]
+        response = self.client.get(
+            f'/idea/{idea_id}/download',
+            headers={"Authorization": "Bearer {}".format(access_token)})
+        response_data = json.loads(response.data)
+        assert response_data["symbol"] == "AAPL"
+        assert response_data["thesisSummary"] == "Test Thesis Summary"
+        assert response_data["fullReport"] == "Test Full Report"
+        assert "exhibits" in response_data
 
     def tearDown(self) -> None:
         db.session.remove()

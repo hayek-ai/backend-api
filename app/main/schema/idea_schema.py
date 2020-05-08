@@ -39,6 +39,7 @@ class NewIdeaSchema(Schema):
             raise ValidationError(get_text("invalid_position_type"))
 
 
-idea_schema = IdeaSchema()
+idea_schema = IdeaSchema(exclude=("full_report", "exhibits"))
 idea_list_schema = IdeaSchema(many=True)
 new_idea_schema = NewIdeaSchema()
+idea_with_report_schema = IdeaSchema()
