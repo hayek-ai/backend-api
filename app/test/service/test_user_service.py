@@ -1,13 +1,13 @@
 import unittest
-import io
-from app.main.service.user_service import UserService
+
 from app.main.db import db
-from app.test.conftest import flask_test_client
 from app.main.libs.s3 import S3
 from app.main.libs.util import create_image_file
-from app.test.conftest import mock_mailgun_send_email
+from app.main.service.user_service import UserService
+from app.test.conftest import flask_test_client
+from app.test.conftest import register_mock_mailgun, requests_session
 
-mock_mailgun_send_email()
+register_mock_mailgun(requests_session())
 
 
 class TestUserService(unittest.TestCase):

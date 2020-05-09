@@ -5,6 +5,11 @@ import requests_mock
 
 import app
 from app.main import create_app
+from app.test.mock_responses import aapl_quote, aapl_company, aapl_chart, aapl_advanced_stats, aapl_alpha_advantage
+
+MAILGUN_URL = 'https://api.mailgun.net/v3/'
+IEX_URL = 'https://cloud.iexapis.com/v1/stock/AAPL'
+ALPHA_ADVANTAGE_URL = 'https://www.alphavantage.co/query?function=SYMBOL_SEARCH'
 
 
 def services_for_test(user=None, confirmation=None, idea=None, download=None, follow=None, review=None):
@@ -25,9 +30,33 @@ def flask_test_client(services=None, environment="testing"):
     return application.test_client()
 
 
-def mock_mailgun_send_email():
+def requests_session():
+    return requests.session()
+
+
+def register_mock_mailgun(session):
     adapter = requests_mock.Adapter()
-    MAILGUN_URL = 'https://api.mailgun.net/v3/sandboxc3e6b65541ae41bc8bf153f612aa0b0d.mailgun.org/messages'
+
     adapter.register_uri('POST', MAILGUN_URL, text='resp')
-    session = requests.Session()
+
+    session.mount('https://', adapter)
+
+
+def register_mock_iex(session):
+    adapter = requests_mock.Adapter()
+
+    # Register mock responses you want returned
+    adapter.register_uri('GET', IEX_URL + '/quote', json=aapl_quote)
+    adapter.register_uri('GET', IEX_URL + '/company', json=aapl_company)
+    adapter.register_uri('GET', IEX_URL + '/chart', json=aapl_chart)
+    adapter.register_uri('GET', IEX_URL + '/advanced-stats', json=aapl_advanced_stats)
+
+    session.mount('https://', adapter)
+
+
+def register_mock_alpha_advantage(session):
+    adapter = requests_mock.Adapter()
+
+    adapter.register_uri('GET', ALPHA_ADVANTAGE_URL + '&keywords=AAPL', json=aapl_alpha_advantage)
+
     session.mount('https://', adapter)

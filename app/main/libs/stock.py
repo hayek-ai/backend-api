@@ -18,7 +18,7 @@ class Stock:
         if cls.IEX_API_KEY is None:
             raise StockException(get_text("env_fail").format("IEX API Key"))
 
-        response = get(url = f"https://cloud.iexapis.com/v1/stock/{symbol}/quote?token={cls.IEX_API_KEY}")
+        response = get(url=f"https://cloud.iexapis.com/v1/stock/{symbol}/quote?token={cls.IEX_API_KEY}")
 
         if response.status_code != 200:
             raise StockException(response.content)
@@ -30,7 +30,7 @@ class Stock:
         if cls.IEX_API_KEY is None:
             raise StockException(get_text("env_fail").format("IEX API Key"))
 
-        response = get(url = f"https://cloud.iexapis.com/v1/stock/{symbol}/company?token={cls.IEX_API_KEY}")
+        response = get(url=f"https://cloud.iexapis.com/v1/stock/{symbol}/company?token={cls.IEX_API_KEY}")
 
         if response.status_code != 200:
             raise StockException(response.content)

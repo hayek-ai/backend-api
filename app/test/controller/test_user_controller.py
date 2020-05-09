@@ -6,9 +6,9 @@ from app.main.libs.s3 import S3
 from app.main.libs.strings import get_text
 from app.main.libs.util import create_image_file
 from app.main.service.user_service import UserService
-from app.test.conftest import flask_test_client, services_for_test, mock_mailgun_send_email
+from app.test.conftest import flask_test_client, services_for_test, register_mock_mailgun, requests_session
 
-mock_mailgun_send_email()
+register_mock_mailgun(requests_session())
 
 
 class TestUserController(unittest.TestCase):
@@ -159,9 +159,9 @@ class TestUserController(unittest.TestCase):
         # try to edit profile other than your own
         response = self.client.put("/user/2", data=json.dumps(
             dict(bio="test bio")),
-            content_type='application/json',
-            headers={'Authorization': 'Bearer {}'.format(access_token)}
-        )
+                                   content_type='application/json',
+                                   headers={'Authorization': 'Bearer {}'.format(access_token)}
+                                   )
         data = json.loads(response.data)
         assert data["errors"][0]["detail"] == get_text("unauthorized_user_edit")
         assert response.status_code == 403
@@ -169,9 +169,9 @@ class TestUserController(unittest.TestCase):
         # handle user not found
         response = self.client.put("/user/5", data=json.dumps(
             dict(bio="test bio")),
-           content_type='application/json',
-           headers={'Authorization': 'Bearer {}'.format(access_token)}
-        )
+                                   content_type='application/json',
+                                   headers={'Authorization': 'Bearer {}'.format(access_token)}
+                                   )
         data = json.loads(response.data)
         assert data["errors"][0]["detail"] == get_text("not_found").format("User")
         assert response.status_code == 404
@@ -179,9 +179,9 @@ class TestUserController(unittest.TestCase):
         # update bio
         response = self.client.put("/user/1", data=json.dumps(
             dict(bio="test bio")),
-           content_type='application/json',
-           headers={'Authorization': 'Bearer {}'.format(access_token)}
-        )
+                                   content_type='application/json',
+                                   headers={'Authorization': 'Bearer {}'.format(access_token)}
+                                   )
         updated_user = json.loads(response.data)
         assert updated_user["bio"] == "test bio"
         assert response.status_code == 201
@@ -189,8 +189,8 @@ class TestUserController(unittest.TestCase):
         # update prefers_darkmode
         response = self.client.put("/user/1", data=json.dumps(
             dict(prefersDarkmode=True)),
-            content_type='application/json',
-            headers={'Authorization': 'Bearer {}'.format(access_token)})
+                                   content_type='application/json',
+                                   headers={'Authorization': 'Bearer {}'.format(access_token)})
         updated_user = json.loads(response.data)
         assert updated_user["prefersDarkmode"] is True
         assert response.status_code == 201

@@ -1,13 +1,16 @@
-import unittest
 import json
-from app.test.conftest import flask_test_client, services_for_test, mock_mailgun_send_email
-from app.main.service.user_service import UserService
-from app.main.service.idea_service import IdeaService
-from app.main.service.download_service import DownloadService
+import unittest
+
 from app.main.db import db
 from app.main.libs.util import create_image_file
+from app.main.service.download_service import DownloadService
+from app.main.service.idea_service import IdeaService
+from app.main.service.user_service import UserService
+from app.test.conftest import flask_test_client, services_for_test, register_mock_mailgun, register_mock_iex, requests_session
 
-mock_mailgun_send_email()
+session = requests_session()
+register_mock_mailgun(session)
+register_mock_iex(session)
 
 
 class TestIdeaController(unittest.TestCase):

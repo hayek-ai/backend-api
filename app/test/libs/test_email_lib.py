@@ -1,9 +1,9 @@
 import unittest
 
 from app.main.libs.email import Email
-from app.test.conftest import mock_mailgun_send_email
+from app.test.conftest import register_mock_mailgun, requests_session
 
-mock_mailgun_send_email()
+register_mock_mailgun(requests_session())
 
 
 class TestEmailLib(unittest.TestCase):

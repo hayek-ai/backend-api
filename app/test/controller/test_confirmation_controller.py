@@ -1,13 +1,13 @@
-import unittest
 import json
-from app.test.conftest import flask_test_client, services_for_test, mock_mailgun_send_email
-from app.main.libs.strings import get_text
-from app.main.service.user_service import UserService
-from app.main.service.confirmation_service import ConfirmationService
+import unittest
+
 from app.main.db import db
+from app.main.libs.strings import get_text
+from app.main.service.confirmation_service import ConfirmationService
+from app.main.service.user_service import UserService
+from app.test.conftest import flask_test_client, services_for_test, register_mock_mailgun, requests_session
 
-
-mock_mailgun_send_email()
+register_mock_mailgun(requests_session())
 
 
 class TestConfirmationController(unittest.TestCase):
