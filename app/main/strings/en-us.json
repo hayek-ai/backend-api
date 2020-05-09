@@ -25,5 +25,10 @@
 
   "not_an_analyst": "Only analysts can upload ideas.",
   "invalid_position_type": "Position type can be either 'long' or 'short'",
-  "incorrect_price": "That price doesn't match our records"
+  "incorrect_price": "That price doesn't match our records",
+
+  "non_pro_tier_review": "Only customers who are subscribed to the pro tier are permitted to leave a review.",
+  "already_reviewed": "Users are only permitted to review a plan or analyst once.",
+  "invalid_self_review": "Analysts are not permitted to review themselves.",
+  "unauthorized_review_delete": "Unauthorized attempt to delete a review."
   }

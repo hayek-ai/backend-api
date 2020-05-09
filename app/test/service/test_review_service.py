@@ -20,8 +20,7 @@ class TestReviewService(unittest.TestCase):
             body="One of the best analysts on the site",
             stars=5,
             user_id=user.id,
-            analyst_id=analyst.id
-        )
+            analyst_id=analyst.id)
         found_review = self.review_service.get_review_by_id(review.id)
         assert found_review.id == review.id
         assert analyst.review_star_total == 5
@@ -44,8 +43,7 @@ class TestReviewService(unittest.TestCase):
             body="One of the best analysts on the site",
             stars=5,
             user_id=user.id,
-            analyst_id=analyst.id
-        )
+            analyst_id=analyst.id)
         found_review = self.review_service.get_review_by_user_and_analyst(user_id=user.id, analyst_id=analyst.id)
         assert found_review.id == review.id
 
@@ -61,8 +59,7 @@ class TestReviewService(unittest.TestCase):
             body="One of the best analysts on the site",
             stars=5,
             user_id=user.id,
-            analyst_id=analyst.id
-        )
+            analyst_id=analyst.id)
         self.review_service.delete_review(review.id)
         assert analyst.review_star_total == 0
         assert analyst.num_reviews == 0
@@ -73,20 +70,18 @@ class TestReviewService(unittest.TestCase):
         user1 = self.user_service.save_new_user("user1@email.com", "user1", "password")
         user2 = self.user_service.save_new_user("user2@email.com", "user2", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        review1 = self.review_service.save_new_review(
+        self.review_service.save_new_review(
             title="Great analyst",
             body="One of the best analysts on the site",
             stars=5,
             user_id=user1.id,
-            analyst_id=analyst.id
-        )
-        review2 = self.review_service.save_new_review(
+            analyst_id=analyst.id)
+        self.review_service.save_new_review(
             title="Great analyst",
             body="One of the best analysts on the site",
             stars=4,
             user_id=user2.id,
-            analyst_id=analyst.id
-        )
+            analyst_id=analyst.id)
         reviews = self.review_service.get_all_reviews_for_analyst(analyst.id)
         assert len(reviews) == 2
         assert reviews[0].user_id == user2.id

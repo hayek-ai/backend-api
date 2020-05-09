@@ -20,6 +20,7 @@ class UserModel(db.Model):
     prefers_darkmode = db.Column(db.Boolean, default=False)
     bio = db.Column(db.String(500))
     stripe_cust_id = db.Column(db.String(80), unique=True)
+    is_pro_tier = db.Column(db.Boolean, default=False)  # free or pro
 
     # Analyst Data
     connected_stripe_acct_id = db.Column(db.String(80), unique=True)
