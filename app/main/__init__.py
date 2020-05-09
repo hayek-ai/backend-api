@@ -14,6 +14,7 @@ from app.main.controller.user_controller import UserRegister, UserLogin, User, U
 from app.main.controller.confirmation_controller import Confirmation, ResendConfirmation
 from app.main.controller.idea_controller import NewIdea, Idea, DownloadReport
 from app.main.controller.follow_controller import Follow, FollowingList, FollowerList
+from app.main.controller.review_controller import NewReview, Review, AnalystReviews
 
 # Services
 from app.main.service.user_service import UserService
@@ -84,5 +85,16 @@ def create_app(services, config_name):
                      resource_class_kwargs={
                          'follow_service': services['follow'],
                          'user_service': services['user']})
+    api.add_resource(NewReview, '/analyst/<int:analyst_id>/review',
+                     resource_class_kwargs={
+                         'user_service': services['user'],
+                         'review_service': services['review']
+                     })
+    api.add_resource(Review, '/review/<int:review_id>', resource_class_kwargs={'review_service': services['review']})
+    api.add_resource(AnalystReviews, '/analyst/<int:analyst_id>/reviews',
+                     resource_class_kwargs={
+                         'user_service': services['user'],
+                         'review_service': services['review']
+                     })
 
     return app

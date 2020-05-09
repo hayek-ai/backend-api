@@ -4,12 +4,15 @@ from marshmallow.validate import Length, Range
 from app.main.libs.util import camelcase
 from app.main.ma import ma
 from app.main.model.review import ReviewModel
+from app.main.schema.user_schema import UserSchema
 
 
 class ReviewSchema(ma.SQLAlchemyAutoSchema):
+    user = ma.Nested(lambda: UserSchema(only=("id", "username", "image_url")))
+
     class Meta:
         model = ReviewModel
-        load_only=("user", "analyst")
+        load_only=("analyst",)
         include_fk = True
 
     @classmethod
@@ -21,8 +24,6 @@ class NewReviewSchema(Schema):
     title = fields.Str(required=True, validate=Length(min=1, max=160))
     body = fields.Str(required=True, validate=Length(min=1, max=1000))
     stars = fields.Integer(required=True, validate=Range(min=1, max=5))
-    user_id = fields.Integer(required=True, validate=Range(min=1))
-    analyst_id = fields.Integer(required=True, validate=Range(min=1))
 
 
 review_schema = ReviewSchema()

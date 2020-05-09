@@ -16,6 +16,7 @@ class NewReview(Resource):
     @jwt_required
     def post(self, analyst_id: int):
         """Creates a review for given analyst"""
+        review_json = request.get_json()
         user_id = get_jwt_identity()
 
         # analysts can't review themselves
@@ -23,7 +24,7 @@ class NewReview(Resource):
             return get_error(400, get_text("invalid_self_review"))
 
         # validate review schema
-        errors = self.new_review_schema.validate(request.form)
+        errors = self.new_review_schema.validate(review_json)
         if errors:
             return get_error(400, get_text("incorrect_fields"), **errors)
 
@@ -39,16 +40,16 @@ class NewReview(Resource):
 
         # user can only review analysts once
         all_analyst_reviews = self.review_service.get_all_reviews_for_analyst(analyst_id)
-        already_reviewed = bool([review for review in all_analyst_reviews if (review.customer_id == user_id)])
+        already_reviewed = bool([review for review in all_analyst_reviews if (review.user_id == user_id)])
         if already_reviewed:
             return get_error(400, get_text("already_reviewed"))
 
         # create review
         try:
             review = self.review_service.save_new_review(
-                title=request.form.get("title"),
-                body=request.form.get("body"),
-                stars=request.form.get("stars"),
+                title=review_json["title"],
+                body=review_json["body"],
+                stars=review_json["stars"],
                 user_id=user_id,
                 analyst_id=analyst_id)
             return self.review_schema.dump(review), 201
@@ -73,7 +74,7 @@ class Review(Resource):
         review = self.review_service.get_review_by_id(review_id)
         if not review:
             return get_error(404, get_text("not_found").format("Review"))
-        if review.customer_id != get_jwt_identity():
+        if review.user_id != get_jwt_identity():
             return get_error(400, get_text("unauthorized_review_delete"))
         try:
             self.review_service.delete_review(review_id)
@@ -95,6 +96,6 @@ class AnalystReviews(Resource):
         if not analyst:
             return get_error(404, get_text("not_found").format("Analyst"))
         reviews = self.review_service.get_all_reviews_for_analyst(analyst_id)
-        return self.review_list_schema(reviews), 200
+        return self.review_list_schema.dump(reviews), 200
 
 
