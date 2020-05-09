@@ -7,13 +7,14 @@ import app
 from app.main import create_app
 
 
-def services_for_test(user=None, confirmation=None, idea=None, download=None, follow=None):
+def services_for_test(user=None, confirmation=None, idea=None, download=None, follow=None, review=None):
     return {
         'user': user or create_autospec(app.main.UserService, spec_set=True, instance=True),
         'confirmation': confirmation or create_autospec(app.main.ConfirmationService, spec_set=True, instance=True),
         'idea': idea or create_autospec(app.main.IdeaService, spec_set=True, instance=True),
         'download': download or create_autospec(app.main.DownloadService, spec_set=True, instance=True),
-        'follow': follow or create_autospec(app.main.FollowService, spec_set=True, instance=True)
+        'follow': follow or create_autospec(app.main.FollowService, spec_set=True, instance=True),
+        'review': review or create_autospec(app.main.ReviewService, spec_set=True, instance=True)
     }
 
 

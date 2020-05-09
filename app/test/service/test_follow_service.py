@@ -1,5 +1,4 @@
 import unittest
-import datetime
 from app.main.db import db
 from app.test.conftest import flask_test_client
 from app.main.service.user_service import UserService
@@ -36,12 +35,6 @@ class TestFollowService(unittest.TestCase):
         follow = self.follow_service.save_new_follow(user_id=user.id, analyst_id=analyst.id)
         found_follow = self.follow_service.get_follow_by_user_and_analyst(user_id=user.id, analyst_id=analyst.id)
         assert found_follow.id == follow.id
-        assert user.num_following == 1
-        assert user.num_followers == 0
-        assert analyst.num_following == 0
-        assert analyst.num_followers == 1
-        assert follow.analyst_id == analyst.id
-        assert follow.user_id == user.id
 
         # make sure returns None if not found
         not_found = self.follow_service.get_follow_by_user_and_analyst(10, 10)
