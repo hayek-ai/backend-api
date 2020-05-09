@@ -13,6 +13,7 @@ from app.main.ma import ma
 from app.main.controller.user_controller import UserRegister, UserLogin, User, UploadProfileImage
 from app.main.controller.confirmation_controller import Confirmation, ResendConfirmation
 from app.main.controller.idea_controller import NewIdea, Idea, DownloadReport
+from app.main.controller.follow_controller import Follow, FollowingList, FollowerList
 
 # Services
 from app.main.service.user_service import UserService
@@ -70,5 +71,17 @@ def create_app(services, config_name):
                      resource_class_kwargs={
                          'idea_service': services['idea'],
                          'download_service': services['download']})
+    api.add_resource(Follow, '/analyst/<int:analyst_id>/follow',
+                     resource_class_kwargs={
+                         'follow_service': services['follow'],
+                         'user_service': services['user']})
+    api.add_resource(FollowingList, '/user/<int:user_id>/following',
+                     resource_class_kwargs={
+                         'follow_service': services['follow'],
+                         'user_service': services['user']})
+    api.add_resource(FollowerList, '/analyst/<int:analyst_id>/followers',
+                     resource_class_kwargs={
+                         'follow_service': services['follow'],
+                         'user_service': services['user']})
 
     return app

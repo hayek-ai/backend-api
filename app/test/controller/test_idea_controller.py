@@ -178,6 +178,7 @@ class TestIdeaController(unittest.TestCase):
             f'/idea/{idea_id}',
             headers={"Authorization": "Bearer {}".format(access_token)})
         response_data = json.loads(response.data)
+        assert response.status_code == 200
         assert response_data["symbol"] == "AAPL"
         assert response_data["thesisSummary"] == "Test Thesis Summary"
         assert "fullReport" not in response_data
@@ -211,6 +212,7 @@ class TestIdeaController(unittest.TestCase):
             f'/idea/{idea_id}/download',
             headers={"Authorization": "Bearer {}".format(access_token)})
         response_data = json.loads(response.data)
+        assert response.status_code == 200
         assert response_data["symbol"] == "AAPL"
         assert response_data["thesisSummary"] == "Test Thesis Summary"
         assert response_data["fullReport"] == "Test Full Report"

@@ -5,6 +5,11 @@
   "invalid_file_extension": "File extension is invaild.",
   "env_fail": "Couldn't load {} from ENV.",
   "error_sending_email": "There was an error trying to send the email.",
+  "successfully_deleted": "{} successfully deleted.",
+  "successfully_updated": "{} successfully updated.",
+  "error_deleting": "error deleting {} from database.",
+  "successfully_created": "{} successfully created",
+  "error_saving": "Error saving {} to database.",
 
   "email_exists": "A user with that email address already exists",
   "username_exists": "A user with that username already exists",

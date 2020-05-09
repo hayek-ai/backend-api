@@ -2,6 +2,7 @@ from typing import List
 from app.main.db import db
 from app.main.model.user import UserModel
 from app.main.model.follow import FollowModel
+from sqlalchemy import and_
 
 
 class FollowService:
@@ -19,6 +20,11 @@ class FollowService:
     @classmethod
     def get_follow_by_id(cls, follow_id: int) -> "FollowModel":
         return FollowModel.query.filter_by(id=follow_id).first()
+
+    @classmethod
+    def get_follow_by_user_and_analyst(cls, user_id: int, analyst_id: int) -> "FollowModel":
+        filters = [FollowModel.user_id == user_id, FollowModel.analyst_id == analyst_id]
+        return FollowModel.query.filter(and_(*filters)).first()
 
     def delete_follow(self, follow_id: int) -> None:
         follow = self.get_follow_by_id(follow_id)

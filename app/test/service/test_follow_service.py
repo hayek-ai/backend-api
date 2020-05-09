@@ -26,6 +26,27 @@ class TestFollowService(unittest.TestCase):
         assert follow.analyst_id == analyst.id
         assert follow.user_id == user.id
 
+        # make sure returns None if not found
+        not_found = self.follow_service.get_follow_by_id(10)
+        assert not_found is None
+
+    def test_get_follow_by_user_and_analyst(self) -> None:
+        user = self.user_service.save_new_user("user@email.com", "user", "password")
+        analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
+        follow = self.follow_service.save_new_follow(user_id=user.id, analyst_id=analyst.id)
+        found_follow = self.follow_service.get_follow_by_user_and_analyst(user_id=user.id, analyst_id=analyst.id)
+        assert found_follow.id == follow.id
+        assert user.num_following == 1
+        assert user.num_followers == 0
+        assert analyst.num_following == 0
+        assert analyst.num_followers == 1
+        assert follow.analyst_id == analyst.id
+        assert follow.user_id == user.id
+
+        # make sure returns None if not found
+        not_found = self.follow_service.get_follow_by_user_and_analyst(10, 10)
+        assert not_found is None
+
     def test_delete_follow(self) -> None:
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
