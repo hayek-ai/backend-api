@@ -28,5 +28,6 @@ class IdeaModel(db.Model):
 
     analyst_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     analyst = db.relationship("UserModel")
+    comments = db.relationship("CommentModel", lazy="dynamic", cascade="all, delete-orphan")
 
 

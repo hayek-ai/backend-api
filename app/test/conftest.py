@@ -12,14 +12,16 @@ IEX_URL = 'https://cloud.iexapis.com/v1/stock/AAPL'
 ALPHA_ADVANTAGE_URL = 'https://www.alphavantage.co/query?function=SYMBOL_SEARCH'
 
 
-def services_for_test(user=None, confirmation=None, idea=None, download=None, follow=None, review=None):
+def services_for_test(user=None, confirmation=None, idea=None, download=None,\
+                      follow=None, review=None, comment=None):
     return {
         'user': user or create_autospec(app.main.UserService, spec_set=True, instance=True),
         'confirmation': confirmation or create_autospec(app.main.ConfirmationService, spec_set=True, instance=True),
         'idea': idea or create_autospec(app.main.IdeaService, spec_set=True, instance=True),
         'download': download or create_autospec(app.main.DownloadService, spec_set=True, instance=True),
         'follow': follow or create_autospec(app.main.FollowService, spec_set=True, instance=True),
-        'review': review or create_autospec(app.main.ReviewService, spec_set=True, instance=True)
+        'review': review or create_autospec(app.main.ReviewService, spec_set=True, instance=True),
+        'comment': comment or create_autospec(app.main.CommentService, spec_set=True, instance=True)
     }
 
 

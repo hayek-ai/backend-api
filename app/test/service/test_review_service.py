@@ -51,7 +51,7 @@ class TestReviewService(unittest.TestCase):
         not_found = self.review_service.get_review_by_user_and_analyst(10, 10)
         assert not_found is None
 
-    def test_delete_review(self) -> None:
+    def test_delete_review_by_id(self) -> None:
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         review = self.review_service.save_new_review(
@@ -60,7 +60,7 @@ class TestReviewService(unittest.TestCase):
             stars=5,
             user_id=user.id,
             analyst_id=analyst.id)
-        self.review_service.delete_review(review.id)
+        self.review_service.delete_review_by_id(review.id)
         assert analyst.review_star_total == 0
         assert analyst.num_reviews == 0
         review = self.review_service.get_review_by_id(review.id)

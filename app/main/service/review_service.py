@@ -31,7 +31,7 @@ class ReviewService:
         filters = [ReviewModel.user_id == user_id, ReviewModel.analyst_id == analyst_id]
         return ReviewModel.query.filter(and_(*filters)).first()
 
-    def delete_review(self, review_id: int) -> None:
+    def delete_review_by_id(self, review_id: int) -> None:
         review = self.get_review_by_id(review_id)
         analyst = UserModel.query.filter_by(id=review.analyst_id).first()
         analyst.review_star_total = analyst.review_star_total - review.stars

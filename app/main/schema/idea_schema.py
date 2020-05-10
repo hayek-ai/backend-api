@@ -6,10 +6,12 @@ from app.main.libs.util import camelcase
 from app.main.ma import ma
 from app.main.model.idea import IdeaModel
 from app.main.schema.user_schema import UserSchema
+from app.main.schema.comment_schema import CommentSchema
 
 
 class IdeaSchema(ma.SQLAlchemyAutoSchema):
-    analyst = ma.Nested(lambda: UserSchema(only=(
+    comments = ma.Nested(CommentSchema, many=True)
+    analyst = ma.Nested(UserSchema(only=(
         'id', 'username', "image_url", "num_ideas", "analyst_rank",
         "analyst_rank_percentile", 'avg_return', 'success_rate',
         'avg_holding_period', "review_star_total", "num_reviews")))

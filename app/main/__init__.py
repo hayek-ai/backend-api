@@ -23,6 +23,7 @@ from app.main.service.idea_service import IdeaService
 from app.main.service.download_service import DownloadService
 from app.main.service.follow_service import FollowService
 from app.main.service.review_service import ReviewService
+from app.main.service.comment_service import CommentService
 
 
 def create_app(services, config_name):
