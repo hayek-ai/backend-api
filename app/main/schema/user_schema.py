@@ -5,9 +5,16 @@ from app.main.libs.strings import get_text
 from app.main.libs.util import camelcase
 from app.main.ma import ma
 from app.main.model.user import UserModel
+from app.main.schema.upvote_schema import UpvoteSchema
+from app.main.schema.downvote_schema import DownvoteSchema
+from app.main.schema.bookmark_schema import BookmarkSchema
 
 
 class UserSchema(ma.SQLAlchemyAutoSchema):
+    upvotes = ma.Nested(UpvoteSchema, many=True)
+    downvotes = ma.Nested(UpvoteSchema, many=True)
+    bookmarks = ma.Nested(UpvoteSchema, many=True)
+
     class Meta:
         model = UserModel
         load_only = ("password_hash", "email", "is_admin", "connected_stripe_acct_id", "stripe_cust_id")

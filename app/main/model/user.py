@@ -41,6 +41,9 @@ class UserModel(db.Model):
 
     confirmation = db.relationship("ConfirmationModel", lazy="dynamic", cascade="all, delete-orphan")
     ideas = db.relationship("IdeaModel", lazy="dynamic", cascade="all, delete-orphan")
+    upvotes = db.relationship("UpvoteModel", lazy="dynamic", cascade="all, delete-orphan")
+    downvotes = db.relationship("DownvoteModel", lazy="dynamic", cascade="all, delete-orphan")
+    bookmarks = db.relationship("BookmarkModel", lazy="dynamic", cascade="all, delete-orphan")
 
     @property
     def password(self) -> None:

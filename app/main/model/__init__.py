@@ -5,3 +5,6 @@ from app.main.model.download import DownloadModel
 from app.main.model.follow import FollowModel
 from app.main.model.review import ReviewModel
 from app.main.model.comment import CommentModel
+from app.main.model.upvote import UpvoteModel
+from app.main.model.downvote import DownvoteModel
+from app.main.model.bookmark import BookmarkModel

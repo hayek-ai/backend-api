@@ -17,7 +17,7 @@ class CommentService:
     def get_comment_by_id(cls, comment_id: int) -> "CommentModel":
         return CommentModel.query.filter_by(id=comment_id).first()
 
-    def delete_comment_by_id(self, comment_id: int) -> "CommentModel":
+    def delete_comment_by_id(self, comment_id: int) -> None:
         comment = self.get_comment_by_id(comment_id)
         idea = IdeaModel.query.filter_by(id=comment.idea_id).first()
         idea.num_comments = idea.num_comments - 1
