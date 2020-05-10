@@ -6,7 +6,7 @@ from app.main.model.idea import IdeaModel
 
 class DownvoteService:
     def save_new_downvote(self, user_id: int, idea_id: int) -> "DownvoteModel":
-        downvote = DownvoteModel(user_id=user_id, idea_id = idea_id)
+        downvote = DownvoteModel(user_id=user_id, idea_id=idea_id)
         idea = IdeaModel.query.filter_by(id=idea_id).first()
         idea.num_downvotes = idea.num_downvotes + 1
         idea.score = idea.score - 1
