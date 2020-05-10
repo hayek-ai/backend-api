@@ -26,7 +26,7 @@ class TestReviewController(unittest.TestCase):
         login_data = json.loads(response.data)
         return {"access_token": login_data["accessToken"], "user": new_user}
 
-    def create_review_dict(self, analyst_id, access_token) -> Response:
+    def create_review(self, analyst_id, access_token) -> Response:
         """Creates new review and returns response"""
         response = self.client.post(
             f'/analyst/{analyst_id}/review',
@@ -46,7 +46,7 @@ class TestReviewController(unittest.TestCase):
         analyst_id = analyst_dict["user"].id
 
         # simple review submit
-        response = self.create_review_dict(analyst_id, user_dict["access_token"])
+        response = self.create_review(analyst_id, user_dict["access_token"])
         response_data = json.loads(response.data)
         assert response.status_code == 201
         # returns new review
@@ -73,7 +73,7 @@ class TestReviewController(unittest.TestCase):
         analyst_dict = self.create_user("analyst@email.com", "analyst", is_analyst=True)
 
         # simple review submit
-        response = self.create_review_dict(analyst_dict["user"].id, user_dict["access_token"])
+        response = self.create_review(analyst_dict["user"].id, user_dict["access_token"])
         review_dict = json.loads(response.data)
         response = self.client.get(
             f'/review/{review_dict["id"]}',
@@ -101,9 +101,9 @@ class TestReviewController(unittest.TestCase):
         analyst_id = analyst_dict["user"].id
 
         # submit 2 reviews
-        response1 = self.create_review_dict(analyst_id, user1_dict["access_token"])
+        response1 = self.create_review(analyst_id, user1_dict["access_token"])
         response1_data = json.loads(response1.data)
-        response2 = self.create_review_dict(analyst_id, user2_dict["access_token"])
+        response2 = self.create_review(analyst_id, user2_dict["access_token"])
         response2_data = json.loads(response2.data)
 
         response = self.client.get(

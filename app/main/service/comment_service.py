@@ -25,6 +25,10 @@ class CommentService:
         self.delete_from_db(comment)
 
     @classmethod
+    def get_all_comments_for_idea(cls, idea_id: int) -> List["CommentModel"]:
+        return CommentModel.query.order_by(db.desc(CommentModel.created_at)).filter_by(idea_id=idea_id).all()
+
+    @classmethod
     def delete_from_db(cls, data) -> None:
         db.session.delete(data)
         db.session.commit()

@@ -10,6 +10,7 @@
   "error_deleting": "error deleting {} from database.",
   "successfully_created": "{} successfully created",
   "error_saving": "Error saving {} to database.",
+  "unauthorized_delete": "Unauthorized attempt to delete.",
 
   "email_exists": "A user with that email address already exists",
   "username_exists": "A user with that username already exists",
@@ -29,6 +30,5 @@
 
   "non_pro_tier_review": "Only customers who are subscribed to the pro tier are permitted to leave a review.",
   "already_reviewed": "Users are only permitted to review a plan or analyst once.",
-  "invalid_self_review": "Analysts are not permitted to review themselves.",
-  "unauthorized_review_delete": "Unauthorized attempt to delete a review."
+  "invalid_self_review": "Analysts are not permitted to review themselves."
   }

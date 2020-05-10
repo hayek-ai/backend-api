@@ -15,6 +15,7 @@ from app.main.controller.confirmation_controller import Confirmation, ResendConf
 from app.main.controller.idea_controller import NewIdea, Idea, DownloadReport
 from app.main.controller.follow_controller import Follow, FollowingList, FollowerList
 from app.main.controller.review_controller import NewReview, Review, AnalystReviews
+from app.main.controller.comment_controller import NewComment, Comment, IdeaComments
 
 # Services
 from app.main.service.user_service import UserService
@@ -96,6 +97,17 @@ def create_app(services, config_name):
                      resource_class_kwargs={
                          'user_service': services['user'],
                          'review_service': services['review']
+                     })
+    api.add_resource(NewComment, '/idea/<int:idea_id>/comment',
+                     resource_class_kwargs={
+                         "idea_service": services["idea"],
+                         "comment_service": services["comment"]
+                     })
+    api.add_resource(Comment, '/comment/<int:comment_id>', resource_class_kwargs={"comment_service": services["comment"]})
+    api.add_resource(IdeaComments, '/idea/<int:idea_id>/comments',
+                     resource_class_kwargs={
+                         "idea_service": services["idea"],
+                         "comment_service": services["comment"]
                      })
 
     return app

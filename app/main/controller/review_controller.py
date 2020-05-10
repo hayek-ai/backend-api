@@ -75,9 +75,9 @@ class Review(Resource):
         if not review:
             return get_error(404, get_text("not_found").format("Review"))
         if review.user_id != get_jwt_identity():
-            return get_error(400, get_text("unauthorized_review_delete"))
+            return get_error(400, get_text("unauthorized_delete"))
         try:
-            self.review_service.delete_review(review_id)
+            self.review_service.delete_review_by_id(review_id)
             return {"message": get_text("successfully_deleted").format("Review")}, 200
         except Exception as e:
             return get_error(500, str(e))
