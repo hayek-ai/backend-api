@@ -10,7 +10,6 @@ from app.main.schema.comment_schema import CommentSchema
 
 
 class IdeaSchema(ma.SQLAlchemyAutoSchema):
-    comments = ma.Nested(CommentSchema, many=True)
     analyst = ma.Nested(UserSchema(only=(
         'id', 'username', "image_url", "num_ideas", "analyst_rank",
         "analyst_rank_percentile", 'avg_return', 'success_rate',
@@ -18,6 +17,7 @@ class IdeaSchema(ma.SQLAlchemyAutoSchema):
 
     class Meta:
         model = IdeaModel
+        load_only =("comments",)
         include_fk = True
 
     @classmethod
