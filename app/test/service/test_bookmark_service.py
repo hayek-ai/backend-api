@@ -54,6 +54,26 @@ class TestBookmarkService(unittest.TestCase):
         assert found_bookmark is None
         assert len(user.bookmarks.all()) == 0
 
+    def test_get_bookmark_by_user_and_idea(self) -> None:
+        user = self.user_service.save_new_user("user@email.com", "user", "password")
+        analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
+        idea = self.idea_service.save_new_idea(
+            analyst_id=analyst.id,
+            symbol="AAPL",
+            position_type="long",
+            price_target=400,
+            entry_price=309.93,
+            thesis_summary="My Thesis Summary",
+            full_report="My Full Report",
+        )["idea"]
+        bookmark = self.bookmark_service.save_new_bookmark(user_id=user.id, idea_id=idea.id)
+        found_bookmark = self.bookmark_service.get_bookmark_by_user_and_idea(user_id=user.id, idea_id=idea.id)
+        assert found_bookmark.id == bookmark.id
+
+        # make sure returns none if not found
+        found_bookmark = self.bookmark_service.get_bookmark_by_user_and_idea(10, 10)
+        assert found_bookmark is None
+
     def tearDown(self) -> None:
         db.session.remove()
         db.drop_all()

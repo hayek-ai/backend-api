@@ -13,7 +13,8 @@ ALPHA_ADVANTAGE_URL = 'https://www.alphavantage.co/query?function=SYMBOL_SEARCH'
 
 
 def services_for_test(user=None, confirmation=None, idea=None, download=None,\
-                      follow=None, review=None, comment=None):
+                      follow=None, review=None, comment=None, upvote=None,\
+                      downvote=None, bookmark=None):
     return {
         'user': user or create_autospec(app.main.UserService, spec_set=True, instance=True),
         'confirmation': confirmation or create_autospec(app.main.ConfirmationService, spec_set=True, instance=True),
@@ -21,7 +22,10 @@ def services_for_test(user=None, confirmation=None, idea=None, download=None,\
         'download': download or create_autospec(app.main.DownloadService, spec_set=True, instance=True),
         'follow': follow or create_autospec(app.main.FollowService, spec_set=True, instance=True),
         'review': review or create_autospec(app.main.ReviewService, spec_set=True, instance=True),
-        'comment': comment or create_autospec(app.main.CommentService, spec_set=True, instance=True)
+        'comment': comment or create_autospec(app.main.CommentService, spec_set=True, instance=True),
+        'upvote': upvote or create_autospec(app.main.UpvoteService, spec_set=True, instance=True),
+        'downvote': downvote or create_autospec(app.main.DownvoteService, spec_set=True, instance=True),
+        'bookmark': bookmark or create_autospec(app.main.BookmarkService, spec_set=True, instance=True)
     }
 
 

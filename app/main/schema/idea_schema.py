@@ -42,6 +42,6 @@ class NewIdeaSchema(Schema):
 
 
 idea_schema = IdeaSchema(exclude=("full_report", "exhibits"))
-idea_list_schema = IdeaSchema(many=True)
+idea_list_schema = IdeaSchema(many=True, exclude=("full_report", "exhibits"))
 new_idea_schema = NewIdeaSchema()
 idea_with_report_schema = IdeaSchema()

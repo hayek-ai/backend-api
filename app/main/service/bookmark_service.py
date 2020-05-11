@@ -14,6 +14,11 @@ class BookmarkService:
     def get_bookmark_by_id(cls, bookmark_id: int) -> "BookmarkModel":
         return BookmarkModel.query.filter_by(id=bookmark_id).first()
 
+    @classmethod
+    def get_bookmark_by_user_and_idea(cls, user_id: int, idea_id: int) -> "BookmarkModel":
+        filters = [BookmarkModel.user_id == user_id, BookmarkModel.idea_id == idea_id]
+        return BookmarkModel.query.filter(*filters).first()
+
     def delete_bookmark_by_id(self, bookmark_id: int) -> None:
         bookmark = self.get_bookmark_by_id(bookmark_id)
         self.delete_from_db(bookmark)

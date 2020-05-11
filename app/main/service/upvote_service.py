@@ -18,6 +18,11 @@ class UpvoteService:
     def get_upvote_by_id(cls, upvote_id: int) -> "UpvoteModel":
         return UpvoteModel.query.filter_by(id=upvote_id).first()
 
+    @classmethod
+    def get_upvote_by_user_and_idea(cls, user_id: int, idea_id: int) -> "UpvoteModel":
+        filters = [UpvoteModel.user_id == user_id, UpvoteModel.idea_id == idea_id]
+        return UpvoteModel.query.filter(*filters).first()
+
     def delete_upvote_by_id(self, upvote_id: int) -> None:
         upvote = self.get_upvote_by_id(upvote_id)
         idea = IdeaModel.query.filter_by(id=upvote.idea_id).first()
@@ -29,6 +34,11 @@ class UpvoteService:
     @classmethod
     def get_all_upvotes_for_idea(cls, idea_id: int) -> List["UpvoteModel"]:
         return UpvoteModel.query.order_by(db.desc(UpvoteModel.created_at)).filter_by(idea_id=idea_id).all()
+
+    @classmethod
+    def get_users_upvoted_ideas(cls, user_id: int) -> List["IdeaModel"]:
+        return IdeaModel.query.join(UpvoteModel).order_by(db.desc(UpvoteModel.created_at))\
+            .filter(UpvoteModel.user_id == user_id).all()
 
     @classmethod
     def delete_from_db(cls, data) -> None:

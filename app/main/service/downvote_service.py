@@ -18,6 +18,11 @@ class DownvoteService:
     def get_downvote_by_id(cls, downvote_id: int) -> "DownvoteModel":
         return DownvoteModel.query.filter_by(id=downvote_id).first()
 
+    @classmethod
+    def get_downvote_by_user_and_idea(cls, user_id: int, idea_id: int) -> "DownvoteModel":
+        filters = [DownvoteModel.user_id == user_id, DownvoteModel.idea_id == idea_id]
+        return DownvoteModel.query.filter(*filters).first()
+
     def delete_downvote_by_id(self, downvote_id: int) -> None:
         downvote = self.get_downvote_by_id(downvote_id)
         idea = IdeaModel.query.filter_by(id=downvote.idea_id).first()

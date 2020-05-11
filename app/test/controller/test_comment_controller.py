@@ -1,6 +1,5 @@
 import unittest
 import json
-from flask import Response
 from app.test.conftest import flask_test_client, services_for_test
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService

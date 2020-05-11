@@ -6,6 +6,7 @@ from app.main.service.follow_service import FollowService
 from app.main.db import db
 from app.main.libs.strings import get_text
 
+
 class TestFollowController(unittest.TestCase):
     def setUp(self) -> None:
         self.client = flask_test_client(services_for_test(user=UserService(), follow=FollowService()))

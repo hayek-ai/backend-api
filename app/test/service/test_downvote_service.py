@@ -79,6 +79,26 @@ class TestDownvoteService(unittest.TestCase):
         assert downvotes[0].id == downvote2.id
         assert downvotes[1].id == downvote1.id
 
+    def test_downvote_by_user_and_idea(self) -> None:
+        user = self.user_service.save_new_user("user@email.com", "user", "password")
+        analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
+        idea = self.idea_service.save_new_idea(
+            analyst_id=analyst.id,
+            symbol="AAPL",
+            position_type="long",
+            price_target=400,
+            entry_price=309.93,
+            thesis_summary="My Thesis Summary",
+            full_report="My Full Report",
+        )["idea"]
+        downvote = self.downvote_service.save_new_downvote(user_id=user.id, idea_id=idea.id)
+        found_downvote = self.downvote_service.get_downvote_by_user_and_idea(user_id=user.id, idea_id=idea.id)
+        assert found_downvote.id == downvote.id
+
+        # make sure returns none if not found
+        found_downvote = self.downvote_service.get_downvote_by_user_and_idea(10, 10)
+        assert found_downvote is None
+
     def tearDown(self) -> None:
         db.session.remove()
         db.drop_all()
