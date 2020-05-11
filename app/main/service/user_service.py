@@ -50,13 +50,14 @@ class UserService:
                 ContentType=image.content_type
             )
         except Exception as e:
-            return {"error": str(e)}
+            print(str(e))
+            return None
 
         # update user profile image
         user = self.get_user_by_id(user_id)
         user.image_url = f"{S3.S3_ENDPOINT_URL}/user_images/{filename}"
         self.save_changes(user)
-        return {"imageUrl": user.image_url}
+        return user.image_url
 
     @classmethod
     def save_changes(cls, data) -> None:

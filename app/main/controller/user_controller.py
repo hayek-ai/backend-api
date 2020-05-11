@@ -125,6 +125,7 @@ class UserLogin(Resource):
 class UploadProfileImage(Resource):
     def __init__(self, **kwargs):
         self.user_service = kwargs['service']
+        self.user_schema = user_schema
 
     @jwt_required
     def post(self):
@@ -141,9 +142,7 @@ class UploadProfileImage(Resource):
             if image_extension not in valid_extensions:
                 return get_error(400, get_text("invalid_file_extension"))
             filename = f"{user.username}-profile-image.{image_extension}"
-            response_dict = self.user_service.change_user_image(user_id, image, filename)
-            if "error" in response_dict:
-                return get_error(500, response_dict["error"])
-            return response_dict, 201
+            self.user_service.change_user_image(user_id, image, filename)
+            return self.user_schema.dump(user), 201
         except Exception as e:
             return get_error(400, str(e))

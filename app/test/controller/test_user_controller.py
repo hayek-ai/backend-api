@@ -248,11 +248,7 @@ class TestUserController(unittest.TestCase):
         self.service.save_new_user("email@email.com", "username", "password")
 
         image = create_image_file("test.jpg", "image/jpg")
-        data = dict(
-            file=(image, "test.jpg")
-        )
-
-        # login
+        data = dict(file=(image, "test.jpg"))
         access_token = self.login("username", "password")
 
         response = self.client.post(
@@ -262,14 +258,12 @@ class TestUserController(unittest.TestCase):
             content_type='multipart/form-data',
             headers={'Authorization': 'Bearer {}'.format(access_token)}
         )
-        data = json.loads(response.data)
-        assert data["imageUrl"] == f"{S3.S3_ENDPOINT_URL}/user_images/username-profile-image.jpg"
+        user_dict = json.loads(response.data)
+        assert user_dict["imageUrl"] == f"{S3.S3_ENDPOINT_URL}/user_images/username-profile-image.jpg"
         assert response.status_code == 201
 
         # invalid file extension
-        data = {
-            'file': (create_image_file("test.pdf", "application/pdf"), "test.pdf")
-        }
+        data = {'file': (create_image_file("test.pdf", "application/pdf"), "test.pdf")}
         response = self.client.post(
             '/upload-profile-image',
             data=data,

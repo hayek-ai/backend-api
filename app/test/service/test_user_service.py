@@ -91,11 +91,11 @@ class TestUserService(unittest.TestCase):
     def test_change_user_image(self) -> None:
         user = self.service.save_new_user("user@email.com", "username", "password")
         image = create_image_file("test.jpg", "image/jpg")
-        response_dict = self.service.change_user_image(user.id, image, "test.jpg")
-        assert response_dict["imageUrl"] == f"{S3.S3_ENDPOINT_URL}/user_images/test.jpg"
+        image_url = self.service.change_user_image(user.id, image, "test.jpg")
+        assert image_url == f"{S3.S3_ENDPOINT_URL}/user_images/test.jpg"
 
         # make sure changes have been saved to user
-        assert user.image_url == response_dict["imageUrl"]
+        assert user.image_url == image_url
 
     def tearDown(self) -> None:
         db.session.remove()
