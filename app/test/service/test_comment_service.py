@@ -14,19 +14,22 @@ class TestCommentService(unittest.TestCase):
         self.app = flask_test_client()
         db.create_all()
 
-    def test_save_new_comment_and_get_comment_by_id(self) -> None:
-        user = self.user_service.save_new_user("user@email.com", "user", "password")
-        analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea_dict = self.idea_service.save_new_idea(
-            analyst_id=analyst.id,
+    def create_new_idea(self, analyst_id) -> "IdeaModel":
+        idea = self.idea_service.save_new_idea(
+            analyst_id=analyst_id,
             symbol="AAPL",
             position_type="long",
             price_target=400,
-            entry_price=309.93,
+            entry_price=313.49,
             thesis_summary="My Thesis Summary",
             full_report="My Full Report",
-        )
-        idea = idea_dict["idea"]
+        )["idea"]
+        return idea
+
+    def test_save_new_comment_and_get_comment_by_id(self) -> None:
+        user = self.user_service.save_new_user("user@email.com", "user", "password")
+        analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
+        idea = self.create_new_idea(analyst.id)
         comment = self.comment_service.save_new_comment(
             body="Test Comment",
             user_id=user.id,
@@ -48,16 +51,7 @@ class TestCommentService(unittest.TestCase):
     def test_delete_comment_by_id(self) -> None:
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea_dict = self.idea_service.save_new_idea(
-            analyst_id=analyst.id,
-            symbol="AAPL",
-            position_type="long",
-            price_target=400,
-            entry_price=309.93,
-            thesis_summary="My Thesis Summary",
-            full_report="My Full Report",
-        )
-        idea = idea_dict["idea"]
+        idea = self.create_new_idea(analyst.id)
         comment = self.comment_service.save_new_comment(
             body="Test Comment",
             user_id=user.id,
@@ -72,16 +66,7 @@ class TestCommentService(unittest.TestCase):
     def test_get_all_comments_for_idea(self) -> None:
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea_dict = self.idea_service.save_new_idea(
-            analyst_id=analyst.id,
-            symbol="AAPL",
-            position_type="long",
-            price_target=400,
-            entry_price=309.93,
-            thesis_summary="My Thesis Summary",
-            full_report="My Full Report",
-        )
-        idea = idea_dict["idea"]
+        idea = self.create_new_idea(analyst.id)
         comment1 = self.comment_service.save_new_comment(
             body="Test Comment",
             user_id=user.id,

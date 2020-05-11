@@ -34,7 +34,7 @@ class TestIdeaService(unittest.TestCase):
             symbol="AAPL",
             position_type="long",
             price_target=400,
-            entry_price=309.93,
+            entry_price=313.49,
             thesis_summary="My Thesis Summary",
             full_report="My Full Report",
             exhibits=[exhibit1, exhibit2],
@@ -48,7 +48,7 @@ class TestIdeaService(unittest.TestCase):
         assert new_idea.company_name == "Apple, Inc."
         assert new_idea.market_cap > 500000000000
         assert new_idea.sector == "technology"
-        assert new_idea.entry_price == 309.93
+        assert new_idea.entry_price == 313.49
         # entry price withing 1% of last price
         assert abs(new_idea.last_price - new_idea.entry_price) / new_idea.last_price < 0.01
         assert new_idea.thesis_summary == "My Thesis Summary"
@@ -81,7 +81,7 @@ class TestIdeaService(unittest.TestCase):
             symbol="AAPL",
             position_type="long",
             price_target=400,
-            entry_price=309.93,
+            entry_price=313.49,
             thesis_summary="My Thesis Summary",
             full_report="My Full Report"
         )
@@ -101,7 +101,7 @@ class TestIdeaService(unittest.TestCase):
             symbol="AAPL",
             position_type="long",
             price_target=400,
-            entry_price=309.93,
+            entry_price=313.49,
             thesis_summary="My Thesis Summary",
             full_report="My Full Report",
         )
@@ -114,7 +114,7 @@ class TestIdeaService(unittest.TestCase):
             symbol="GM",
             position_type="short",
             price_target=10,
-            entry_price=23.88,
+            entry_price=23.21,
             thesis_summary="My Thesis Summary",
             full_report="My Full Report",
         )

@@ -14,18 +14,22 @@ class TestBookmarkService(unittest.TestCase):
         self.app = flask_test_client()
         db.create_all()
 
-    def test_save_new_bookmark_and_get_bookmark_by_id(self) -> None:
-        user = self.user_service.save_new_user("user@email.com", "user", "password")
-        analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
+    def create_new_idea(self, analyst_id) -> "IdeaModel":
         idea = self.idea_service.save_new_idea(
-            analyst_id=analyst.id,
+            analyst_id=analyst_id,
             symbol="AAPL",
             position_type="long",
             price_target=400,
-            entry_price=309.93,
+            entry_price=313.49,
             thesis_summary="My Thesis Summary",
             full_report="My Full Report",
         )["idea"]
+        return idea
+
+    def test_save_new_bookmark_and_get_bookmark_by_id(self) -> None:
+        user = self.user_service.save_new_user("user@email.com", "user", "password")
+        analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
+        idea = self.create_new_idea(analyst.id)
         bookmark = self.bookmark_service.save_new_bookmark(user_id=user.id, idea_id=idea.id)
         found_bookmark = self.bookmark_service.get_bookmark_by_id(bookmark.id)
         assert found_bookmark.id == bookmark.id
@@ -39,15 +43,7 @@ class TestBookmarkService(unittest.TestCase):
     def test_delete_bookmark_by_id(self) -> None:
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.idea_service.save_new_idea(
-            analyst_id=analyst.id,
-            symbol="AAPL",
-            position_type="long",
-            price_target=400,
-            entry_price=309.93,
-            thesis_summary="My Thesis Summary",
-            full_report="My Full Report",
-        )["idea"]
+        idea = self.create_new_idea(analyst.id)
         bookmark = self.bookmark_service.save_new_bookmark(user_id=user.id, idea_id=idea.id)
         self.bookmark_service.delete_bookmark_by_id(bookmark.id)
         found_bookmark = self.bookmark_service.get_bookmark_by_id(bookmark.id)
@@ -57,15 +53,7 @@ class TestBookmarkService(unittest.TestCase):
     def test_get_bookmark_by_user_and_idea(self) -> None:
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.idea_service.save_new_idea(
-            analyst_id=analyst.id,
-            symbol="AAPL",
-            position_type="long",
-            price_target=400,
-            entry_price=309.93,
-            thesis_summary="My Thesis Summary",
-            full_report="My Full Report",
-        )["idea"]
+        idea = self.create_new_idea(analyst.id)
         bookmark = self.bookmark_service.save_new_bookmark(user_id=user.id, idea_id=idea.id)
         found_bookmark = self.bookmark_service.get_bookmark_by_user_and_idea(user_id=user.id, idea_id=idea.id)
         assert found_bookmark.id == bookmark.id
@@ -73,6 +61,18 @@ class TestBookmarkService(unittest.TestCase):
         # make sure returns none if not found
         found_bookmark = self.bookmark_service.get_bookmark_by_user_and_idea(10, 10)
         assert found_bookmark is None
+
+    def test_get_users_bookmarked_ideas(self) -> None:
+        user = self.user_service.save_new_user("user@email.com", "user", "password")
+        analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
+        idea1 = self.create_new_idea(analyst.id)
+        idea2 = self.create_new_idea(analyst.id)
+        self.bookmark_service.save_new_bookmark(user_id=user.id, idea_id=idea1.id)
+        self.bookmark_service.save_new_bookmark(user_id=user.id, idea_id=idea2.id)
+        bookmarked_ideas = self.bookmark_service.get_users_bookmarked_ideas(user.id)
+        assert len(bookmarked_ideas) == 2
+        assert bookmarked_ideas[0].id == idea2.id
+        assert bookmarked_ideas[1].id == idea1.id
 
     def tearDown(self) -> None:
         db.session.remove()

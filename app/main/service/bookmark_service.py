@@ -24,6 +24,11 @@ class BookmarkService:
         self.delete_from_db(bookmark)
 
     @classmethod
+    def get_users_bookmarked_ideas(cls, user_id: int) -> List["IdeaModel"]:
+        return IdeaModel.query.join(BookmarkModel).order_by(db.desc(BookmarkModel.created_at))\
+            .filter(BookmarkModel.user_id == user_id).all()
+
+    @classmethod
     def delete_from_db(cls, data) -> None:
         db.session.delete(data)
         db.session.commit()

@@ -17,6 +17,8 @@ from app.main.controller.follow_controller import Follow, FollowingList, Followe
 from app.main.controller.review_controller import NewReview, Review, AnalystReviews
 from app.main.controller.comment_controller import NewComment, Comment, IdeaComments
 from app.main.controller.upvote_controller import Upvote, UpvoteFeed
+from app.main.controller.downvote_controller import Downvote
+from app.main.controller.bookmark_controller import Bookmark, BookmarkFeed
 
 # Services
 from app.main.service.user_service import UserService
@@ -116,6 +118,18 @@ def create_app(services, config_name):
     api.add_resource(UpvoteFeed, '/user/<string:username>/upvotes',
                      resource_class_kwargs={
                          "upvote_service": services["upvote"],
+                         "user_service": services["user"]})
+    api.add_resource(Downvote, '/idea/<int:idea_id>/downvote',
+                     resource_class_kwargs={
+                         "idea_service": services["idea"],
+                         "downvote_service": services["downvote"]})
+    api.add_resource(Bookmark, '/idea/<int:idea_id>/bookmark',
+                     resource_class_kwargs={
+                         "idea_service": services["idea"],
+                         "bookmark_service": services["bookmark"]})
+    api.add_resource(BookmarkFeed, '/user/<string:username>/bookmarks',
+                     resource_class_kwargs={
+                         "bookmark_service": services["bookmark"],
                          "user_service": services["user"]})
 
     return app

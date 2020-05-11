@@ -34,7 +34,7 @@ class TestCommentController(unittest.TestCase):
             symbol="AAPL",
             position_type="long",
             price_target=400,
-            entry_price=309.93,
+            entry_price=313.30,
             thesis_summary="My Thesis Summary",
             full_report="My Full Report",)
         return new_idea_dict["idea"]

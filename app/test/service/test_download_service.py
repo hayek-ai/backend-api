@@ -22,7 +22,7 @@ class TestDownloadService(unittest.TestCase):
             symbol="AAPL",
             position_type="long",
             price_target=400,
-            entry_price=309.95,
+            entry_price=313.49,
             thesis_summary="My Thesis Summary",
             full_report="My Full Report"
         )

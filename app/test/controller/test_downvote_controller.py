@@ -3,18 +3,18 @@ import json
 from app.test.conftest import flask_test_client, services_for_test
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService
-from app.main.service.upvote_service import UpvoteService
+from app.main.service.downvote_service import DownvoteService
 from app.main.db import db
 from app.main.libs.strings import get_text
 
 
-class TestUpvoteController(unittest.TestCase):
+class TestDownvoteController(unittest.TestCase):
     def setUp(self) -> None:
         self.client = flask_test_client(services_for_test(
-            user=UserService(), idea=IdeaService(), upvote=UpvoteService()))
+            user=UserService(), idea=IdeaService(), downvote=DownvoteService()))
         self.user_service = UserService()
         self.idea_service = IdeaService()
-        self.upvote_service = UpvoteService()
+        self.downvote_service = DownvoteService()
         db.create_all()
 
     def create_user(self, email, username, **kwargs) -> dict:
@@ -38,57 +38,38 @@ class TestUpvoteController(unittest.TestCase):
             full_report="My Full Report",)
         return new_idea_dict["idea"]
 
-    def upvote_idea(self, idea_id, access_token):
-        """Creates/Deletes upvote and returns response"""
+    def downvote_idea(self, idea_id, access_token):
+        """Creates/Deletes downvote and returns response"""
         response = self.client.post(
-            f"/idea/{idea_id}/upvote",
+            f"/idea/{idea_id}/downvote",
             headers={"Authorization": "Bearer {}".format(access_token)})
         return response
 
-    def test_create_and_delete_upvote_post(self) -> None:
+    def test_create_and_delete_downvote_post(self) -> None:
         user_dict = self.create_user("user@email.com", "user")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea = self.create_idea(analyst.id)
 
-        # create upvote
-        response = self.upvote_idea(idea.id, user_dict["access_token"])
+        # create downvote
+        response = self.downvote_idea(idea.id, user_dict["access_token"])
         assert response.status_code == 200
-        upvote = self.upvote_service.get_upvote_by_id(1)
-        assert upvote is not None
+        downvote = self.downvote_service.get_downvote_by_id(1)
+        assert downvote is not None
         response_data = json.loads(response.data)
-        assert response_data["message"] == get_text("successfully_created").format("Upvote")
+        assert response_data["message"] == get_text("successfully_created").format("Downvote")
         assert response_data["idea"]["id"] == idea.id
-        assert response_data["idea"]["numUpvotes"] == 1
-        assert response_data["idea"]["score"] == 1
+        assert response_data["idea"]["numDownvotes"] == 1
+        assert response_data["idea"]["score"] == -1
 
-        # delete upvote
-        response = self.upvote_idea(idea.id, user_dict["access_token"])
-        upvote = self.upvote_service.get_upvote_by_id(1)
+        response = self.downvote_idea(idea.id, user_dict["access_token"])
         assert response.status_code == 200
+        downvote = self.downvote_service.get_downvote_by_id(1)
+        assert downvote is None
         response_data = json.loads(response.data)
-        assert response_data["message"] == get_text("successfully_deleted").format("Upvote")
-        assert response_data["idea"]["id"] == idea.id
-        assert response_data["idea"]["numUpvotes"] == 0
+        assert response_data["message"] == get_text("successfully_deleted").format("Downvote")
+        assert response_data["idea"]["id"]== idea.id
+        assert response_data["idea"]["numDownvotes"] == 0
         assert response_data["idea"]["score"] == 0
-        assert upvote is None
-
-    def test_get_upvote_feed(self) -> None:
-        user_dict = self.create_user("user@email.com", "user")
-        analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea1 = self.create_idea(analyst.id)
-        idea2 = self.create_idea(analyst.id)
-
-        self.upvote_idea(idea1.id, user_dict["access_token"])
-        self.upvote_idea(idea2.id, user_dict["access_token"])
-
-        response = self.client.get(
-            f'/user/{user_dict["user"].username}/upvotes',
-            headers={"Authorization": "Bearer {}".format(user_dict["access_token"])})
-        response_data = json.loads(response.data)
-        assert response.status_code == 200
-        assert len(response_data["ideas"]) == 2
-        assert response_data["ideas"][0]["analyst"]["id"] == analyst.id
-        assert response_data["ideas"][1]["analyst"]["id"] == analyst.id
 
     def tearDown(self) -> None:
         db.session.remove()

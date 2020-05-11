@@ -3,18 +3,18 @@ import json
 from app.test.conftest import flask_test_client, services_for_test
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService
-from app.main.service.upvote_service import UpvoteService
+from app.main.service.bookmark_service import BookmarkService
 from app.main.db import db
 from app.main.libs.strings import get_text
 
 
-class TestUpvoteController(unittest.TestCase):
+class TestBookmarkController(unittest.TestCase):
     def setUp(self) -> None:
         self.client = flask_test_client(services_for_test(
-            user=UserService(), idea=IdeaService(), upvote=UpvoteService()))
+            user=UserService(), idea=IdeaService(), bookmark=BookmarkService()))
         self.user_service = UserService()
         self.idea_service = IdeaService()
-        self.upvote_service = UpvoteService()
+        self.bookmark_service = BookmarkService()
         db.create_all()
 
     def create_user(self, email, username, **kwargs) -> dict:
@@ -38,54 +38,48 @@ class TestUpvoteController(unittest.TestCase):
             full_report="My Full Report",)
         return new_idea_dict["idea"]
 
-    def upvote_idea(self, idea_id, access_token):
-        """Creates/Deletes upvote and returns response"""
+    def bookmark_idea(self, idea_id, access_token):
+        """Creates/Deletes bookmark and returns response"""
         response = self.client.post(
-            f"/idea/{idea_id}/upvote",
+            f"/idea/{idea_id}/bookmark",
             headers={"Authorization": "Bearer {}".format(access_token)})
         return response
 
-    def test_create_and_delete_upvote_post(self) -> None:
+    def test_create_and_delete_bookmark_post(self) -> None:
         user_dict = self.create_user("user@email.com", "user")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea = self.create_idea(analyst.id)
 
-        # create upvote
-        response = self.upvote_idea(idea.id, user_dict["access_token"])
-        assert response.status_code == 200
-        upvote = self.upvote_service.get_upvote_by_id(1)
-        assert upvote is not None
-        response_data = json.loads(response.data)
-        assert response_data["message"] == get_text("successfully_created").format("Upvote")
-        assert response_data["idea"]["id"] == idea.id
-        assert response_data["idea"]["numUpvotes"] == 1
-        assert response_data["idea"]["score"] == 1
-
-        # delete upvote
-        response = self.upvote_idea(idea.id, user_dict["access_token"])
-        upvote = self.upvote_service.get_upvote_by_id(1)
+        response = self.bookmark_idea(idea.id, user_dict["access_token"])
+        bookmark = self.bookmark_service.get_bookmark_by_id(1)
         assert response.status_code == 200
         response_data = json.loads(response.data)
-        assert response_data["message"] == get_text("successfully_deleted").format("Upvote")
+        assert response_data["message"] == get_text("successfully_created").format("Bookmark")
         assert response_data["idea"]["id"] == idea.id
-        assert response_data["idea"]["numUpvotes"] == 0
-        assert response_data["idea"]["score"] == 0
-        assert upvote is None
+        assert bookmark is not None
 
-    def test_get_upvote_feed(self) -> None:
+        response = self.bookmark_idea(idea.id, user_dict["access_token"])
+        bookmark = self.bookmark_service.get_bookmark_by_id(1)
+        assert response.status_code == 200
+        response_data = json.loads(response.data)
+        assert response_data["message"] == get_text("successfully_deleted").format("Bookmark")
+        assert response_data["idea"]["id"] == idea.id
+        assert bookmark is None
+
+    def test_get_bookmark_feed(self) -> None:
         user_dict = self.create_user("user@email.com", "user")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea1 = self.create_idea(analyst.id)
         idea2 = self.create_idea(analyst.id)
 
-        self.upvote_idea(idea1.id, user_dict["access_token"])
-        self.upvote_idea(idea2.id, user_dict["access_token"])
+        self.bookmark_idea(idea1.id, user_dict["access_token"])
+        self.bookmark_idea(idea2.id, user_dict["access_token"])
 
         response = self.client.get(
-            f'/user/{user_dict["user"].username}/upvotes',
+            f'/user/{user_dict["user"].username}/bookmarks',
             headers={"Authorization": "Bearer {}".format(user_dict["access_token"])})
-        response_data = json.loads(response.data)
         assert response.status_code == 200
+        response_data = json.loads(response.data)
         assert len(response_data["ideas"]) == 2
         assert response_data["ideas"][0]["analyst"]["id"] == analyst.id
         assert response_data["ideas"][1]["analyst"]["id"] == analyst.id
@@ -93,4 +87,3 @@ class TestUpvoteController(unittest.TestCase):
     def tearDown(self) -> None:
         db.session.remove()
         db.drop_all()
-

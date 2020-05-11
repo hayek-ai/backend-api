@@ -14,18 +14,22 @@ class TestDownvoteService(unittest.TestCase):
         self.app = flask_test_client()
         db.create_all()
 
-    def test_save_new_downvote_and_get_downvote_by_id(self) -> None:
-        user = self.user_service.save_new_user("user@email.com", "user", "password")
-        analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.idea_service.save_new_idea(
-            analyst_id=analyst.id,
+    def create_idea_for_test(self, analyst_id: int) -> "IdeaModel":
+        new_idea_dict = self.idea_service.save_new_idea(
+            analyst_id=analyst_id,
             symbol="AAPL",
             position_type="long",
             price_target=400,
-            entry_price=309.93,
+            entry_price=313.49,
             thesis_summary="My Thesis Summary",
-            full_report="My Full Report",
-        )["idea"]
+            full_report="My Full Report"
+        )
+        return new_idea_dict["idea"]
+
+    def test_save_new_downvote_and_get_downvote_by_id(self) -> None:
+        user = self.user_service.save_new_user("user@email.com", "user", "password")
+        analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
+        idea = self.create_idea_for_test(analyst.id)
         downvote = self.downvote_service.save_new_downvote(user_id=user.id, idea_id=idea.id)
         found_downvote = self.downvote_service.get_downvote_by_id(downvote.id)
         assert found_downvote.id == downvote.id
@@ -42,15 +46,8 @@ class TestDownvoteService(unittest.TestCase):
     def test_delete_downvote_by_id(self) -> None:
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.idea_service.save_new_idea(
-            analyst_id=analyst.id,
-            symbol="AAPL",
-            position_type="long",
-            price_target=400,
-            entry_price=309.93,
-            thesis_summary="My Thesis Summary",
-            full_report="My Full Report",
-        )["idea"]
+        idea = self.create_idea_for_test(analyst.id)
+
         downvote = self.downvote_service.save_new_downvote(user_id=user.id, idea_id=idea.id)
         self.downvote_service.delete_downvote_by_id(downvote.id)
         found_downvote = self.downvote_service.get_downvote_by_id(downvote.id)
@@ -63,15 +60,7 @@ class TestDownvoteService(unittest.TestCase):
         user1 = self.user_service.save_new_user("user1@email.com", "user1", "password")
         user2 = self.user_service.save_new_user("user2@email.com", "user2", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.idea_service.save_new_idea(
-            analyst_id=analyst.id,
-            symbol="AAPL",
-            position_type="long",
-            price_target=400,
-            entry_price=309.93,
-            thesis_summary="My Thesis Summary",
-            full_report="My Full Report",
-        )["idea"]
+        idea = self.create_idea_for_test(analyst.id)
         downvote1 = self.downvote_service.save_new_downvote(user_id=user1.id, idea_id=idea.id)
         downvote2 = self.downvote_service.save_new_downvote(user_id=user2.id, idea_id=idea.id)
         downvotes = self.downvote_service.get_all_downvotes_for_idea(idea.id)
@@ -82,15 +71,7 @@ class TestDownvoteService(unittest.TestCase):
     def test_downvote_by_user_and_idea(self) -> None:
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.idea_service.save_new_idea(
-            analyst_id=analyst.id,
-            symbol="AAPL",
-            position_type="long",
-            price_target=400,
-            entry_price=309.93,
-            thesis_summary="My Thesis Summary",
-            full_report="My Full Report",
-        )["idea"]
+        idea = self.create_idea_for_test(analyst.id)
         downvote = self.downvote_service.save_new_downvote(user_id=user.id, idea_id=idea.id)
         found_downvote = self.downvote_service.get_downvote_by_user_and_idea(user_id=user.id, idea_id=idea.id)
         assert found_downvote.id == downvote.id
