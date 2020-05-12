@@ -1,15 +1,14 @@
 import json
 import unittest
-
+import requests_mock
 from app.main.db import db
 from app.main.libs.strings import get_text
 from app.main.service.confirmation_service import ConfirmationService
 from app.main.service.user_service import UserService
-from app.test.conftest import flask_test_client, services_for_test, register_mock_mailgun, requests_session
-
-register_mock_mailgun(requests_session())
+from app.test.conftest import flask_test_client, services_for_test, register_mock_mailgun
 
 
+@requests_mock.Mocker()
 class TestConfirmationController(unittest.TestCase):
     def setUp(self) -> None:
         self.client = flask_test_client(
@@ -27,7 +26,9 @@ class TestConfirmationController(unittest.TestCase):
         login_data = json.loads(response.data)
         return login_data["accessToken"]
 
-    def test_confirm_user(self) -> None:
+    def test_confirm_user(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("michaelmcguiness123@gmail.com", "username", "password")
         assert user.is_confirmed is False
         code = user.most_recent_confirmation.code

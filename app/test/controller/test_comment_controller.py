@@ -1,6 +1,8 @@
 import unittest
 import json
-from app.test.conftest import flask_test_client, services_for_test
+import requests_mock
+
+from app.test.conftest import flask_test_client, services_for_test,register_mock_iex, register_mock_mailgun
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService
 from app.main.service.comment_service import CommentService
@@ -8,6 +10,7 @@ from app.main.db import db
 from app.main.libs.strings import get_text
 
 
+@requests_mock.Mocker()
 class TestCommentController(unittest.TestCase):
     def setUp(self) -> None:
         self.client = flask_test_client(services_for_test(
@@ -48,7 +51,10 @@ class TestCommentController(unittest.TestCase):
             headers={"Authorization": "Bearer {}".format(access_token)})
         return response
 
-    def test_new_comment_post(self) -> None:
+    def test_new_comment_post(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user_dict = self.create_user("user@email.com", "user")
         analyst_dict = self.create_user("analyst@email.com", "analyst", is_analyst=True)
         idea = self.create_idea(analyst_dict["user"].id)
@@ -61,7 +67,10 @@ class TestCommentController(unittest.TestCase):
         assert response_data["user"]["imageUrl"] is not None
         assert response_data["user"]["username"] == "user"
 
-    def test_get_and_delete_comment(self) -> None:
+    def test_get_and_delete_comment(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user_dict = self.create_user("user@email.com", "user")
         analyst_dict = self.create_user("analyst@email.com", "analyst", is_analyst=True)
         idea = self.create_idea(analyst_dict["user"].id)
@@ -86,7 +95,10 @@ class TestCommentController(unittest.TestCase):
         comment = self.comment_service.get_comment_by_id(comment.id)
         assert comment is None
 
-    def test_get_idea_comments(self) -> None:
+    def test_get_idea_comments(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user_dict = self.create_user("user@email.com", "user")
         analyst_dict = self.create_user("analyst@email.com", "analyst", is_analyst=True)
         idea = self.create_idea(analyst_dict["user"].id)
@@ -105,7 +117,6 @@ class TestCommentController(unittest.TestCase):
         assert len(response_data) == 2
         assert response_data[0]["id"] == response2_data["id"]
         assert response_data[1]["id"] == response1_data["id"]
-
 
     def tearDown(self) -> None:
         db.session.remove()

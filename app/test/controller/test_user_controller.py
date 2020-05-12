@@ -1,16 +1,16 @@
 import json
 import unittest
+import requests_mock
 
 from app.main.db import db
 from app.main.libs.s3 import S3
 from app.main.libs.strings import get_text
 from app.main.libs.util import create_image_file
 from app.main.service.user_service import UserService
-from app.test.conftest import flask_test_client, services_for_test, register_mock_mailgun, requests_session
-
-register_mock_mailgun(requests_session())
+from app.test.conftest import flask_test_client, services_for_test, register_mock_mailgun
 
 
+@requests_mock.Mocker()
 class TestUserController(unittest.TestCase):
     def setUp(self) -> None:
         self.client = flask_test_client(services_for_test(user=UserService()))
@@ -26,7 +26,9 @@ class TestUserController(unittest.TestCase):
         login_data = json.loads(response.data)
         return login_data["accessToken"]
 
-    def test_register_user_post(self) -> None:
+    def test_register_user_post(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         response = self.client.post('/register', data=json.dumps(dict(
             email='email@email.com',
             username='username',
@@ -103,7 +105,9 @@ class TestUserController(unittest.TestCase):
         assert data["errors"][0]["username"] == [get_text("username_invalid")]
         assert response.status_code == 400
 
-    def test_get_user(self) -> None:
+    def test_get_user(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         # create users
         self.service.save_new_user("email1@email.com", "username1", "password")
         self.service.save_new_user("email2@email.com", "username2", "password")
@@ -142,7 +146,9 @@ class TestUserController(unittest.TestCase):
         assert data["errors"][0]["detail"] == get_text("not_found").format("User")
         assert response.status_code == 404
 
-    def test_edit_user_put(self) -> None:
+    def test_edit_user_put(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         self.service.save_new_user("email@email.com", "username", "password")
         self.service.save_new_user("email2@email.com", "username2", "password")
 
@@ -195,7 +201,9 @@ class TestUserController(unittest.TestCase):
         assert updated_user["prefersDarkmode"] is True
         assert response.status_code == 201
 
-    def test_login_user_post(self) -> None:
+    def test_login_user_post(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         self.service.save_new_user("email@email.com", "username", "password")
 
         # login with username
@@ -244,7 +252,7 @@ class TestUserController(unittest.TestCase):
         assert data["errors"][0]["detail"] == get_text("incorrect_fields")
         assert response.status_code == 400
 
-    def test_image_upload_post(self) -> None:
+    def test_image_upload_post(self, mock) -> None:
         self.service.save_new_user("email@email.com", "username", "password")
 
         image = create_image_file("test.jpg", "image/jpg")

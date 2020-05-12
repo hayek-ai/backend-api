@@ -1,18 +1,16 @@
 import json
 import unittest
+import requests_mock
 
 from app.main.db import db
 from app.main.libs.util import create_image_file
 from app.main.service.download_service import DownloadService
 from app.main.service.idea_service import IdeaService
 from app.main.service.user_service import UserService
-from app.test.conftest import flask_test_client, services_for_test, register_mock_mailgun, register_mock_iex, requests_session
-
-session = requests_session()
-register_mock_mailgun(session)
-register_mock_iex(session)
+from app.test.conftest import flask_test_client, services_for_test, register_mock_mailgun, register_mock_iex
 
 
+@requests_mock.Mocker()
 class TestIdeaController(unittest.TestCase):
     def setUp(self) -> None:
         self.client = flask_test_client(services_for_test(
@@ -33,7 +31,10 @@ class TestIdeaController(unittest.TestCase):
         login_data = json.loads(response.data)
         return login_data["accessToken"]
 
-    def test_new_idea_post(self) -> None:
+    def test_new_idea_post(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         access_token = self.create_analyst("email@email.com", "username")
 
         # simple idea submit with exhibits
@@ -153,7 +154,10 @@ class TestIdeaController(unittest.TestCase):
         )
         assert response.status_code == 400
 
-    def test_get_idea(self) -> None:
+    def test_get_idea(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         access_token = self.create_analyst("email@email.com", "username")
         exhibit1 = create_image_file("testexhibit1.png", "image/png")
         exhibit2 = create_image_file("testexhibit2.jpg", "image/jpg")
@@ -187,7 +191,10 @@ class TestIdeaController(unittest.TestCase):
         assert "fullReport" not in response_data
         assert "exhibits" not in response_data
 
-    def test_download_report(self) -> None:
+    def test_download_report(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         access_token = self.create_analyst("email@email.com", "username")
         exhibit1 = create_image_file("testexhibit1.png", "image/png")
         exhibit2 = create_image_file("testexhibit2.jpg", "image/jpg")

@@ -1,12 +1,15 @@
 import unittest
 import json
-from app.test.conftest import flask_test_client, services_for_test
+import requests_mock
+
+from app.test.conftest import flask_test_client, services_for_test, register_mock_mailgun
 from app.main.service.user_service import UserService
 from app.main.service.follow_service import FollowService
 from app.main.db import db
 from app.main.libs.strings import get_text
 
 
+@requests_mock.Mocker()
 class TestFollowController(unittest.TestCase):
     def setUp(self) -> None:
         self.client = flask_test_client(services_for_test(user=UserService(), follow=FollowService()))
@@ -25,7 +28,9 @@ class TestFollowController(unittest.TestCase):
         login_data = json.loads(response.data)
         return login_data["accessToken"]
 
-    def test_follow_and_unfollow_post(self) -> None:
+    def test_follow_and_unfollow_post(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         access_token = self.create_user("email@email.com", "username")
         analyst = self.user_service.save_new_user(
             "analyst@email.com", "analyst", "password", is_analyst=True)
@@ -49,7 +54,9 @@ class TestFollowController(unittest.TestCase):
         assert response_data["analyst"]["id"] == analyst.id
         assert response_data["analyst"]["numFollowers"] == 0
 
-    def test_following_get_and_followers_get(self) -> None:
+    def test_following_get_and_followers_get(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         # create follow relationship
         access_token = self.create_user("email@email.com", "username")
         analyst = self.user_service.save_new_user(

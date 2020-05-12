@@ -1,14 +1,15 @@
 import unittest
+import requests_mock
 
 from app.main.libs.email import Email
-from app.test.conftest import register_mock_mailgun, requests_session
-
-register_mock_mailgun(requests_session())
+from app.test.conftest import register_mock_mailgun
 
 
 class TestEmailLib(unittest.TestCase):
     @classmethod
-    def test_send_email(cls):
+    @requests_mock.Mocker()
+    def test_send_email(cls, mock):
+        register_mock_mailgun(mock)
         email = "michaelmcguiness123@gmail.com"
         subject = "Test Subject"
         text = "Test Text"

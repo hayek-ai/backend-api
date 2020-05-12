@@ -1,13 +1,16 @@
 import unittest
 import json
+import requests_mock
+
 from flask import Response
-from app.test.conftest import flask_test_client, services_for_test
+from app.test.conftest import flask_test_client, services_for_test, register_mock_mailgun
 from app.main.service.user_service import UserService
 from app.main.service.review_service import ReviewService
 from app.main.db import db
 from app.main.libs.strings import get_text
 
 
+@requests_mock.Mocker()
 class TestReviewController(unittest.TestCase):
     def setUp(self) -> None:
         self.client = flask_test_client(services_for_test(user=UserService(), review=ReviewService()))
@@ -39,7 +42,9 @@ class TestReviewController(unittest.TestCase):
             headers={"Authorization": "Bearer {}".format(access_token)})
         return response
 
-    def test_new_review_post(self) -> None:
+    def test_new_review_post(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         user_dict = self.create_user("user@email.com", "user", is_pro_tier=True)
         user_id = user_dict["user"].id
         analyst_dict = self.create_user("analyst@email.com", "analyst", is_analyst=True)
@@ -68,7 +73,9 @@ class TestReviewController(unittest.TestCase):
         )
         assert response.status_code == 400
 
-    def test_get_and_delete_review(self) -> None:
+    def test_get_and_delete_review(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         user_dict = self.create_user("user@email.com", "user", is_pro_tier=True)
         analyst_dict = self.create_user("analyst@email.com", "analyst", is_analyst=True)
 
@@ -94,7 +101,9 @@ class TestReviewController(unittest.TestCase):
         review = self.review_service.get_review_by_id(review.id)
         assert review is None
 
-    def test_get_analyst_reviews(self) -> None:
+    def test_get_analyst_reviews(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         user1_dict = self.create_user("user1@email.com", "user1", is_pro_tier=True)
         user2_dict = self.create_user("user2@email.com", "user2", is_pro_tier=True)
         analyst_dict = self.create_user("analyst@email.com", "analyst", is_analyst=True)

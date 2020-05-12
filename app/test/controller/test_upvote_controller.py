@@ -1,6 +1,8 @@
 import unittest
 import json
-from app.test.conftest import flask_test_client, services_for_test
+import requests_mock
+
+from app.test.conftest import flask_test_client, services_for_test, register_mock_iex, register_mock_mailgun
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService
 from app.main.service.upvote_service import UpvoteService
@@ -8,6 +10,7 @@ from app.main.db import db
 from app.main.libs.strings import get_text
 
 
+@requests_mock.Mocker()
 class TestUpvoteController(unittest.TestCase):
     def setUp(self) -> None:
         self.client = flask_test_client(services_for_test(
@@ -45,7 +48,10 @@ class TestUpvoteController(unittest.TestCase):
             headers={"Authorization": "Bearer {}".format(access_token)})
         return response
 
-    def test_create_and_delete_upvote_post(self) -> None:
+    def test_create_and_delete_upvote_post(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user_dict = self.create_user("user@email.com", "user")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea = self.create_idea(analyst.id)
@@ -72,7 +78,10 @@ class TestUpvoteController(unittest.TestCase):
         assert response_data["idea"]["score"] == 0
         assert upvote is None
 
-    def test_get_upvote_feed(self) -> None:
+    def test_get_upvote_feed(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user_dict = self.create_user("user@email.com", "user")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea1 = self.create_idea(analyst.id)
