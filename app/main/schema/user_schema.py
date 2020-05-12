@@ -26,7 +26,7 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
 
 class UserRegisterSchema(Schema):
     email = fields.Email(required=True)
-    username = fields.Str(required=True, validate=Length(min=1, max=20))
+    username = fields.Str(required=True, validate=Length(min=4, max=20))
     password = fields.Str(required=True, validate=Length(min=4))
 
     @validates('username')
