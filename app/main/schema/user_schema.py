@@ -12,8 +12,8 @@ from app.main.schema.bookmark_schema import BookmarkSchema
 
 class UserSchema(ma.SQLAlchemyAutoSchema):
     upvotes = ma.Nested(UpvoteSchema, many=True)
-    downvotes = ma.Nested(UpvoteSchema, many=True)
-    bookmarks = ma.Nested(UpvoteSchema, many=True)
+    downvotes = ma.Nested(DownvoteSchema, many=True)
+    bookmarks = ma.Nested(BookmarkSchema, many=True)
 
     class Meta:
         model = UserModel
