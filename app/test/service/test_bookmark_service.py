@@ -1,11 +1,13 @@
 import unittest
+import requests_mock
 from app.main.db import db
-from app.test.conftest import flask_test_client
+from app.test.conftest import flask_test_client, register_mock_iex, register_mock_mailgun
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService
 from app.main.service.bookmark_service import BookmarkService
 
 
+@requests_mock.Mocker()
 class TestBookmarkService(unittest.TestCase):
     def setUp(self) -> None:
         self.user_service = UserService()
@@ -26,7 +28,10 @@ class TestBookmarkService(unittest.TestCase):
         )["idea"]
         return idea
 
-    def test_save_new_bookmark_and_get_bookmark_by_id(self) -> None:
+    def test_save_new_bookmark_and_get_bookmark_by_id(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea = self.create_new_idea(analyst.id)
@@ -40,7 +45,10 @@ class TestBookmarkService(unittest.TestCase):
         not_found = self.bookmark_service.get_bookmark_by_id(10)
         assert not_found is None
 
-    def test_delete_bookmark_by_id(self) -> None:
+    def test_delete_bookmark_by_id(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea = self.create_new_idea(analyst.id)
@@ -50,7 +58,10 @@ class TestBookmarkService(unittest.TestCase):
         assert found_bookmark is None
         assert len(user.bookmarks.all()) == 0
 
-    def test_get_bookmark_by_user_and_idea(self) -> None:
+    def test_get_bookmark_by_user_and_idea(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea = self.create_new_idea(analyst.id)
@@ -62,7 +73,10 @@ class TestBookmarkService(unittest.TestCase):
         found_bookmark = self.bookmark_service.get_bookmark_by_user_and_idea(10, 10)
         assert found_bookmark is None
 
-    def test_get_users_bookmarked_ideas(self) -> None:
+    def test_get_users_bookmarked_ideas(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea1 = self.create_new_idea(analyst.id)

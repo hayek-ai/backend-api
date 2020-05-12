@@ -1,10 +1,12 @@
 import unittest
+import requests_mock
 from app.main.db import db
-from app.test.conftest import flask_test_client
+from app.test.conftest import flask_test_client, register_mock_mailgun
 from app.main.service.user_service import UserService
 from app.main.service.review_service import ReviewService
 
 
+@requests_mock.Mocker()
 class TestReviewService(unittest.TestCase):
     def setUp(self) -> None:
         self.user_service = UserService()
@@ -12,7 +14,9 @@ class TestReviewService(unittest.TestCase):
         self.app = flask_test_client()
         db.create_all()
 
-    def test_save_new_review_and_get_review_by_id(self) -> None:
+    def test_save_new_review_and_get_review_by_id(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         review = self.review_service.save_new_review(
@@ -35,7 +39,9 @@ class TestReviewService(unittest.TestCase):
         not_found = self.review_service.get_review_by_id(10)
         assert not_found is None
 
-    def test_get_review_by_user_and_analyst(self) -> None:
+    def test_get_review_by_user_and_analyst(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         review = self.review_service.save_new_review(
@@ -51,7 +57,9 @@ class TestReviewService(unittest.TestCase):
         not_found = self.review_service.get_review_by_user_and_analyst(10, 10)
         assert not_found is None
 
-    def test_delete_review_by_id(self) -> None:
+    def test_delete_review_by_id(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         review = self.review_service.save_new_review(
@@ -66,7 +74,9 @@ class TestReviewService(unittest.TestCase):
         review = self.review_service.get_review_by_id(review.id)
         assert review is None
 
-    def test_get_all_reviews_for_analyst(self) -> None:
+    def test_get_all_reviews_for_analyst(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         user1 = self.user_service.save_new_user("user1@email.com", "user1", "password")
         user2 = self.user_service.save_new_user("user2@email.com", "user2", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)

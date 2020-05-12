@@ -1,11 +1,16 @@
 import unittest
+
+import requests_mock
+
 from app.main.db import db
-from app.test.conftest import flask_test_client
-from app.main.service.user_service import UserService
+from app.main.model.idea import IdeaModel
 from app.main.service.idea_service import IdeaService
 from app.main.service.upvote_service import UpvoteService
-from app.main.model.idea import IdeaModel
+from app.main.service.user_service import UserService
+from app.test.conftest import flask_test_client, register_mock_iex, register_mock_mailgun
 
+
+@requests_mock.Mocker()
 class TestUpvoteService(unittest.TestCase):
     def setUp(self) -> None:
         self.user_service = UserService()
@@ -26,7 +31,10 @@ class TestUpvoteService(unittest.TestCase):
         )["idea"]
         return idea
 
-    def test_save_new_upvote_and_get_upvote_by_id(self) -> None:
+    def test_save_new_upvote_and_get_upvote_by_id(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea = self.create_new_idea(analyst.id)
@@ -43,7 +51,10 @@ class TestUpvoteService(unittest.TestCase):
         not_found = self.upvote_service.get_upvote_by_id(10)
         assert not_found is None
 
-    def test_delete_upvote_by_id(self) -> None:
+    def test_delete_upvote_by_id(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea = self.create_new_idea(analyst.id)
@@ -55,7 +66,10 @@ class TestUpvoteService(unittest.TestCase):
         assert idea.num_upvotes == 0
         assert idea.score == 0
 
-    def test_get_all_upvotes_for_idea(self) -> None:
+    def test_get_all_upvotes_for_idea(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user1 = self.user_service.save_new_user("user1@email.com", "user1", "password")
         user2 = self.user_service.save_new_user("user2@email.com", "user2", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
@@ -67,7 +81,10 @@ class TestUpvoteService(unittest.TestCase):
         assert upvotes[0].id == upvote2.id
         assert upvotes[1].id == upvote1.id
 
-    def test_get_upvote_by_user_and_idea(self) -> None:
+    def test_get_upvote_by_user_and_idea(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea = self.create_new_idea(analyst.id)
@@ -79,7 +96,10 @@ class TestUpvoteService(unittest.TestCase):
         found_upvote = self.upvote_service.get_upvote_by_user_and_idea(10, 10)
         assert found_upvote is None
 
-    def test_get_users_upvoted_ideas(self) -> None:
+    def test_get_users_upvoted_ideas(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea1 = self.create_new_idea(analyst.id)

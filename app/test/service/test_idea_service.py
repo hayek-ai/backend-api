@@ -2,17 +2,15 @@ import datetime
 import json
 import unittest
 
+import requests_mock
+
 from app.main.db import db
 from app.main.libs.s3 import S3
 from app.main.libs.util import create_image_file
 from app.main.service.idea_service import IdeaService
 from app.main.service.user_service import UserService
 from app.test.conftest import flask_test_client
-from app.test.conftest import register_mock_mailgun, register_mock_iex, requests_session
-
-session = requests_session()
-register_mock_mailgun(session)
-register_mock_iex(session)
+from app.test.conftest import register_mock_iex
 
 
 class TestIdeaService(unittest.TestCase):
@@ -22,7 +20,10 @@ class TestIdeaService(unittest.TestCase):
         self.app = flask_test_client()
         db.create_all()
 
-    def test_save_new_idea(self) -> None:
+    @requests_mock.Mocker()
+    def test_save_new_idea(self, mock) -> None:
+        register_mock_iex(mock)
+
         analyst = self.user_service \
             .save_new_user("email@email.com", "analyst", "password", is_analyst=True)
 
@@ -72,7 +73,10 @@ class TestIdeaService(unittest.TestCase):
         assert response_dict["url"] == f"{S3.S3_ENDPOINT_URL}/report_exhibits/test.png"
         assert response_dict["title"] == "Title"
 
-    def test_get_idea_by_id(self) -> None:
+    @requests_mock.Mocker()
+    def test_get_idea_by_id(self, mock) -> None:
+        register_mock_iex(mock)
+
         analyst = self.user_service \
             .save_new_user("email@email.com", "analyst", "password", is_analyst=True)
 
@@ -93,7 +97,10 @@ class TestIdeaService(unittest.TestCase):
         idea = self.idea_service.get_idea_by_id(3)
         assert idea is None
 
-    def test_query_ideas(self) -> None:
+    @requests_mock.Mocker()
+    def test_query_ideas(self, mock) -> None:
+        register_mock_iex(mock)
+
         analyst1 = self.user_service \
             .save_new_user("email1@email.com", "analyst1", "password", is_analyst=True)
         idea1_dict = self.idea_service.save_new_idea(

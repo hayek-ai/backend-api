@@ -1,11 +1,13 @@
 import unittest
+import requests_mock
 from app.main.db import db
-from app.test.conftest import flask_test_client
+from app.test.conftest import flask_test_client, register_mock_mailgun, register_mock_iex
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService
 from app.main.service.comment_service import CommentService
 
 
+@requests_mock.Mocker()
 class TestCommentService(unittest.TestCase):
     def setUp(self) -> None:
         self.user_service = UserService()
@@ -26,7 +28,10 @@ class TestCommentService(unittest.TestCase):
         )["idea"]
         return idea
 
-    def test_save_new_comment_and_get_comment_by_id(self) -> None:
+    def test_save_new_comment_and_get_comment_by_id(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea = self.create_new_idea(analyst.id)
@@ -48,7 +53,10 @@ class TestCommentService(unittest.TestCase):
         not_found = self.comment_service.get_comment_by_id(10)
         assert not_found is None
 
-    def test_delete_comment_by_id(self) -> None:
+    def test_delete_comment_by_id(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea = self.create_new_idea(analyst.id)
@@ -63,7 +71,10 @@ class TestCommentService(unittest.TestCase):
         assert len(idea.comments.all()) == 0
         assert idea.num_comments == 0
 
-    def test_get_all_comments_for_idea(self) -> None:
+    def test_get_all_comments_for_idea(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea = self.create_new_idea(analyst.id)

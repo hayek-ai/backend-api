@@ -1,14 +1,13 @@
 import unittest
+import requests_mock
 from app.main.service.confirmation_service import ConfirmationService
 from app.main.service.user_service import UserService
 from app.main.db import db
 from app.test.conftest import flask_test_client
-from app.test.conftest import register_mock_mailgun, requests_session
+from app.test.conftest import register_mock_mailgun
 
 
-register_mock_mailgun(requests_session())
-
-
+@requests_mock.Mocker()
 class TestConfirmationService(unittest.TestCase):
     def setUp(self) -> None:
         self.confirmation_service = ConfirmationService()
@@ -16,12 +15,16 @@ class TestConfirmationService(unittest.TestCase):
         self.app = flask_test_client()
         db.create_all()
 
-    def test_send_confirmation_email(self) -> None:
+    def test_send_confirmation_email(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         self.user_service.save_new_user("michaelmcguiness123@gmail.com", "user1", "password")
         response = self.confirmation_service.send_confirmation_email(1)
         assert response.status_code == 200
 
-    def test_get_confirmation_by_id(self) -> None:
+    def test_get_confirmation_by_id(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         new_user = self.user_service.save_new_user("email@email.com", "username", "password")
 
         confirmation = self.confirmation_service.get_confirmation_by_id(1)
@@ -33,7 +36,9 @@ class TestConfirmationService(unittest.TestCase):
         confirmation = self.confirmation_service.get_confirmation_by_id(2)
         assert confirmation is None
 
-    def test_force_to_expire(self) -> None:
+    def test_force_to_expire(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         new_user = self.user_service.save_new_user("email@email.com", "username", "password")
         confirmation = new_user.most_recent_confirmation
         assert confirmation.is_expired is False

@@ -1,10 +1,12 @@
 import unittest
+import requests_mock
 from app.main.db import db
-from app.test.conftest import flask_test_client
+from app.test.conftest import flask_test_client, register_mock_mailgun
 from app.main.service.user_service import UserService
 from app.main.service.follow_service import FollowService
 
 
+@requests_mock.Mocker()
 class TestFollowService(unittest.TestCase):
     def setUp(self) -> None:
         self.user_service = UserService()
@@ -12,7 +14,9 @@ class TestFollowService(unittest.TestCase):
         self.app = flask_test_client()
         db.create_all()
 
-    def test_save_new_follow_and_get_follow_by_id(self) -> None:
+    def test_save_new_follow_and_get_follow_by_id(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         follow = self.follow_service.save_new_follow(user_id=user.id, analyst_id=analyst.id)
@@ -29,7 +33,9 @@ class TestFollowService(unittest.TestCase):
         not_found = self.follow_service.get_follow_by_id(10)
         assert not_found is None
 
-    def test_get_follow_by_user_and_analyst(self) -> None:
+    def test_get_follow_by_user_and_analyst(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         follow = self.follow_service.save_new_follow(user_id=user.id, analyst_id=analyst.id)
@@ -40,7 +46,9 @@ class TestFollowService(unittest.TestCase):
         not_found = self.follow_service.get_follow_by_user_and_analyst(10, 10)
         assert not_found is None
 
-    def test_delete_follow(self) -> None:
+    def test_delete_follow(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         follow = self.follow_service.save_new_follow(user_id=user.id, analyst_id=analyst.id)
@@ -52,7 +60,9 @@ class TestFollowService(unittest.TestCase):
         follow = self.follow_service.get_follow_by_id(follow.id)
         assert follow is None
 
-    def test_get_followers_and_get_following(self) -> None:
+    def test_get_followers_and_get_following(self, mock) -> None:
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         self.follow_service.save_new_follow(user_id=user.id, analyst_id=analyst.id)

@@ -1,13 +1,15 @@
 import unittest
 import datetime
+import requests_mock
 from app.main.db import db
-from app.test.conftest import flask_test_client
+from app.test.conftest import flask_test_client, register_mock_iex, register_mock_mailgun
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService
 from app.main.service.download_service import DownloadService
 from app.main.model.idea import IdeaModel
 
 
+@requests_mock.Mocker()
 class TestDownloadService(unittest.TestCase):
     def setUp(self) -> None:
         self.user_service = UserService()
@@ -28,7 +30,10 @@ class TestDownloadService(unittest.TestCase):
         )
         return new_idea_dict["idea"]
 
-    def test_save_new_download_and_get_download_by_id(self) -> None:
+    def test_save_new_download_and_get_download_by_id(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea = self.create_idea_for_test(analyst.id)
@@ -39,7 +44,10 @@ class TestDownloadService(unittest.TestCase):
         found_download = self.download_service.get_download_by_id(download2.id)
         assert found_download.id == download2.id
 
-    def test_get_idea_download_count(self) -> None:
+    def test_get_idea_download_count(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         time_stamp1 = datetime.datetime.utcnow()
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
@@ -58,7 +66,10 @@ class TestDownloadService(unittest.TestCase):
         count = self.download_service.get_idea_download_count(idea.id)
         assert count == 2
 
-    def test_get_user_download_count(self) -> None:
+    def test_get_user_download_count(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         time_stamp1 = datetime.datetime.utcnow()
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
@@ -77,7 +88,10 @@ class TestDownloadService(unittest.TestCase):
         count = self.download_service.get_user_download_count(user.id)
         assert count == 2
 
-    def test_get_analyst_download_count(self) -> None:
+    def test_get_analyst_download_count(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         time_stamp1 = datetime.datetime.utcnow()
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)

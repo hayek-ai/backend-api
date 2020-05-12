@@ -1,11 +1,13 @@
 import unittest
+import requests_mock
 from app.main.db import db
-from app.test.conftest import flask_test_client
+from app.test.conftest import flask_test_client, register_mock_mailgun, register_mock_iex
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService
 from app.main.service.downvote_service import DownvoteService
 
 
+@requests_mock.Mocker()
 class TestDownvoteService(unittest.TestCase):
     def setUp(self) -> None:
         self.user_service = UserService()
@@ -26,7 +28,10 @@ class TestDownvoteService(unittest.TestCase):
         )
         return new_idea_dict["idea"]
 
-    def test_save_new_downvote_and_get_downvote_by_id(self) -> None:
+    def test_save_new_downvote_and_get_downvote_by_id(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea = self.create_idea_for_test(analyst.id)
@@ -43,7 +48,10 @@ class TestDownvoteService(unittest.TestCase):
         not_found = self.downvote_service.get_downvote_by_id(10)
         assert not_found is None
 
-    def test_delete_downvote_by_id(self) -> None:
+    def test_delete_downvote_by_id(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea = self.create_idea_for_test(analyst.id)
@@ -56,7 +64,10 @@ class TestDownvoteService(unittest.TestCase):
         assert idea.num_downvotes == 0
         assert idea.score == 0
 
-    def test_get_all_downvotes_for_idea(self) -> None:
+    def test_get_all_downvotes_for_idea(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user1 = self.user_service.save_new_user("user1@email.com", "user1", "password")
         user2 = self.user_service.save_new_user("user2@email.com", "user2", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
@@ -68,7 +79,10 @@ class TestDownvoteService(unittest.TestCase):
         assert downvotes[0].id == downvote2.id
         assert downvotes[1].id == downvote1.id
 
-    def test_downvote_by_user_and_idea(self) -> None:
+    def test_downvote_by_user_and_idea(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
         idea = self.create_idea_for_test(analyst.id)
