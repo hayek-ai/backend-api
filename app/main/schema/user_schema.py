@@ -40,8 +40,8 @@ class UserRegisterSchema(Schema):
 
 
 class UserLoginSchema(Schema):
-    emailOrUsername = fields.Str(required=True, validate=Length(min=1))
-    password = fields.Str(required=True, validate=Length(min=1))
+    emailOrUsername = fields.Str(required=True)
+    password = fields.Str(required=True)
 
 
 user_schema = UserSchema()
