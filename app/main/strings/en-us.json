@@ -20,7 +20,7 @@
   "unauthorized_user_edit": "Users are only permitted to edit their own account details.",
   "user_confirmed": "User has been confirmed successfully.",
   "user_already_confirmed": "User is already confirmed.",
-  "confirmation_code_expired": "That confirmation code has expired.",
+  "confirmation_code_expired": "Your confirmation code has expired.  We sent you another one.  Please check your email.",
   "incorrect_confirmation_code": "That confirmation code is incorrect.",
   "confirmation_resend_successful": "Confirmation email successfully resent.",
 

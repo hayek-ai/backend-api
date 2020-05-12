@@ -19,11 +19,13 @@ class Confirmation(Resource):
         if not confirmation:
             return get_error(404, get_text("not_found").format("confirmation"))
 
-        if confirmation.is_expired:
-            return get_error(400, get_text("confirmation_code_expired"))
-
         if user.is_confirmed:
             return get_error(400, get_text("user_already_confirmed"))
+
+        if confirmation.is_expired:
+            self.confirmation_service.save_new_confirmation(user_id)
+            self.confirmation_service.send_confirmation_email(user_id)
+            return get_error(400, get_text("confirmation_code_expired"))
 
         if confirmation_code != confirmation.code:
             return get_error(400, get_text("incorrect_confirmation_code"))
