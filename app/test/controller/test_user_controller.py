@@ -79,8 +79,8 @@ class TestUserController(unittest.TestCase):
             password='password'
         )), content_type='application/json')
         data = json.loads(response.data)
-        assert data["errors"][0]["detail"] == get_text("incorrect_fields")
-        assert data["errors"][0]["email"] == ['Not a valid email address.']
+        assert data["errors"][0]["detail"] == 'Not a valid email address.'
+        assert data["errors"][0]["field"] == 'email'
         assert response.status_code == 400
 
         # invalid username (with spaces)
@@ -90,8 +90,8 @@ class TestUserController(unittest.TestCase):
             password='password'
         )), content_type='application/json')
         data = json.loads(response.data)
-        assert data["errors"][0]["detail"] == get_text("incorrect_fields")
-        assert data["errors"][0]["username"] == [get_text("username_invalid")]
+        assert data["errors"][0]["detail"] == get_text("username_invalid")
+        assert data["errors"][0]["field"] == 'username'
         assert response.status_code == 400
 
         # invalid username (with special characters)
@@ -101,8 +101,8 @@ class TestUserController(unittest.TestCase):
             password='password'
         )), content_type='application/json')
         data = json.loads(response.data)
-        assert data["errors"][0]["detail"] == get_text("incorrect_fields")
-        assert data["errors"][0]["username"] == [get_text("username_invalid")]
+        assert data["errors"][0]["detail"] == get_text("username_invalid")
+        assert data["errors"][0]["field"] == 'username'
         assert response.status_code == 400
 
     def test_get_user(self, mock) -> None:

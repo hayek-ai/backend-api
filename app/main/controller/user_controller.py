@@ -23,7 +23,9 @@ class UserRegister(Resource):
         user_json = request.get_json()
         errors = self.user_register_schema.validate(user_json)
         if errors:
-            return get_error(400, get_text("incorrect_fields"), **errors)
+            key = list(errors.keys())[0]
+            value = errors[key][0]
+            return get_error(400, value, field=key)
 
         user = self.user_service.get_user_by_email(user_json['email'])
         if user:
