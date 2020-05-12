@@ -89,10 +89,10 @@ class TestUserController(unittest.TestCase):
             username='user name',
             password='password'
         )), content_type='application/json')
+        assert response.status_code == 400
         data = json.loads(response.data)
         assert data["errors"][0]["detail"] == get_text("username_invalid")
         assert data["errors"][0]["field"] == 'username'
-        assert response.status_code == 400
 
         # invalid username (with special characters)
         response = self.client.post('/register', data=json.dumps(dict(
@@ -100,10 +100,24 @@ class TestUserController(unittest.TestCase):
             username='username&',
             password='password'
         )), content_type='application/json')
+        assert response.status_code == 400
         data = json.loads(response.data)
         assert data["errors"][0]["detail"] == get_text("username_invalid")
         assert data["errors"][0]["field"] == 'username'
+
+        # invalid username AND invalid email
+        response = self.client.post('/register', data=json.dumps(dict(
+            email='email.com',
+            username='username&',
+            password='password'
+        )), content_type='application/json')
         assert response.status_code == 400
+        data = json.loads(response.data)
+        assert data["errors"][0]["detail"] == 'Not a valid email address.'
+        assert data["errors"][0]["field"] == 'email'
+        assert data["errors"][1]["detail"] == get_text("username_invalid")
+        assert data["errors"][1]["field"] == 'username'
+
 
     def test_get_user(self, mock) -> None:
         register_mock_mailgun(mock)

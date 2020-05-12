@@ -23,9 +23,14 @@ class UserRegister(Resource):
         user_json = request.get_json()
         errors = self.user_register_schema.validate(user_json)
         if errors:
-            key = list(errors.keys())[0]
-            value = errors[key][0]
-            return get_error(400, value, field=key)
+            response_errors = []
+            for key, value in errors.items():
+                response_errors.append({
+                    "status": 400,
+                    "detail": value[0],
+                    "field": key
+                })
+            return {"errors": response_errors}, 400
 
         user = self.user_service.get_user_by_email(user_json['email'])
         if user:
