@@ -96,7 +96,6 @@ class IdeaFeed(Resource):
             return self.idea_list_schema.dump(ideas), 200
         elif feed_type == "discover":
             ideas = self.idea_service.query_ideas(query_string=query_string)
-            print(query_string)
             return self.idea_list_schema.dump(ideas), 200
         else:
             return get_error(400, get_text("invalid_feed_type"))
