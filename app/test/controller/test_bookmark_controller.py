@@ -38,7 +38,7 @@ class TestBookmarkController(unittest.TestCase):
             price_target=400,
             entry_price=313.40,
             thesis_summary="My Thesis Summary",
-            full_report="My Full Report",)
+            full_report="My Full Report")
         return new_idea_dict["idea"]
 
     def bookmark_idea(self, idea_id, access_token):

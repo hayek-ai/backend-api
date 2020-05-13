@@ -1,5 +1,5 @@
 import datetime
-
+from typing import List
 from app.main.db import db
 from app.main.libs.security import encrypt_password, check_encrypted_password
 from app.main.model.confirmation import ConfirmationModel

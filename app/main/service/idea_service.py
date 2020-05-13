@@ -149,12 +149,13 @@ class IdeaService:
             or_(*market_cap_filter)
         )
 
-        # assume query_string["sort"] == "latest" (as default)
-        query = IdeaModel.query.join(UserModel).filter(filters).order_by(db.desc(IdeaModel.created_at))
+        # assume query_string["sort"] == "top" (as default), w/ created_at as tiebreaker
+        query = IdeaModel.query.join(UserModel).filter(filters)\
+            .order_by(db.desc(IdeaModel.score), db.desc(IdeaModel.created_at))
 
         if "sort" in query_string:
-            if query_string["sort"] == "top":
-                query = IdeaModel.query.join(UserModel).filter(filters).order_by(db.desc(IdeaModel.score))
+            if query_string["sort"] == "latest":
+                query = IdeaModel.query.join(UserModel).filter(filters).order_by(db.desc(IdeaModel.created_at))
 
         if page_size:
             query = query.limit(page_size)

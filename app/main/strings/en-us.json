@@ -27,6 +27,7 @@
   "not_an_analyst": "Only analysts can upload ideas.",
   "invalid_position_type": "Position type can be either 'long' or 'short'",
   "incorrect_price": "That price doesn't match our records",
+  "invalid_feed_type": "Invalid feed type. Use 'following' or 'discover'.",
 
   "non_pro_tier_review": "Only customers who are subscribed to the pro tier are permitted to leave a review.",
   "already_reviewed": "Users are only permitted to review a plan or analyst once.",
