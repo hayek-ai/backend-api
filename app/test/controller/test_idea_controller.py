@@ -319,18 +319,18 @@ class TestIdeaController(unittest.TestCase):
         response_data = json.loads(response.data)
         assert len(response_data) == 3
 
-        # sort by popularity (default)
-        idea2.score = 100
-        self.idea_service.save_changes(idea2)
+        # sort by popularity
+        idea3.score = 100
+        self.idea_service.save_changes(idea3)
         response = self.client.get(
-            '/ideas/discover',
+            '/ideas/discover?sort=top',
             headers={"Authorization": "Bearer {}".format(user_dict["access_token"])})
         assert response.status_code == 200
         response_data = json.loads(response.data)
         assert len(response_data) == 4
-        assert response_data[0]["id"] == idea2.id
+        assert response_data[0]["id"] == idea3.id
 
-        # sort by latest
+        # sort by latest (default)
         idea1.created_at = datetime.datetime.utcnow()
         self.idea_service.save_changes(idea1)
         response = self.client.get(

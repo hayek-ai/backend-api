@@ -175,19 +175,19 @@ class TestIdeaService(unittest.TestCase):
         assert len(ideas) == 1
         assert ideas[0].symbol == idea1.symbol
 
-        # sort by popularity (default)
-        idea1.created_at = datetime.datetime.utcnow()
-        self.idea_service.save_changes(idea1)
+        # sort by popularity
+        idea2.score = 100
+        self.idea_service.save_changes(idea2)
+        ideas = self.idea_service.query_ideas(query_string={"sort": "top"})
+        assert len(ideas) == 2
+        assert ideas[0].symbol == idea2.symbol
+
+        # sort by latest (default)
+        idea2.created_at = datetime.datetime.utcnow()
+        self.idea_service.save_changes(idea2)
         ideas = self.idea_service.query_ideas()
         assert len(ideas) == 2
-        assert ideas[0].symbol == idea1.symbol
-
-        # sort by latest
-        idea1.created_at = datetime.datetime.utcnow()
-        self.idea_service.save_changes(idea1)
-        ideas = self.idea_service.query_ideas(query_string={"sort": "latest"})
-        assert len(ideas) == 2
-        assert ideas[0].symbol == idea1.symbol
+        assert ideas[0].symbol == idea2.symbol
 
     def tearDown(self) -> None:
         db.session.remove()
