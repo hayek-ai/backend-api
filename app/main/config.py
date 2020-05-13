@@ -22,6 +22,13 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.getenv('DEV_DATABASE_URI')
 
 
+class LocalConfig(Config):
+    """Configurations for local development"""
+    ENV = 'development'
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = os.getenv('LOCAL_DATABASE_URI')
+
+
 class TestingConfig(Config):
     """Configurations for Testing ,with a separate test database."""
     ENV = 'testing'
@@ -40,5 +47,6 @@ class ProductionConfig(Config):
 app_config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
-    'production': ProductionConfig
+    'production': ProductionConfig,
+    'local': LocalConfig
 }

@@ -41,10 +41,10 @@ docker run --name hayek_test_db \
     -p 5431:5432 \
     -d postgres
 
-docker run --name hayek_development_db \
+docker run --name hayek_local_db \
     -e POSTGRES_PASSWORD=postgres \
     -e POSTGRES_USER=michael \
-    -e POSTGRES_DB=hayek_development_db \
+    -e POSTGRES_DB=hayek_local_db \
     -p 5432:5432 \
     -d postgres
 ```
@@ -53,14 +53,14 @@ Connect application to databases in .env file.  Example:
 
 ```
 TEST_DATABASE_URI="postgresql://michael:postgres@localhost:5431/hayek_test_db"
-DEV_DATABASE_URI="postgresql://michael:postgres@localhost:5432/hayek_development_db"
+LOCAL_DATABASE_URI="postgresql://michael:postgres@localhost:5432/hayek_local_db"
 ```
 
 Before testing & development, start up both databases. Example:
 
 ```
 docker start hayek_test_db
-docker start hayek_development_db
+docker start hayek_local_db
 ```
 
 Build Command
