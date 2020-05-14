@@ -7,7 +7,7 @@ from app.main.model.downvote import DownvoteModel
 class DownvoteSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = DownvoteModel
-        load_only = ("idea", "user")
+        load_only = ("id", "created_at", "idea", "user")
         include_fk = True
 
     def on_bind_field(self, field_name, field_obj):

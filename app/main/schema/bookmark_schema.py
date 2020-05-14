@@ -7,7 +7,7 @@ from app.main.model.bookmark import BookmarkModel
 class BookmarkSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = BookmarkModel
-        load_only = ("idea", "user")
+        load_only = ("id", "created_at", "idea", "user")
         include_fk = True
 
     def on_bind_field(self, field_name, field_obj):
