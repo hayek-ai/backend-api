@@ -66,6 +66,21 @@ class TestUpvoteService(unittest.TestCase):
         assert idea.num_upvotes == 0
         assert idea.score == 0
 
+    def test_delete_upvote_by_user_and_idea_if_exists(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
+        user = self.user_service.save_new_user("user@email.com", "user", "password")
+        analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
+        idea = self.create_new_idea(analyst.id)
+        upvote = self.upvote_service.save_new_upvote(user_id=user.id, idea_id=idea.id)
+        self.upvote_service.delete_upvote_by_user_and_idea_if_exists(user.id, idea.id)
+        found_upvote = self.upvote_service.get_upvote_by_id(upvote.id)
+        assert found_upvote is None
+        assert len(user.upvotes.all()) == 0
+        assert idea.num_upvotes == 0
+        assert idea.score == 0
+
     def test_get_all_upvotes_for_idea(self, mock) -> None:
         register_mock_iex(mock)
         register_mock_mailgun(mock)

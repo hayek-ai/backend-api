@@ -10,6 +10,7 @@ class Upvote(Resource):
     def __init__(self, **kwargs):
         self.idea_service = kwargs["idea_service"]
         self.upvote_service = kwargs["upvote_service"]
+        self.downvote_service = kwargs["downvote_service"]
         self.idea_schema = idea_schema
 
     @jwt_required
@@ -34,8 +35,9 @@ class Upvote(Resource):
             except Exception as e:
                 return get_error(500, str(e))
 
-        # else, create upvote
+        # else, delete downvote if exists and create upvote
         try:
+            self.downvote_service.delete_downvote_by_user_and_idea_if_exists(user_id, idea_id)
             self.upvote_service.save_new_upvote(user_id=user_id, idea_id=idea_id)
             return {
                 "message": get_text("successfully_created").format("Upvote"),

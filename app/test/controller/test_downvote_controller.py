@@ -6,6 +6,7 @@ from app.test.conftest import flask_test_client, services_for_test, register_moc
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService
 from app.main.service.downvote_service import DownvoteService
+from app.main.service.upvote_service import UpvoteService
 from app.main.db import db
 from app.main.libs.strings import get_text
 
@@ -14,10 +15,11 @@ from app.main.libs.strings import get_text
 class TestDownvoteController(unittest.TestCase):
     def setUp(self) -> None:
         self.client = flask_test_client(services_for_test(
-            user=UserService(), idea=IdeaService(), downvote=DownvoteService()))
+            user=UserService(), idea=IdeaService(), downvote=DownvoteService(), upvote=UpvoteService()))
         self.user_service = UserService()
         self.idea_service = IdeaService()
         self.downvote_service = DownvoteService()
+        self.upvote_service = UpvoteService()
         db.create_all()
 
     def create_user(self, email, username, **kwargs) -> dict:
@@ -73,9 +75,35 @@ class TestDownvoteController(unittest.TestCase):
         assert downvote is None
         response_data = json.loads(response.data)
         assert response_data["message"] == get_text("successfully_deleted").format("Downvote")
-        assert response_data["idea"]["id"]== idea.id
+        assert response_data["idea"]["id"] == idea.id
         assert response_data["idea"]["numDownvotes"] == 0
         assert response_data["idea"]["score"] == 0
+
+    def test_delete_upvote_if_upvote_exists(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
+        user_dict = self.create_user("user@email.com", "user")
+        analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
+        idea = self.create_idea(analyst.id)
+
+        # create upvote
+        self.upvote_service.save_new_upvote(user_dict["user"].id, idea.id)
+        assert idea.num_upvotes == 1
+        assert idea.score == 1
+
+        # create downvote
+        response = self.downvote_idea(idea.id, user_dict["access_token"])
+        assert response.status_code == 200
+        response_data = json.loads(response.data)
+        assert response_data["message"] == get_text("successfully_created").format("Downvote")
+        assert response_data["idea"]["id"] == idea.id
+        assert response_data["idea"]["numDownvotes"] == 1
+        assert response_data["idea"]["score"] == -1
+        assert response_data["idea"]["numUpvotes"] == 0
+        assert idea.num_upvotes == 0
+        assert idea.num_downvotes == 1
+        assert idea.score == -1
 
     def tearDown(self) -> None:
         db.session.remove()

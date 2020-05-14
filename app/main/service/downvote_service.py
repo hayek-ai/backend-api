@@ -3,7 +3,6 @@ from app.main.db import db
 from app.main.model.downvote import DownvoteModel
 from app.main.model.idea import IdeaModel
 
-
 class DownvoteService:
     def save_new_downvote(self, user_id: int, idea_id: int) -> "DownvoteModel":
         downvote = DownvoteModel(user_id=user_id, idea_id=idea_id)
@@ -25,7 +24,23 @@ class DownvoteService:
 
     def delete_downvote_by_id(self, downvote_id: int) -> None:
         downvote = self.get_downvote_by_id(downvote_id)
+        if downvote is None:
+            return
         idea = IdeaModel.query.filter_by(id=downvote.idea_id).first()
+        if idea is None:
+            return
+        idea.num_downvotes = idea.num_downvotes - 1
+        idea.score = idea.score + 1
+        self.save_changes(idea)
+        self.delete_from_db(downvote)
+
+    def delete_downvote_by_user_and_idea_if_exists(self, user_id: int, idea_id: int) -> None:
+        downvote = self.get_downvote_by_user_and_idea(user_id, idea_id)
+        if downvote is None:
+            return
+        idea = IdeaModel.query.filter_by(id=downvote.idea_id).first()
+        if idea is None:
+            return
         idea.num_downvotes = idea.num_downvotes - 1
         idea.score = idea.score + 1
         self.save_changes(idea)

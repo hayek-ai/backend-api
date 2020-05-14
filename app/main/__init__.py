@@ -119,6 +119,7 @@ def create_app(services, config_name):
     api.add_resource(Upvote, '/idea/<int:idea_id>/upvote',
                      resource_class_kwargs={
                          "idea_service": services["idea"],
+                         "downvote_service": services["downvote"],
                          "upvote_service": services["upvote"]})
     api.add_resource(UpvoteFeed, '/user/<string:username>/upvotes',
                      resource_class_kwargs={
@@ -127,6 +128,7 @@ def create_app(services, config_name):
     api.add_resource(Downvote, '/idea/<int:idea_id>/downvote',
                      resource_class_kwargs={
                          "idea_service": services["idea"],
+                         "upvote_service": services["upvote"],
                          "downvote_service": services["downvote"]})
     api.add_resource(Bookmark, '/idea/<int:idea_id>/bookmark',
                      resource_class_kwargs={

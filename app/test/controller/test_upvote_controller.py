@@ -6,6 +6,7 @@ from app.test.conftest import flask_test_client, services_for_test, register_moc
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService
 from app.main.service.upvote_service import UpvoteService
+from app.main.service.downvote_service import DownvoteService
 from app.main.db import db
 from app.main.libs.strings import get_text
 
@@ -14,10 +15,11 @@ from app.main.libs.strings import get_text
 class TestUpvoteController(unittest.TestCase):
     def setUp(self) -> None:
         self.client = flask_test_client(services_for_test(
-            user=UserService(), idea=IdeaService(), upvote=UpvoteService()))
+            user=UserService(), idea=IdeaService(), upvote=UpvoteService(), downvote=DownvoteService()))
         self.user_service = UserService()
         self.idea_service = IdeaService()
         self.upvote_service = UpvoteService()
+        self.downvote_service = DownvoteService()
         db.create_all()
 
     def create_user(self, email, username, **kwargs) -> dict:
@@ -77,6 +79,32 @@ class TestUpvoteController(unittest.TestCase):
         assert response_data["idea"]["numUpvotes"] == 0
         assert response_data["idea"]["score"] == 0
         assert upvote is None
+
+    def test_delete_downvote_if_downvote_exists(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
+        user_dict = self.create_user("user@email.com", "user")
+        analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
+        idea = self.create_idea(analyst.id)
+
+        # create downvote
+        self.downvote_service.save_new_downvote(user_dict["user"].id, idea.id)
+        assert idea.num_downvotes == 1
+        assert idea.score == -1
+
+        # create upvote
+        response = self.upvote_idea(idea.id, user_dict["access_token"])
+        assert response.status_code == 200
+        response_data = json.loads(response.data)
+        assert response_data["message"] == get_text("successfully_created").format("Upvote")
+        assert response_data["idea"]["id"] == idea.id
+        assert response_data["idea"]["numUpvotes"] == 1
+        assert response_data["idea"]["score"] == 1
+        assert response_data["idea"]["numDownvotes"] == 0
+        assert idea.num_upvotes == 1
+        assert idea.num_downvotes == 0
+        assert idea.score == 1
 
     def test_get_upvote_feed(self, mock) -> None:
         register_mock_iex(mock)

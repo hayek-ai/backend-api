@@ -6,7 +6,7 @@ from app.main.model.idea import IdeaModel
 
 class UpvoteService:
     def save_new_upvote(self, user_id: int, idea_id: int) -> "UpvoteModel":
-        upvote = UpvoteModel(user_id=user_id, idea_id = idea_id)
+        upvote = UpvoteModel(user_id=user_id, idea_id=idea_id)
         idea = IdeaModel.query.filter_by(id=idea_id).first()
         idea.num_upvotes = idea.num_upvotes + 1
         idea.score = idea.score + 1
@@ -25,7 +25,23 @@ class UpvoteService:
 
     def delete_upvote_by_id(self, upvote_id: int) -> None:
         upvote = self.get_upvote_by_id(upvote_id)
+        if upvote is None:
+            return
         idea = IdeaModel.query.filter_by(id=upvote.idea_id).first()
+        if idea is None:
+            return
+        idea.num_upvotes = idea.num_upvotes - 1
+        idea.score = idea.score - 1
+        self.save_changes(idea)
+        self.delete_from_db(upvote)
+
+    def delete_upvote_by_user_and_idea_if_exists(self, user_id: int, idea_id: int) -> None:
+        upvote = self.get_upvote_by_user_and_idea(user_id, idea_id)
+        if upvote is None:
+            return
+        idea = IdeaModel.query.filter_by(id=upvote.idea_id).first()
+        if idea is None:
+            return
         idea.num_upvotes = idea.num_upvotes - 1
         idea.score = idea.score - 1
         self.save_changes(idea)
