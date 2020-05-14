@@ -4,6 +4,7 @@ from app.main.libs.strings import get_text
 from app.main.libs.util import get_error
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from app.main.schema.comment_schema import comment_schema, new_comment_schema, comment_list_schema
+from app.main.schema.idea_schema import idea_schema
 
 
 class NewComment(Resource):
@@ -12,6 +13,7 @@ class NewComment(Resource):
         self.idea_service = kwargs["idea_service"]
         self.comment_schema = comment_schema
         self.new_comment_schema = new_comment_schema
+        self.idea_schema = idea_schema
 
     @jwt_required
     def post(self, idea_id: int):
@@ -35,7 +37,10 @@ class NewComment(Resource):
                 body=comment_json["body"],
                 user_id=user_id,
                 idea_id=idea_id)
-            return self.comment_schema.dump(comment), 201
+            return {
+                "comment": self.comment_schema.dump(comment),
+                "idea": self.idea_schema.dump(idea)
+            }, 201
         except Exception as e:
             return get_error(500, str(e))
 
@@ -43,7 +48,9 @@ class NewComment(Resource):
 class Comment(Resource):
     def __init__(self, **kwargs):
         self.comment_service = kwargs["comment_service"]
+        self.idea_service = kwargs["idea_service"]
         self.comment_schema = comment_schema
+        self.idea_schema = idea_schema
 
     @jwt_required
     def get(self, comment_id: int):
@@ -60,8 +67,12 @@ class Comment(Resource):
         if comment.user_id != get_jwt_identity():
             return get_error(400, get_text("unauthorized_delete"))
         try:
+            idea = self.idea_service.get_idea_by_id(comment.idea_id)
             self.comment_service.delete_comment_by_id(comment_id)
-            return {"message": get_text("successfully_deleted").format("Comment")}, 200
+            return {
+                "message": get_text("successfully_deleted").format("Comment"),
+                "idea": idea_schema.dump(idea)
+            }, 200
         except Exception as e:
             return get_error(500, str(e))
 

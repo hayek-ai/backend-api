@@ -111,7 +111,10 @@ def create_app(services, config_name):
                      resource_class_kwargs={
                          "idea_service": services["idea"],
                          "comment_service": services["comment"]})
-    api.add_resource(Comment, '/comment/<int:comment_id>', resource_class_kwargs={"comment_service": services["comment"]})
+    api.add_resource(Comment, '/comment/<int:comment_id>',
+                     resource_class_kwargs={
+                         "comment_service": services["comment"],
+                         "idea_service": services["idea"]})
     api.add_resource(IdeaComments, '/idea/<int:idea_id>/comments',
                      resource_class_kwargs={
                          "idea_service": services["idea"],

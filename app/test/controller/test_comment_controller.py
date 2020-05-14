@@ -63,9 +63,10 @@ class TestCommentController(unittest.TestCase):
         response = self.create_comment(idea.id, user_dict["access_token"])
         response_data = json.loads(response.data)
         assert response.status_code == 201
-        assert response_data["body"] == "Test Comment"
-        assert response_data["user"]["imageUrl"] is not None
-        assert response_data["user"]["username"] == "user"
+        assert response_data["comment"]["body"] == "Test Comment"
+        assert response_data["comment"]["user"]["imageUrl"] is not None
+        assert response_data["comment"]["user"]["username"] == "user"
+        assert response_data["idea"]["id"] == idea.id
 
     def test_get_and_delete_comment(self, mock) -> None:
         register_mock_iex(mock)
@@ -77,7 +78,7 @@ class TestCommentController(unittest.TestCase):
 
         # simple comment submit
         response = self.create_comment(idea.id, user_dict["access_token"])
-        comment_dict = json.loads(response.data)
+        comment_dict = json.loads(response.data)["comment"]
         response = self.client.get(
             f'/comment/{comment_dict["id"]}',
             headers={"Authorization": "Bearer {}".format(user_dict["access_token"])})
@@ -92,6 +93,8 @@ class TestCommentController(unittest.TestCase):
         response_data = json.loads(response.data)
         assert response.status_code == 200
         assert response_data["message"] == get_text("successfully_deleted").format("Comment")
+        assert response_data["idea"]["id"] == idea.id
+
         comment = self.comment_service.get_comment_by_id(comment.id)
         assert comment is None
 
@@ -115,8 +118,8 @@ class TestCommentController(unittest.TestCase):
         response_data = json.loads(response.data)
         assert response.status_code == 200
         assert len(response_data) == 2
-        assert response_data[0]["id"] == response2_data["id"]
-        assert response_data[1]["id"] == response1_data["id"]
+        assert response_data[0]["id"] == response2_data["comment"]["id"]
+        assert response_data[1]["id"] == response1_data["comment"]["id"]
 
     def tearDown(self) -> None:
         db.session.remove()

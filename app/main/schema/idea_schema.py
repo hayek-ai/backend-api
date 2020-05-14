@@ -14,10 +14,10 @@ class IdeaSchema(ma.SQLAlchemyAutoSchema):
         'id', 'username', "image_url", "num_ideas", "analyst_rank",
         "analyst_rank_percentile", 'avg_return', 'success_rate',
         'avg_holding_period', "review_star_total", "num_reviews")))
+    comments = ma.Nested(CommentSchema(many=True))
 
     class Meta:
         model = IdeaModel
-        load_only =("comments",)
         include_fk = True
 
     @classmethod
