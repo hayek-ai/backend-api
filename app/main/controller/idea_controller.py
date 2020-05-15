@@ -113,7 +113,11 @@ class DownloadReport(Resource):
         idea = self.idea_service.get_idea_by_id(idea_id)
         if not idea:
             return get_error(404, get_text("not_found").format("Idea"))
+        financial_metrics = self.idea_service.get_idea_financial_metrics(idea.symbol)
         self.download_service.save_new_download(user_id=user_id, idea_id=idea.id)
         idea.num_downloads = idea.num_downloads + 1
         self.idea_service.save_changes(idea)
-        return self.idea_with_report_schema.dump(idea), 200
+        return {
+            **self.idea_with_report_schema.dump(idea),
+            **financial_metrics
+        }, 200

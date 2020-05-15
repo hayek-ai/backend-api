@@ -384,6 +384,7 @@ class TestIdeaController(unittest.TestCase):
         assert response_data["symbol"] == "AAPL"
         assert response_data["thesisSummary"] == "Test Thesis Summary"
         assert response_data["fullReport"] == "Test Full Report"
+        assert response_data["forwardPE"] == 18.14
         assert "exhibits" in response_data
         assert response_data["numDownloads"] == 1
         download = self.download_service.get_download_by_id(1)

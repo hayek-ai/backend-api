@@ -189,6 +189,12 @@ class TestIdeaService(unittest.TestCase):
         assert len(ideas) == 2
         assert ideas[0].symbol == idea2.symbol
 
+    @requests_mock.Mocker()
+    def test_query_ideas(self, mock) -> None:
+        register_mock_iex(mock)
+        financial_metrics = self.idea_service.get_idea_financial_metrics("AAPL")
+        assert financial_metrics["forwardPE"] == 18.14
+
     def tearDown(self) -> None:
         db.session.remove()
         db.drop_all()

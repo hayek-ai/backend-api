@@ -165,6 +165,13 @@ class IdeaService:
         return query.all()
 
     @classmethod
+    def get_idea_financial_metrics(cls, symbol):
+        try:
+            return Stock.fetch_financial_metrics(symbol)
+        except StockException as e:
+            return {"error": str(e)}
+
+    @classmethod
     def save_changes(cls, data) -> None:
         db.session.add(data)
         db.session.commit()

@@ -11,14 +11,15 @@ class StockException(Exception):
 
 class Stock:
     IEX_API_KEY = os.environ.get("IEX_API_KEY", None)
+    IEX_URI = os.environ.get("IEX_TESTING_URI", None)
     ALPHA_VANTAGE_API_KEY = os.environ.get("ALPHA_VANTAGE_API_KEY", None)
 
     @classmethod
     def fetch_stock_quote(cls, symbol: str) -> dict:
-        if cls.IEX_API_KEY is None:
+        if cls.IEX_API_KEY is None or cls.IEX_URI is None:
             raise StockException(get_text("env_fail").format("IEX API Key"))
 
-        response = get(url=f"https://cloud.iexapis.com/v1/stock/{symbol}/quote?token={cls.IEX_API_KEY}")
+        response = get(url=f"{cls.IEX_URI}v1/stock/{symbol}/quote?token={cls.IEX_API_KEY}")
 
         if response.status_code != 200:
             raise StockException(response.content)
@@ -27,10 +28,10 @@ class Stock:
 
     @classmethod
     def fetch_company_info(cls, symbol: str) -> dict:
-        if cls.IEX_API_KEY is None:
+        if cls.IEX_API_KEY is None or cls.IEX_URI is None:
             raise StockException(get_text("env_fail").format("IEX API Key"))
 
-        response = get(url=f"https://cloud.iexapis.com/v1/stock/{symbol}/company?token={cls.IEX_API_KEY}")
+        response = get(url=f"{cls.IEX_URI}v1/stock/{symbol}/company?token={cls.IEX_API_KEY}")
 
         if response.status_code != 200:
             raise StockException(response.content)
@@ -86,7 +87,7 @@ class Stock:
         if cls.IEX_API_KEY is None:
             raise StockException(get_text("env_fail").format("IEX API Key"))
 
-        response = get(url=f"https://cloud.iexapis.com/v1/stock/{symbol}/chart/{date}?token={cls.IEX_API_KEY}&chartCloseOnly=true")
+        response = get(url=f"{cls.IEX_URI}v1/stock/{symbol}/chart/{date}?token={cls.IEX_API_KEY}&chartCloseOnly=true")
 
         if response.status_code != 200:
             raise StockException(response.content)
@@ -113,18 +114,17 @@ class Stock:
             raise StockException(get_text("env_fail").format("IEX API Key"))
 
         metrics = {}
-        quote_info = get(url=f"https://cloud.iexapis.com/v1/stock/{symbol}/quote?token={cls.IEX_API_KEY}")
+        quote_info = get(url=f"{cls.IEX_URI}v1/stock/{symbol}/quote?token={cls.IEX_API_KEY}")
         if quote_info.status_code != 200:
             raise StockException(quote_info.content)
         quote_info = quote_info.json()
 
-        advanced_stats = get(url=f"https://cloud.iexapis.com/v1/stock/{symbol}/advanced-stats?token={cls.IEX_API_KEY}")
+        advanced_stats = get(url=f"{cls.IEX_URI}v1/stock/{symbol}/advanced-stats?token={cls.IEX_API_KEY}")
 
         if advanced_stats.status_code != 200:
             raise StockException(advanced_stats.content)
 
         advanced_stats = advanced_stats.json()
-        advanced_stats = advanced_stats['metric']
         ev_to_ebitda = advanced_stats["enterpriseValue"] / advanced_stats["EBITDA"] if advanced_stats["EBITDA"] > 0 else "n/a"
         metrics["forwardPE"] = advanced_stats["forwardPERatio"]
         metrics["evToEBITDA"] = ev_to_ebitda

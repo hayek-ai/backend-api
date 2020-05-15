@@ -6,7 +6,7 @@ from app.test.mock_responses import aapl_quote, aapl_company, aapl_chart, aapl_a
     gm_advanced_stats, gm_chart, gm_quote, gm_company, gm_alpha_advantage
 
 MAILGUN_URL = 'https://api.mailgun.net/v3/sandboxc3e6b65541ae41bc8bf153f612aa0b0d.mailgun.org/messages'
-IEX_URL = 'https://cloud.iexapis.com/v1/stock'
+IEX_URL = 'https://sandbox.iexapis.com/v1/stock'
 ALPHA_ADVANTAGE_URL = 'https://www.alphavantage.co/query?function=SYMBOL_SEARCH'
 
 
