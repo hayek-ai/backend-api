@@ -5,8 +5,9 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 
 from app.main.libs.strings import get_text
 from app.main.libs.util import get_error
-from app.main.schema.user_schema import user_schema, user_register_schema, user_login_schema
-from app.main.schema.follow_schema import follow_list_schema
+from app.main.schema.user_schema import (
+    user_schema, user_register_schema, user_login_schema, user_follow_list_schema
+)
 
 
 class UserRegister(Resource):
@@ -66,8 +67,8 @@ class User(Resource):
     def __init__(self, **kwargs):
         self.user_service = kwargs['user_service']
         self.follow_service = kwargs['follow_service']
+        self.user_follow_list_schema = user_follow_list_schema
         self.user_schema = user_schema
-        self.follow_list_schema = follow_list_schema
 
     @jwt_required
     def get(self, username_or_id):
@@ -80,8 +81,8 @@ class User(Resource):
             following = self.follow_service.get_following(user.id)
             return {
                 **self.user_schema.dump(user),
-                "following": self.follow_list_schema.dump(following)
-        }, 200
+                "following": self.user_follow_list_schema.dump(following)
+            }, 200
         else:
             return get_error(404, get_text("not_found").format("User"))
 
@@ -127,7 +128,7 @@ class User(Resource):
         following = self.follow_service.get_following(user.id)
         return {
             **self.user_schema.dump(user),
-            "following": self.follow_list_schema.dump(following)
+            "following": self.user_follow_list_schema.dump(following)
         }, 201
 
 
@@ -137,7 +138,7 @@ class UserLogin(Resource):
         self.follow_service = kwargs['follow_service']
         self.user_schema = user_schema
         self.user_login_schema = user_login_schema
-        self.follow_list_schema = follow_list_schema
+        self.user_follow_list_schema = user_follow_list_schema
 
     def post(self):
         credentials = request.get_json()
@@ -155,11 +156,11 @@ class UserLogin(Resource):
             access_token = create_access_token(identity=user.id, expires_delta=expires, fresh=True)
             following = self.follow_service.get_following(user.id)
             return {
-                       "user": {
-                           **self.user_schema.dump(user),
-                           "following": self.follow_list_schema.dump(following)
-                       },
-                       "accessToken": access_token,
-                   }, 200
+               "user": {
+                   **self.user_schema.dump(user),
+                   "following": self.user_follow_list_schema.dump(following)
+               },
+               "accessToken": access_token,
+            }, 200
 
         return get_error(401, get_text("user_invalid_credentials"), field="general")

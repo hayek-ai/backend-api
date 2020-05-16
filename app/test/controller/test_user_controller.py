@@ -7,14 +7,17 @@ from app.main.libs.s3 import S3
 from app.main.libs.strings import get_text
 from app.main.libs.util import create_image_file
 from app.main.service.user_service import UserService
+from app.main.service.follow_service import FollowService
 from app.test.conftest import flask_test_client, services_for_test, register_mock_mailgun
 
 
 @requests_mock.Mocker()
 class TestUserController(unittest.TestCase):
     def setUp(self) -> None:
-        self.client = flask_test_client(services_for_test(user=UserService()))
-        self.service = UserService()
+        self.client = flask_test_client(services_for_test(
+            user=UserService(), follow=FollowService()))
+        self.user_service = UserService()
+        self.follow_service = FollowService()
         db.create_all()
 
     def login(self, username, password) -> str:
@@ -125,8 +128,11 @@ class TestUserController(unittest.TestCase):
         register_mock_mailgun(mock)
 
         # create users
-        self.service.save_new_user("email1@email.com", "username1", "password")
-        self.service.save_new_user("email2@email.com", "username2", "password")
+        user1 = self.user_service.save_new_user("email1@email.com", "username1", "password")
+        user2 = self.user_service.save_new_user("email2@email.com", "username2", "password")
+        analyst = self.user_service.save_new_user("email3@email.com", "analyst", "password", is_analyst=True)
+        self.follow_service.save_new_follow(user1.id, analyst.id)
+        self.follow_service.save_new_follow(user2.id, analyst.id)
 
         # login
         access_token = self.login("username1", "password")
@@ -142,7 +148,8 @@ class TestUserController(unittest.TestCase):
         assert response.status_code == 200
         user = json.loads(response.data)
         assert user["username"] == "username1"
-        assert len(user["following"]) == 0
+        assert len(user["following"]) == 1
+        assert user["following"][0]["id"] == 3
 
         # get by username
         response = self.client.get(
@@ -164,8 +171,11 @@ class TestUserController(unittest.TestCase):
     def test_edit_user_put(self, mock) -> None:
         register_mock_mailgun(mock)
 
-        self.service.save_new_user("email@email.com", "user1", "password")
-        self.service.save_new_user("email2@email.com", "user2", "password")
+        user1 = self.user_service.save_new_user("email@email.com", "user1", "password")
+        user2 = self.user_service.save_new_user("email2@email.com", "user2", "password")
+        analyst = self.user_service.save_new_user("email3@email.com", "analyst", "password", is_analyst=True)
+        self.follow_service.save_new_follow(user1.id, analyst.id)
+        self.follow_service.save_new_follow(user2.id, analyst.id)
 
         # login
         access_token = self.login("user1", "password")
@@ -219,7 +229,8 @@ class TestUserController(unittest.TestCase):
         assert updated_user["bio"] == "test bio"
         assert updated_user["prefersDarkmode"] is True
         assert updated_user["imageUrl"] == f"{S3.S3_ENDPOINT_URL}/user_images/user1-profile-image.jpeg"
-        assert len(updated_user["following"]) == 0
+        assert len(updated_user["following"]) == 1
+        assert updated_user["following"][0]["id"] == 3
 
 
         # invalid profileImage file extension
@@ -238,7 +249,7 @@ class TestUserController(unittest.TestCase):
     def test_login_user_post(self, mock) -> None:
         register_mock_mailgun(mock)
 
-        self.service.save_new_user("email@email.com", "username", "password")
+        self.user_service.save_new_user("email@email.com", "username", "password")
 
         # login with username
         response = self.client.post('/login', data=json.dumps(dict(
