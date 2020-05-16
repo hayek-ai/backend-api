@@ -58,9 +58,15 @@ def create_app(services, config_name):
                         'user_service': services["user"],
                         'confirmation_service': services["confirmation"]})
     api.add_resource(UserLogin, '/login',
-                     resource_class_kwargs={'service': services["user"]})
+                     resource_class_kwargs={
+                         'user_service': services["user"],
+                         'follow_service': services['follow']
+                     })
     api.add_resource(User, '/user/<username_or_id>',
-                     resource_class_kwargs={'service': services["user"]})
+                     resource_class_kwargs={
+                         'user_service': services["user"],
+                         'follow_service': services['follow']
+                     })
     api.add_resource(Confirmation, '/user/confirm/<string:confirmation_code>',
                      resource_class_kwargs={
                          'user_service': services["user"],

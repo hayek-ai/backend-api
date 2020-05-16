@@ -41,8 +41,10 @@ class TestUserController(unittest.TestCase):
         assert "password" not in new_user
         assert new_user["isAnalyst"] is False
         assert new_user["isConfirmed"] is False
+        assert len(new_user["following"]) == 0
         assert response.status_code == 201
         assert data["confirmationEmailSent"] is True
+
 
         # underscores are valid in username
         response = self.client.post('/register', data=json.dumps(dict(
@@ -136,20 +138,19 @@ class TestUserController(unittest.TestCase):
         # get by id
         response = self.client.get(
             '/user/1',
-            headers={'Authorization': 'Bearer {}'.format(access_token)}
-        )
+            headers={'Authorization': 'Bearer {}'.format(access_token)})
+        assert response.status_code == 200
         user = json.loads(response.data)
         assert user["username"] == "username1"
-        assert response.status_code == 200
+        assert len(user["following"]) == 0
 
         # get by username
         response = self.client.get(
             '/user/username2',
-            headers={'Authorization': 'Bearer {}'.format(access_token)}
-        )
+            headers={'Authorization': 'Bearer {}'.format(access_token)})
+        assert response.status_code == 200
         user = json.loads(response.data)
         assert user["username"] == "username2"
-        assert response.status_code == 200
 
         # user not found
         response = self.client.get(
@@ -218,6 +219,8 @@ class TestUserController(unittest.TestCase):
         assert updated_user["bio"] == "test bio"
         assert updated_user["prefersDarkmode"] is True
         assert updated_user["imageUrl"] == f"{S3.S3_ENDPOINT_URL}/user_images/user1-profile-image.jpeg"
+        assert len(updated_user["following"]) == 0
+
 
         # invalid profileImage file extension
         data = {'profileImage': (create_image_file("test.pdf", "application/pdf"), "test.pdf")}
@@ -255,6 +258,7 @@ class TestUserController(unittest.TestCase):
         data = json.loads(response.data)
         assert "accessToken" in data
         assert data["user"]["username"] == "username"
+        assert len(data["user"]["following"]) == 0
         assert response.status_code == 200
 
         # invalid username/email

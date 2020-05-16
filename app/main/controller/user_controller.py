@@ -6,6 +6,7 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 from app.main.libs.strings import get_text
 from app.main.libs.util import get_error
 from app.main.schema.user_schema import user_schema, user_register_schema, user_login_schema
+from app.main.schema.follow_schema import follow_list_schema
 
 
 class UserRegister(Resource):
@@ -50,7 +51,10 @@ class UserRegister(Resource):
             expires = datetime.timedelta(days=30)
             access_token = create_access_token(identity=new_user.id, expires_delta=expires, fresh=True)
             return {
-                       "user": self.user_schema.dump(new_user),
+                       "user": {
+                           **self.user_schema.dump(new_user),
+                           "following": []
+                       },
                        "accessToken": access_token,
                        "confirmationEmailSent": email_success
                    }, 201
@@ -60,8 +64,10 @@ class UserRegister(Resource):
 
 class User(Resource):
     def __init__(self, **kwargs):
-        self.user_service = kwargs['service']
+        self.user_service = kwargs['user_service']
+        self.follow_service = kwargs['follow_service']
         self.user_schema = user_schema
+        self.follow_list_schema = follow_list_schema
 
     @jwt_required
     def get(self, username_or_id):
@@ -71,7 +77,11 @@ class User(Resource):
             user = self.user_service.get_user_by_username(username_or_id)
 
         if user:
-            return self.user_schema.dump(user), 200
+            following = self.follow_service.get_following(user.id)
+            return {
+                **self.user_schema.dump(user),
+                "following": self.follow_list_schema.dump(following)
+        }, 200
         else:
             return get_error(404, get_text("not_found").format("User"))
 
@@ -114,14 +124,20 @@ class User(Resource):
                 return get_error(400, str(e))
 
         self.user_service.save_changes(user)
-        return self.user_schema.dump(user), 201
+        following = self.follow_service.get_following(user.id)
+        return {
+            **self.user_schema.dump(user),
+            "following": self.follow_list_schema.dump(following)
+        }, 201
 
 
 class UserLogin(Resource):
     def __init__(self, **kwargs):
-        self.user_service = kwargs['service']
+        self.user_service = kwargs['user_service']
+        self.follow_service = kwargs['follow_service']
         self.user_schema = user_schema
         self.user_login_schema = user_login_schema
+        self.follow_list_schema = follow_list_schema
 
     def post(self):
         credentials = request.get_json()
@@ -137,8 +153,12 @@ class UserLogin(Resource):
         if user and user.check_password(credentials["password"]):
             expires = datetime.timedelta(days=30)
             access_token = create_access_token(identity=user.id, expires_delta=expires, fresh=True)
+            following = self.follow_service.get_following(user.id)
             return {
-                       "user": self.user_schema.dump(user),
+                       "user": {
+                           **self.user_schema.dump(user),
+                           "following": self.follow_list_schema.dump(following)
+                       },
                        "accessToken": access_token,
                    }, 200
 
