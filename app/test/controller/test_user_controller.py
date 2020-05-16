@@ -163,57 +163,74 @@ class TestUserController(unittest.TestCase):
     def test_edit_user_put(self, mock) -> None:
         register_mock_mailgun(mock)
 
-        self.service.save_new_user("email@email.com", "username", "password")
-        self.service.save_new_user("email2@email.com", "username2", "password")
+        self.service.save_new_user("email@email.com", "user1", "password")
+        self.service.save_new_user("email2@email.com", "user2", "password")
 
         # login
-        access_token = self.login("username", "password")
+        access_token = self.login("user1", "password")
 
         # try to edit user without authorization header -- error
-        response = self.client.put("/user/1", data=json.dumps(dict(
-            emailOrUsername="username",
-            password="password"
-        )), content_type='application/json')
+        response = self.client.put(
+            "/user/1",
+            data=dict(bio="test bio", prefersDarkmode=True),
+            follow_redirects=True,
+            content_type='multipart/form-data')
         assert response.status_code == 401
 
         # try to edit profile other than your own
-        response = self.client.put("/user/2", data=json.dumps(
-            dict(bio="test bio")),
-                                   content_type='application/json',
-                                   headers={'Authorization': 'Bearer {}'.format(access_token)}
-                                   )
+        response = self.client.put(
+            "/user/2",
+            data=dict(bio="test bio", prefersDarkmode=True),
+            follow_redirects=True,
+            content_type='multipart/form-data',
+            headers={'Authorization': 'Bearer {}'.format(access_token)})
         data = json.loads(response.data)
         assert data["errors"][0]["detail"] == get_text("unauthorized_user_edit")
         assert response.status_code == 403
 
+
         # handle user not found
-        response = self.client.put("/user/5", data=json.dumps(
-            dict(bio="test bio")),
-                                   content_type='application/json',
-                                   headers={'Authorization': 'Bearer {}'.format(access_token)}
-                                   )
+        response = self.client.put(
+            "/user/5",
+            data=dict(bio="test bio", prefersDarkmode=True),
+            follow_redirects=True,
+            content_type='multipart/form-data',
+            headers={'Authorization': 'Bearer {}'.format(access_token)})
         data = json.loads(response.data)
         assert data["errors"][0]["detail"] == get_text("not_found").format("User")
         assert response.status_code == 404
 
-        # update bio
-        response = self.client.put("/user/1", data=json.dumps(
-            dict(bio="test bio")),
-                                   content_type='application/json',
-                                   headers={'Authorization': 'Bearer {}'.format(access_token)}
-                                   )
+        # update bio, prefersDarkmode, and profileImage
+        profileImage = create_image_file("testProfileImage.jpeg", "image/jpeg")
+        data = {
+            "bio": "test bio",
+            "prefersDarkmode": "true",
+            "profileImage": (profileImage, "testProfileImage.jpeg")
+        }
+        response = self.client.put(
+            "/user/1",
+            data=data,
+            follow_redirects=True,
+            content_type='multipart/form-data',
+            headers={'Authorization': 'Bearer {}'.format(access_token)})
+        assert response.status_code == 201
         updated_user = json.loads(response.data)
         assert updated_user["bio"] == "test bio"
-        assert response.status_code == 201
-
-        # update prefers_darkmode
-        response = self.client.put("/user/1", data=json.dumps(
-            dict(prefersDarkmode=True)),
-                                   content_type='application/json',
-                                   headers={'Authorization': 'Bearer {}'.format(access_token)})
-        updated_user = json.loads(response.data)
         assert updated_user["prefersDarkmode"] is True
-        assert response.status_code == 201
+        assert updated_user["imageUrl"] == f"{S3.S3_ENDPOINT_URL}/user_images/user1-profile-image.jpeg"
+
+        # invalid profileImage file extension
+        data = {'profileImage': (create_image_file("test.pdf", "application/pdf"), "test.pdf")}
+        response = self.client.put(
+            '/user/1',
+            data=data,
+            follow_redirects=True,
+            content_type="multipart/form-data",
+            headers={'Authorization': 'Bearer {}'.format(access_token)}
+        )
+        data = json.loads(response.data)
+        assert data['errors'][0]['detail'] == get_text("invalid_file_extension")
+        assert response.status_code == 400
 
     def test_login_user_post(self, mock) -> None:
         register_mock_mailgun(mock)
@@ -264,47 +281,6 @@ class TestUserController(unittest.TestCase):
         )), content_type='application/json')
         data = json.loads(response.data)
         assert data["errors"][0]["detail"] == get_text("incorrect_fields")
-        assert response.status_code == 400
-
-    def test_image_upload_post(self, mock) -> None:
-        self.service.save_new_user("email@email.com", "username", "password")
-
-        image = create_image_file("test.jpg", "image/jpg")
-        data = dict(file=(image, "test.jpg"))
-        access_token = self.login("username", "password")
-
-        response = self.client.post(
-            '/upload-profile-image',
-            data=data,
-            follow_redirects=True,
-            content_type='multipart/form-data',
-            headers={'Authorization': 'Bearer {}'.format(access_token)}
-        )
-        user_dict = json.loads(response.data)
-        assert user_dict["imageUrl"] == f"{S3.S3_ENDPOINT_URL}/user_images/username-profile-image.jpg"
-        assert response.status_code == 201
-
-        # invalid file extension
-        data = {'file': (create_image_file("test.pdf", "application/pdf"), "test.pdf")}
-        response = self.client.post(
-            '/upload-profile-image',
-            data=data,
-            follow_redirects=True,
-            content_type="multipart/form-data",
-            headers={'Authorization': 'Bearer {}'.format(access_token)}
-        )
-        data = json.loads(response.data)
-        assert data['errors'][0]['detail'] == get_text("invalid_file_extension")
-        assert response.status_code == 400
-
-        # invalid form
-        response = self.client.post(
-            '/upload-profile-image',
-            data=None,
-            follow_redirects=True,
-            content_type="multipart/form-data",
-            headers={'Authorization': 'Bearer {}'.format(access_token)}
-        )
         assert response.status_code == 400
 
     def tearDown(self) -> None:

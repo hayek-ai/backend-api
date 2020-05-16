@@ -81,6 +81,7 @@ class User(Resource):
             user = self.user_service.get_user_by_id(username_or_id)
         else:
             user = self.user_service.get_user_by_username(username_or_id)
+
         if not user:
             return get_error(404, get_text("not_found").format("User"))
 
@@ -88,14 +89,29 @@ class User(Resource):
         if user.id != get_jwt_identity():
             return get_error(403, get_text("unauthorized_user_edit"))
 
-        user_details = request.get_json()
-        if "bio" in user_details:
-            if user_details["bio"].strip() == "":
+        if "bio" in request.form:
+            if request.form.get('bio').strip() == "":
                 user.bio = None
             else:
-                user.bio = user_details["bio"]
-        if "prefersDarkmode" in user_details:
-            user.prefers_darkmode = user_details["prefersDarkmode"]
+                user.bio = request.form.get('bio')
+        if "prefersDarkmode" in request.form:
+            if request.form.get('prefersDarkmode').lower() == "true":
+                user.prefers_darkmode = True
+            else:
+                user.prefers_darkmode = False
+
+        if "profileImage" in request.files:
+            try:
+                # get file and rename
+                image = request.files['profileImage']
+                image_extension = image.filename.split('.')[len(image.filename.split(".")) - 1]
+                valid_extensions = ['jpg', 'png', 'jpeg']
+                if image_extension not in valid_extensions:
+                    return get_error(400, get_text("invalid_file_extension"))
+                filename = f"{user.username}-profile-image.{image_extension}"
+                self.user_service.change_user_image(user.id, image, filename)
+            except Exception as e:
+                return get_error(400, str(e))
 
         self.user_service.save_changes(user)
         return self.user_schema.dump(user), 201
@@ -127,29 +143,3 @@ class UserLogin(Resource):
                    }, 200
 
         return get_error(401, get_text("user_invalid_credentials"), field="general")
-
-
-class UploadProfileImage(Resource):
-    def __init__(self, **kwargs):
-        self.user_service = kwargs['service']
-        self.user_schema = user_schema
-
-    @jwt_required
-    def post(self):
-        user_id = get_jwt_identity()
-        user = self.user_service.get_user_by_id(user_id)
-        if not user:
-            return get_error(404, get_text("not_found").format("user"))
-
-        try:
-            # get file and rename
-            image = request.files['file']
-            image_extension = image.filename.split('.')[len(image.filename.split(".")) - 1]
-            valid_extensions = ['jpg', 'png', 'jpeg']
-            if image_extension not in valid_extensions:
-                return get_error(400, get_text("invalid_file_extension"))
-            filename = f"{user.username}-profile-image.{image_extension}"
-            self.user_service.change_user_image(user_id, image, filename)
-            return self.user_schema.dump(user), 201
-        except Exception as e:
-            return get_error(400, str(e))

@@ -14,7 +14,6 @@ class TestEndpointsConfiguration(unittest.TestCase):
     def test_endpoints_are_configured(self):
         assert '/register' in self.endpoints
         assert '/login' in self.endpoints
-        assert '/upload-profile-image' in self.endpoints
         assert '/user/<username_or_id>' in self.endpoints
         assert '/user/confirm/<string:confirmation_code>' in self.endpoints
         assert '/resend-confirmation' in self.endpoints

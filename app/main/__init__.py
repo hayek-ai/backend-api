@@ -10,7 +10,7 @@ from app.main.db import db
 from app.main.ma import ma
 
 # Controllers
-from app.main.controller.user_controller import UserRegister, UserLogin, User, UploadProfileImage
+from app.main.controller.user_controller import UserRegister, UserLogin, User
 from app.main.controller.confirmation_controller import Confirmation, ResendConfirmation
 from app.main.controller.idea_controller import NewIdea, Idea, IdeaFeed, DownloadReport
 from app.main.controller.follow_controller import Follow, FollowingList, FollowerList
@@ -58,8 +58,6 @@ def create_app(services, config_name):
                         'user_service': services["user"],
                         'confirmation_service': services["confirmation"]})
     api.add_resource(UserLogin, '/login',
-                     resource_class_kwargs={'service': services["user"]})
-    api.add_resource(UploadProfileImage, '/upload-profile-image',
                      resource_class_kwargs={'service': services["user"]})
     api.add_resource(User, '/user/<username_or_id>',
                      resource_class_kwargs={'service': services["user"]})
