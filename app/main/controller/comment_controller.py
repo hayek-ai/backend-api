@@ -4,7 +4,7 @@ from app.main.libs.strings import get_text
 from app.main.libs.util import get_error
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from app.main.schema.comment_schema import comment_schema, new_comment_schema, comment_list_schema
-from app.main.schema.idea_schema import idea_schema
+from app.main.schema.idea_schema import idea_with_report_schema
 
 
 class NewComment(Resource):
@@ -13,7 +13,7 @@ class NewComment(Resource):
         self.idea_service = kwargs["idea_service"]
         self.comment_schema = comment_schema
         self.new_comment_schema = new_comment_schema
-        self.idea_schema = idea_schema
+        self.idea_with_report_schema = idea_with_report_schema
 
     @jwt_required
     def post(self, idea_id: int):
@@ -39,7 +39,7 @@ class NewComment(Resource):
                 idea_id=idea_id)
             return {
                 "comment": self.comment_schema.dump(comment),
-                "idea": self.idea_schema.dump(idea)
+                "idea": self.idea_with_report_schema.dump(idea)
             }, 201
         except Exception as e:
             return get_error(500, str(e))
@@ -50,7 +50,7 @@ class Comment(Resource):
         self.comment_service = kwargs["comment_service"]
         self.idea_service = kwargs["idea_service"]
         self.comment_schema = comment_schema
-        self.idea_schema = idea_schema
+        self.idea_with_report_schema = idea_with_report_schema
 
     @jwt_required
     def get(self, comment_id: int):
@@ -71,7 +71,7 @@ class Comment(Resource):
             self.comment_service.delete_comment_by_id(comment_id)
             return {
                 "message": get_text("successfully_deleted").format("Comment"),
-                "idea": idea_schema.dump(idea)
+                "idea": idea_with_report_schema.dump(idea)
             }, 200
         except Exception as e:
             return get_error(500, str(e))
