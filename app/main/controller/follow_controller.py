@@ -3,7 +3,7 @@ from flask_restful import Resource
 from app.main.libs.strings import get_text
 from app.main.libs.util import get_error
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from app.main.schema.user_schema import user_schema, user_list_schema
+from app.main.schema.user_schema import user_schema, user_follow_list_schema
 
 
 class Follow(Resource):
@@ -49,7 +49,7 @@ class FollowingList(Resource):
     def __init__(self, **kwargs):
         self.follow_service = kwargs['follow_service']
         self.user_service = kwargs['user_service']
-        self.user_list_schema = user_list_schema
+        self.user_follow_list_schema = user_follow_list_schema
 
     @jwt_required
     def get(self, user_id: int):
@@ -58,14 +58,14 @@ class FollowingList(Resource):
             return get_error(404, get_text("not_found").format("User"))
 
         following = self.follow_service.get_following(user_id)
-        return {"following": self.user_list_schema.dump(following)}, 200
+        return {"following": self.user_follow_list_schema.dump(following)}, 200
 
 
 class FollowerList(Resource):
     def __init__(self, **kwargs):
         self.follow_service = kwargs['follow_service']
         self.user_service = kwargs['user_service']
-        self.user_list_schema = user_list_schema
+        self.user_follow_list_schema = user_follow_list_schema
 
     @jwt_required
     def get(self, analyst_id: int):
@@ -74,5 +74,5 @@ class FollowerList(Resource):
             return get_error(404, get_text("not_found").format("analyst"))
 
         followers = self.follow_service.get_followers(analyst_id)
-        return {"followers": self.user_list_schema.dump(followers)}, 200
+        return {"followers": self.user_follow_list_schema.dump(followers)}, 200
 
