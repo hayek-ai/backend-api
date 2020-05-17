@@ -9,6 +9,7 @@ from app.main.service.upvote_service import UpvoteService
 from app.main.service.downvote_service import DownvoteService
 from app.main.db import db
 from app.main.libs.strings import get_text
+from app.main.libs.util import create_idea
 
 
 @requests_mock.Mocker()
@@ -32,17 +33,6 @@ class TestUpvoteController(unittest.TestCase):
         login_data = json.loads(response.data)
         return {"access_token": login_data["accessToken"], "user": new_user}
 
-    def create_idea(self, analyst_id) -> dict:
-        new_idea_dict = self.idea_service.save_new_idea(
-            analyst_id=analyst_id,
-            symbol="AAPL",
-            position_type="long",
-            price_target=400,
-            entry_price=313.40,
-            thesis_summary="My Thesis Summary",
-            full_report="My Full Report",)
-        return new_idea_dict["idea"]
-
     def upvote_idea(self, idea_id, access_token):
         """Creates/Deletes upvote and returns response"""
         response = self.client.post(
@@ -56,7 +46,7 @@ class TestUpvoteController(unittest.TestCase):
 
         user_dict = self.create_user("user@email.com", "user")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.create_idea(analyst.id)
+        idea = create_idea(analyst.id, "aapl", False)
 
         # create upvote
         response = self.upvote_idea(idea.id, user_dict["access_token"])
@@ -86,7 +76,7 @@ class TestUpvoteController(unittest.TestCase):
 
         user_dict = self.create_user("user@email.com", "user")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.create_idea(analyst.id)
+        idea = create_idea(analyst.id, "aapl", False)
 
         # create downvote
         self.downvote_service.save_new_downvote(user_dict["user"].id, idea.id)
@@ -112,8 +102,8 @@ class TestUpvoteController(unittest.TestCase):
 
         user_dict = self.create_user("user@email.com", "user")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea1 = self.create_idea(analyst.id)
-        idea2 = self.create_idea(analyst.id)
+        idea1 = create_idea(analyst.id, "aapl", False)
+        idea2 = create_idea(analyst.id, "gm", False)
 
         self.upvote_idea(idea1.id, user_dict["access_token"])
         self.upvote_idea(idea2.id, user_dict["access_token"])

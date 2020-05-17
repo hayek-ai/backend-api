@@ -36,20 +36,26 @@ class NewIdea(Resource):
 
         exhibits = request.files.getlist('exhibits')
         exhibit_title_map = json.loads(request.form.get("exhibitTitleMap")) if request.form.get("exhibitTitleMap") else None
-        new_idea_dict = self.idea_service.save_new_idea(
+        new_idea = self.idea_service.save_new_idea(
             analyst_id=analyst_id,
             symbol=request.form.get("symbol"),
             position_type=request.form.get("positionType"),
-            price_target=request.form.get("priceTarget"),
+            bull_target=request.form.get("bullTarget"),
+            bull_probability=request.form.get("bullProbability"),
+            base_target=request.form.get("baseTarget"),
+            base_probability=request.form.get("baseProbability"),
+            bear_target=request.form.get("bearTarget"),
+            bear_probability=request.form.get("bearProbability"),
             entry_price=request.form.get("entryPrice"),
             thesis_summary=request.form.get("thesisSummary"),
             full_report=request.form.get("fullReport"),
             exhibits=exhibits,
             exhibit_title_map=exhibit_title_map
         )
-        if "error" in new_idea_dict:
-            return get_error(400, new_idea_dict["error"])
-        return self.idea_with_report_schema.dump(new_idea_dict["idea"]), 201
+
+        if type(new_idea) == dict:
+            return get_error(400, new_idea["error"])
+        return self.idea_with_report_schema.dump(new_idea), 201
 
 
 class Idea(Resource):

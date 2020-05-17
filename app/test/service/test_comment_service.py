@@ -5,6 +5,7 @@ from app.test.conftest import flask_test_client, register_mock_mailgun, register
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService
 from app.main.service.comment_service import CommentService
+from app.main.libs.util import create_idea
 
 
 @requests_mock.Mocker()
@@ -16,25 +17,13 @@ class TestCommentService(unittest.TestCase):
         self.app = flask_test_client()
         db.create_all()
 
-    def create_new_idea(self, analyst_id) -> "IdeaModel":
-        idea = self.idea_service.save_new_idea(
-            analyst_id=analyst_id,
-            symbol="AAPL",
-            position_type="long",
-            price_target=400,
-            entry_price=313.49,
-            thesis_summary="My Thesis Summary",
-            full_report="My Full Report",
-        )["idea"]
-        return idea
-
     def test_save_new_comment_and_get_comment_by_id(self, mock) -> None:
         register_mock_iex(mock)
         register_mock_mailgun(mock)
 
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.create_new_idea(analyst.id)
+        idea = create_idea(analyst.id, "aapl", False)
         comment = self.comment_service.save_new_comment(
             body="Test Comment",
             user_id=user.id,
@@ -59,7 +48,7 @@ class TestCommentService(unittest.TestCase):
 
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.create_new_idea(analyst.id)
+        idea = create_idea(analyst.id, "aapl", False)
         comment = self.comment_service.save_new_comment(
             body="Test Comment",
             user_id=user.id,
@@ -77,7 +66,7 @@ class TestCommentService(unittest.TestCase):
 
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.create_new_idea(analyst.id)
+        idea = create_idea(analyst.id, "aapl", False)
         comment1 = self.comment_service.save_new_comment(
             body="Test Comment",
             user_id=user.id,

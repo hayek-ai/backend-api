@@ -25,6 +25,8 @@
   "confirmation_resend_successful": "Confirmation email successfully resent.",
 
   "not_an_analyst": "Only analysts can upload ideas.",
+  "negative_implied_return": "Implied return cannot be negative.",
+  "incorrect_target_probabilities": "Price target probabilities must add up to 100%",
   "invalid_position_type": "Position type can be either 'long' or 'short'",
   "incorrect_price": "That price doesn't match our records",
   "invalid_feed_type": "Invalid feed type. Use 'following' or 'discover'.",

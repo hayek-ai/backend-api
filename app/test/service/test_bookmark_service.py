@@ -5,6 +5,7 @@ from app.test.conftest import flask_test_client, register_mock_iex, register_moc
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService
 from app.main.service.bookmark_service import BookmarkService
+from app.main.libs.util import create_idea
 
 
 @requests_mock.Mocker()
@@ -16,25 +17,13 @@ class TestBookmarkService(unittest.TestCase):
         self.app = flask_test_client()
         db.create_all()
 
-    def create_new_idea(self, analyst_id) -> "IdeaModel":
-        idea = self.idea_service.save_new_idea(
-            analyst_id=analyst_id,
-            symbol="AAPL",
-            position_type="long",
-            price_target=400,
-            entry_price=313.49,
-            thesis_summary="My Thesis Summary",
-            full_report="My Full Report",
-        )["idea"]
-        return idea
-
     def test_save_new_bookmark_and_get_bookmark_by_id(self, mock) -> None:
         register_mock_iex(mock)
         register_mock_mailgun(mock)
 
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.create_new_idea(analyst.id)
+        idea = create_idea(analyst.id, "aapl", False)
         bookmark = self.bookmark_service.save_new_bookmark(user_id=user.id, idea_id=idea.id)
         found_bookmark = self.bookmark_service.get_bookmark_by_id(bookmark.id)
         assert found_bookmark.id == bookmark.id
@@ -51,7 +40,7 @@ class TestBookmarkService(unittest.TestCase):
 
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.create_new_idea(analyst.id)
+        idea = create_idea(analyst.id, "aapl", False)
         bookmark = self.bookmark_service.save_new_bookmark(user_id=user.id, idea_id=idea.id)
         self.bookmark_service.delete_bookmark_by_id(bookmark.id)
         found_bookmark = self.bookmark_service.get_bookmark_by_id(bookmark.id)
@@ -64,7 +53,7 @@ class TestBookmarkService(unittest.TestCase):
 
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.create_new_idea(analyst.id)
+        idea = create_idea(analyst.id, "aapl", False)
         bookmark = self.bookmark_service.save_new_bookmark(user_id=user.id, idea_id=idea.id)
         found_bookmark = self.bookmark_service.get_bookmark_by_user_and_idea(user_id=user.id, idea_id=idea.id)
         assert found_bookmark.id == bookmark.id
@@ -79,8 +68,8 @@ class TestBookmarkService(unittest.TestCase):
 
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea1 = self.create_new_idea(analyst.id)
-        idea2 = self.create_new_idea(analyst.id)
+        idea1 = create_idea(analyst.id, "aapl", False)
+        idea2 = create_idea(analyst.id, "gm", False)
         self.bookmark_service.save_new_bookmark(user_id=user.id, idea_id=idea1.id)
         self.bookmark_service.save_new_bookmark(user_id=user.id, idea_id=idea2.id)
         bookmarked_ideas = self.bookmark_service.get_users_bookmarked_ideas(user.id)

@@ -11,6 +11,7 @@ from app.main.service.idea_service import IdeaService
 from app.main.service.user_service import UserService
 from app.main.service.follow_service import FollowService
 from app.test.conftest import flask_test_client, services_for_test, register_mock_mailgun, register_mock_iex
+from app.main.libs.util import create_idea
 
 
 @requests_mock.Mocker()
@@ -25,7 +26,7 @@ class TestIdeaController(unittest.TestCase):
         self.follow_service = FollowService()
         db.create_all()
 
-    def create_user(self, email, username, **kwargs) -> str:
+    def create_user(self, email, username, **kwargs) -> dict:
         """helper function that creates a new user and returns dict with user and access token"""
         new_user = self.user_service.save_new_user(email, username, "password", **kwargs)
         response = self.client.post('/login', data=json.dumps(dict(
@@ -34,19 +35,6 @@ class TestIdeaController(unittest.TestCase):
         )), content_type="application/json")
         login_data = json.loads(response.data)
         return {"access_token": login_data["accessToken"], "user": new_user}
-
-    def create_idea(self, analyst_id, symbol) -> None:
-        entry_price = 313.40 if symbol.lower() == "aapl" else 23.21
-        position_type = "long" if symbol.lower() == "aapl" else "short"
-        new_idea_dict = self.idea_service.save_new_idea(
-            analyst_id=analyst_id,
-            symbol=symbol,
-            position_type=position_type,
-            price_target=400,
-            entry_price=entry_price,
-            thesis_summary="My Thesis Summary",
-            full_report="My Full Report")
-        return new_idea_dict["idea"]
 
     def test_new_idea_post(self, mock) -> None:
         register_mock_iex(mock)
@@ -60,7 +48,12 @@ class TestIdeaController(unittest.TestCase):
         data = {
             'symbol': "AAPL",
             "positionType": "long",
-            "priceTarget": 400,
+            "bullTarget": 420,
+            "bullProbability": 0.2,
+            "baseTarget": 400,
+            "baseProbability": 0.6,
+            "bearTarget": 380,
+            "bearProbability": 0.2,
             "entryPrice": 313.40,
             "thesisSummary": "Test Thesis Summary",
             "fullReport": "Test Full Report",
@@ -105,7 +98,12 @@ class TestIdeaController(unittest.TestCase):
         data = {
             'symbol': "AAPL",
             "positionType": "long",
-            "priceTarget": 400,
+            "bullTarget": 420,
+            "bullProbability": 0.2,
+            "baseTarget": 400,
+            "baseProbability": 0.6,
+            "bearTarget": 380,
+            "bearProbability": 0.2,
             "entryPrice": 313.40,
             "thesisSummary": "Test Thesis Summary",
             "fullReport": "Test Full Report"
@@ -126,7 +124,58 @@ class TestIdeaController(unittest.TestCase):
         data = {
             'symbol': "AAPL",
             "positionType": "long",
-            "priceTarget": 400,
+            "bullTarget": 420,
+            "bullProbability": 0.2,
+            "baseTarget": 400,
+            "baseProbability": 0.6,
+            "bearTarget": 380,
+            "bearProbability": 0.2,
+            "entryPrice": 1,
+            "thesisSummary": "Test Thesis Summary",
+            "fullReport": "Test Full Report"
+        }
+        response = self.client.post(
+            '/new-idea',
+            data=data,
+            follow_redirects=True,
+            content_type="multipart/form-data",
+            headers={"Authorization": "Bearer {}".format(access_token)}
+        )
+        assert response.status_code == 400
+
+        # invalid target probabilities (must add up to 1)
+        data = {
+            'symbol': "AAPL",
+            "positionType": "long",
+            "bullTarget": 420,
+            "bullProbability": 0.2,
+            "baseTarget": 400,
+            "baseProbability": 0.6,
+            "bearTarget": 380,
+            "bearProbability": 0.2,
+            "entryPrice": 1,
+            "thesisSummary": "Test Thesis Summary",
+            "fullReport": "Test Full Report"
+        }
+        response = self.client.post(
+            '/new-idea',
+            data=data,
+            follow_redirects=True,
+            content_type="multipart/form-data",
+            headers={"Authorization": "Bearer {}".format(access_token)}
+        )
+        assert response.status_code == 400
+
+        # invalid implied return
+        data = {
+            'symbol': "AAPL",
+            "positionType": "long",
+            "bullTarget": 420,
+            "bullProbability": 0.2,
+            "baseTarget": 400,
+            "baseProbability": 0.6,
+            "bearTarget": 380,
+            "bearProbability": 0.2,
             "entryPrice": 1,
             "thesisSummary": "Test Thesis Summary",
             "fullReport": "Test Full Report"
@@ -157,7 +206,12 @@ class TestIdeaController(unittest.TestCase):
         data = {
             'symbol': "AAPL",
             "positionType": "market weight",
-            "priceTarget": 400,
+            "bullTarget": 420,
+            "bullProbability": 0.2,
+            "baseTarget": 400,
+            "baseProbability": 0.6,
+            "bearTarget": 380,
+            "bearProbability": 0.2,
             "entryPrice": 313.40,
             "thesisSummary": "Test Thesis Summary",
             "fullReport": "Test Full Report"
@@ -175,32 +229,11 @@ class TestIdeaController(unittest.TestCase):
         register_mock_iex(mock)
         register_mock_mailgun(mock)
 
-        access_token = self.create_user("email@email.com", "username", is_analyst=True)["access_token"]
-        exhibit1 = create_image_file("testexhibit1.png", "image/png")
-        exhibit2 = create_image_file("testexhibit2.jpg", "image/jpg")
-        data = {
-            'symbol': "AAPL",
-            "positionType": "long",
-            "priceTarget": 400,
-            "entryPrice": 313.40,
-            "thesisSummary": "Test Thesis Summary",
-            "fullReport": "Test Full Report",
-            'exhibits': (exhibit1, "testexhibit1.png"),
-            'exhibits': (exhibit2, "testexhibit2.jpg"),
-            "exhibitTitleMap": '{"testexhibit1.png": "Exhibit 1", "testexhibit2.jpg": "Exhibit 2"}'
-        }
-        response = self.client.post(
-            '/new-idea',
-            data=data,
-            follow_redirects=True,
-            content_type="multipart/form-data",
-            headers={"Authorization": "Bearer {}".format(access_token)}
-        )
-        response_data = json.loads(response.data)
-        idea_id = response_data["id"]
+        analyst_dict = self.create_user("email@email.com", "username", is_analyst=True)
+        idea = create_idea(analyst_dict["user"].id, "aapl", False)
         response = self.client.get(
-            f'/idea/{idea_id}',
-            headers={"Authorization": "Bearer {}".format(access_token)})
+            f'/idea/{idea.id}',
+            headers={"Authorization": "Bearer {}".format(analyst_dict["access_token"])})
         assert response.status_code == 200
         response_data = json.loads(response.data)
         assert response_data["symbol"] == "AAPL"
@@ -213,11 +246,11 @@ class TestIdeaController(unittest.TestCase):
 
         user_dict = self.create_user("user@email.com", "user")
         analyst1 = self.user_service.save_new_user("analyst1@email.com", "analyst1", "password", is_analyst=True)
-        idea1 = self.create_idea(analyst1.id, "AAPL")
-        idea2 = self.create_idea(analyst1.id, "GM")
+        idea1 = create_idea(analyst1.id, "AAPL", False)
+        idea2 = create_idea(analyst1.id, "GM", False)
         analyst2 = self.user_service.save_new_user("analyst2@email.com", "analyst2", "password", is_analyst=True)
-        idea3 = self.create_idea(analyst2.id, "AAPL")
-        idea4 = self.create_idea(analyst2.id, "GM")
+        idea3 = create_idea(analyst2.id, "AAPL", False)
+        idea4 = create_idea(analyst2.id, "GM", False)
 
         # "following" feed_type returns only ideas from analysts user follows
         follow = self.follow_service.save_new_follow(user_dict["user"].id, analyst1.id)
@@ -340,6 +373,7 @@ class TestIdeaController(unittest.TestCase):
         response_data = json.loads(response.data)
         assert len(response_data) == 4
         assert response_data[0]["id"] == idea1.id
+        assert response_data[1]["id"] == idea4.id
 
         # invalid feed_type
         response = self.client.get(
@@ -353,32 +387,12 @@ class TestIdeaController(unittest.TestCase):
         register_mock_iex(mock)
         register_mock_mailgun(mock)
 
-        access_token = self.create_user("email@email.com", "username", is_analyst=True)["access_token"]
-        exhibit1 = create_image_file("testexhibit1.png", "image/png")
-        exhibit2 = create_image_file("testexhibit2.jpg", "image/jpg")
-        data = {
-            'symbol': "AAPL",
-            "positionType": "long",
-            "priceTarget": 400,
-            "entryPrice": 313.40,
-            "thesisSummary": "Test Thesis Summary",
-            "fullReport": "Test Full Report",
-            'exhibits': (exhibit1, "testexhibit1.png"),
-            'exhibits': (exhibit2, "testexhibit2.jpg"),
-            "exhibitTitleMap": '{"testexhibit1.png": "Exhibit 1", "testexhibit2.jpg": "Exhibit 2"}'
-        }
-        response = self.client.post(
-            '/new-idea',
-            data=data,
-            follow_redirects=True,
-            content_type="multipart/form-data",
-            headers={"Authorization": "Bearer {}".format(access_token)}
-        )
-        response_data = json.loads(response.data)
-        idea_id = response_data["id"]
+        analyst_dict = self.create_user("email@email.com", "username", is_analyst=True)
+        idea = create_idea(analyst_dict["user"].id, "aapl", False)
+
         response = self.client.get(
-            f'/idea/{idea_id}/download',
-            headers={"Authorization": "Bearer {}".format(access_token)})
+            f'/idea/{idea.id}/download',
+            headers={"Authorization": "Bearer {}".format(analyst_dict["access_token"])})
         response_data = json.loads(response.data)
         assert response.status_code == 200
         assert response_data["symbol"] == "AAPL"
@@ -389,8 +403,8 @@ class TestIdeaController(unittest.TestCase):
         assert response_data["numDownloads"] == 1
         download = self.download_service.get_download_by_id(1)
         assert download.user_id == 1
-        assert download.idea_id == idea_id
-        count = self.download_service.get_idea_download_count(idea_id)
+        assert download.idea_id == idea.id
+        count = self.download_service.get_idea_download_count(idea.id)
         assert count == 1
         count = self.download_service.get_user_download_count(1)
         assert count == 1

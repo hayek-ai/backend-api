@@ -8,6 +8,7 @@ from app.main.service.idea_service import IdeaService
 from app.main.service.upvote_service import UpvoteService
 from app.main.service.user_service import UserService
 from app.test.conftest import flask_test_client, register_mock_iex, register_mock_mailgun
+from app.main.libs.util import create_idea
 
 
 @requests_mock.Mocker()
@@ -19,25 +20,13 @@ class TestUpvoteService(unittest.TestCase):
         self.app = flask_test_client()
         db.create_all()
 
-    def create_new_idea(self, analyst_id) -> "IdeaModel":
-        idea = self.idea_service.save_new_idea(
-            analyst_id=analyst_id,
-            symbol="AAPL",
-            position_type="long",
-            price_target=400,
-            entry_price=313.40,
-            thesis_summary="My Thesis Summary",
-            full_report="My Full Report",
-        )["idea"]
-        return idea
-
     def test_save_new_upvote_and_get_upvote_by_id(self, mock) -> None:
         register_mock_iex(mock)
         register_mock_mailgun(mock)
 
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.create_new_idea(analyst.id)
+        idea = create_idea(analyst.id, "aapl", False)
         upvote = self.upvote_service.save_new_upvote(user_id=user.id, idea_id=idea.id)
         found_upvote = self.upvote_service.get_upvote_by_id(upvote.id)
         assert found_upvote.id == upvote.id
@@ -57,7 +46,7 @@ class TestUpvoteService(unittest.TestCase):
 
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.create_new_idea(analyst.id)
+        idea = create_idea(analyst.id, "aapl", False)
         upvote = self.upvote_service.save_new_upvote(user_id=user.id, idea_id=idea.id)
         self.upvote_service.delete_upvote_by_id(upvote.id)
         found_upvote = self.upvote_service.get_upvote_by_id(upvote.id)
@@ -72,7 +61,7 @@ class TestUpvoteService(unittest.TestCase):
 
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.create_new_idea(analyst.id)
+        idea = create_idea(analyst.id, "aapl", False)
         upvote = self.upvote_service.save_new_upvote(user_id=user.id, idea_id=idea.id)
         self.upvote_service.delete_upvote_by_user_and_idea_if_exists(user.id, idea.id)
         found_upvote = self.upvote_service.get_upvote_by_id(upvote.id)
@@ -88,7 +77,7 @@ class TestUpvoteService(unittest.TestCase):
         user1 = self.user_service.save_new_user("user1@email.com", "user1", "password")
         user2 = self.user_service.save_new_user("user2@email.com", "user2", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.create_new_idea(analyst.id)
+        idea = create_idea(analyst.id, "aapl", False)
         upvote1 = self.upvote_service.save_new_upvote(user_id=user1.id, idea_id=idea.id)
         upvote2 = self.upvote_service.save_new_upvote(user_id=user2.id, idea_id=idea.id)
         upvotes = self.upvote_service.get_all_upvotes_for_idea(idea.id)
@@ -102,7 +91,7 @@ class TestUpvoteService(unittest.TestCase):
 
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.create_new_idea(analyst.id)
+        idea = create_idea(analyst.id, "aapl", False)
         upvote = self.upvote_service.save_new_upvote(user_id=user.id, idea_id=idea.id)
         found_upvote = self.upvote_service.get_upvote_by_user_and_idea(user_id=user.id, idea_id=idea.id)
         assert found_upvote.id == upvote.id
@@ -117,8 +106,8 @@ class TestUpvoteService(unittest.TestCase):
 
         user = self.user_service.save_new_user("user@email.com", "user", "password")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea1 = self.create_new_idea(analyst.id)
-        idea2 = self.create_new_idea(analyst.id)
+        idea1 = create_idea(analyst.id, "aapl", False)
+        idea2 = create_idea(analyst.id, "gm", False)
         self.upvote_service.save_new_upvote(user_id=user.id, idea_id=idea1.id)
         self.upvote_service.save_new_upvote(user_id=user.id, idea_id=idea2.id)
         upvoted_ideas = self.upvote_service.get_users_upvoted_ideas(user.id)

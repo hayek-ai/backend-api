@@ -14,9 +14,16 @@ from app.main.service.user_service import UserService
 
 class IdeaService:
     def save_new_idea(self, analyst_id: int, symbol: str, position_type: str,
-                      price_target: float, entry_price: float, thesis_summary: str,
+                      bull_target: float, bull_probability: float, base_target: float,
+                      base_probability: float, bear_target: float,
+                      bear_probability: float, entry_price: float, thesis_summary: str,
                       full_report: str, exhibits=[], exhibit_title_map=None):
         analyst = UserService.get_user_by_id(analyst_id)
+
+        price_target = (float(bull_target) * float(bull_probability))\
+            + (float(base_target) * float(base_probability))\
+            + (float(bear_target) * float(bear_probability))
+
         stock_data = {}
         try:
             stock_data.update(Stock.fetch_company_info(symbol))
@@ -47,6 +54,12 @@ class IdeaService:
             symbol=symbol.upper(),
             position_type=position_type.lower(),
             price_target=price_target,
+            bull_target=bull_target,
+            bull_probability=bull_probability,
+            base_target=base_target,
+            base_probability=base_probability,
+            bear_target=bear_target,
+            bear_probability=bear_probability,
             company_name=stock_data["companyName"],
             market_cap=stock_data["marketCap"],
             sector=stock_data["sector"].lower(),
@@ -61,7 +74,7 @@ class IdeaService:
         # update analyst idea count
         analyst.num_ideas = analyst.num_ideas + 1
         self.save_changes(analyst)
-        return {"idea": new_idea}
+        return new_idea
 
     @classmethod
     def upload_exhibit(cls, title: str, filename, image: TextIO):

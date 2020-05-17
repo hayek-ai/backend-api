@@ -10,7 +10,7 @@ class StockException(Exception):
 
 
 class Stock:
-    IEX_API_KEY = os.environ.get("IEX_API_KEY", None)
+    IEX_API_KEY = os.environ.get("IEX_TEST_API_KEY", None)
     IEX_URI = os.environ.get("IEX_TESTING_URI", None)
     ALPHA_VANTAGE_API_KEY = os.environ.get("ALPHA_VANTAGE_API_KEY", None)
 

@@ -8,6 +8,7 @@ from app.main.service.idea_service import IdeaService
 from app.main.service.comment_service import CommentService
 from app.main.db import db
 from app.main.libs.strings import get_text
+from app.main.libs.util import create_idea
 
 
 @requests_mock.Mocker()
@@ -31,17 +32,6 @@ class TestCommentController(unittest.TestCase):
         login_data = json.loads(response.data)
         return {"access_token": login_data["accessToken"], "user": new_user}
 
-    def create_idea(self, analyst_id) -> dict:
-        new_idea_dict = self.idea_service.save_new_idea(
-            analyst_id=analyst_id,
-            symbol="AAPL",
-            position_type="long",
-            price_target=400,
-            entry_price=313.30,
-            thesis_summary="My Thesis Summary",
-            full_report="My Full Report",)
-        return new_idea_dict["idea"]
-
     def create_comment(self, idea_id, access_token):
         """Creates new comment and returns response"""
         response = self.client.post(
@@ -57,7 +47,7 @@ class TestCommentController(unittest.TestCase):
 
         user_dict = self.create_user("user@email.com", "user")
         analyst_dict = self.create_user("analyst@email.com", "analyst", is_analyst=True)
-        idea = self.create_idea(analyst_dict["user"].id)
+        idea = create_idea(analyst_dict["user"].id, "aapl", False)
 
         # simple comment submit
         response = self.create_comment(idea.id, user_dict["access_token"])
@@ -74,7 +64,7 @@ class TestCommentController(unittest.TestCase):
 
         user_dict = self.create_user("user@email.com", "user")
         analyst_dict = self.create_user("analyst@email.com", "analyst", is_analyst=True)
-        idea = self.create_idea(analyst_dict["user"].id)
+        idea = create_idea(analyst_dict["user"].id, "aapl", False)
 
         # simple comment submit
         response = self.create_comment(idea.id, user_dict["access_token"])
@@ -104,7 +94,7 @@ class TestCommentController(unittest.TestCase):
 
         user_dict = self.create_user("user@email.com", "user")
         analyst_dict = self.create_user("analyst@email.com", "analyst", is_analyst=True)
-        idea = self.create_idea(analyst_dict["user"].id)
+        idea = create_idea(analyst_dict["user"].id, "aapl", False)
 
         # submit 2 comments
         response1 = self.create_comment(idea.id, user_dict["access_token"])

@@ -8,6 +8,7 @@ from app.main.service.idea_service import IdeaService
 from app.main.service.bookmark_service import BookmarkService
 from app.main.db import db
 from app.main.libs.strings import get_text
+from app.main.libs.util import create_idea
 
 
 @requests_mock.Mocker()
@@ -30,17 +31,6 @@ class TestBookmarkController(unittest.TestCase):
         login_data = json.loads(response.data)
         return {"access_token": login_data["accessToken"], "user": new_user}
 
-    def create_idea(self, analyst_id) -> dict:
-        new_idea_dict = self.idea_service.save_new_idea(
-            analyst_id=analyst_id,
-            symbol="AAPL",
-            position_type="long",
-            price_target=400,
-            entry_price=313.40,
-            thesis_summary="My Thesis Summary",
-            full_report="My Full Report")
-        return new_idea_dict["idea"]
-
     def bookmark_idea(self, idea_id, access_token):
         """Creates/Deletes bookmark and returns response"""
         response = self.client.post(
@@ -54,7 +44,7 @@ class TestBookmarkController(unittest.TestCase):
 
         user_dict = self.create_user("user@email.com", "user")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea = self.create_idea(analyst.id)
+        idea = create_idea(analyst.id, "aapl", False)
 
         response = self.bookmark_idea(idea.id, user_dict["access_token"])
         bookmark = self.bookmark_service.get_bookmark_by_id(1)
@@ -78,8 +68,8 @@ class TestBookmarkController(unittest.TestCase):
 
         user_dict = self.create_user("user@email.com", "user")
         analyst = self.user_service.save_new_user("analyst@email.com", "analyst", "password", is_analyst=True)
-        idea1 = self.create_idea(analyst.id)
-        idea2 = self.create_idea(analyst.id)
+        idea1 = create_idea(analyst.id, "aapl", False)
+        idea2 = create_idea(analyst.id, "gm", False)
 
         self.bookmark_idea(idea1.id, user_dict["access_token"])
         self.bookmark_idea(idea2.id, user_dict["access_token"])
