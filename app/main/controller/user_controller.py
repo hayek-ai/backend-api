@@ -8,6 +8,7 @@ from app.main.libs.util import get_error
 from app.main.schema.user_schema import (
     user_schema, user_register_schema, user_login_schema, user_follow_list_schema
 )
+from app.main.schema.idea_schema import idea_list_schema
 
 
 class UserRegister(Resource):
@@ -54,7 +55,8 @@ class UserRegister(Resource):
             return {
                        "user": {
                            **self.user_schema.dump(new_user),
-                           "following": []
+                           "following": [],
+                            "ideas": []
                        },
                        "accessToken": access_token,
                        "confirmationEmailSent": email_success
@@ -69,6 +71,7 @@ class User(Resource):
         self.follow_service = kwargs['follow_service']
         self.user_follow_list_schema = user_follow_list_schema
         self.user_schema = user_schema
+        self.idea_list_schema = idea_list_schema
 
     @jwt_required
     def get(self, username_or_id):
@@ -81,7 +84,8 @@ class User(Resource):
             following = self.follow_service.get_following(user.id)
             return {
                 **self.user_schema.dump(user),
-                "following": self.user_follow_list_schema.dump(following)
+                "following": self.user_follow_list_schema.dump(following),
+                "ideas": self.idea_list_schema.dump(user.ideas.all())
             }, 200
         else:
             return get_error(404, get_text("not_found").format("User"))
@@ -128,7 +132,8 @@ class User(Resource):
         following = self.follow_service.get_following(user.id)
         return {
             **self.user_schema.dump(user),
-            "following": self.user_follow_list_schema.dump(following)
+            "following": self.user_follow_list_schema.dump(following),
+            "ideas": self.idea_list_schema.dump(user.ideas.all())
         }, 201
 
 
@@ -139,6 +144,7 @@ class UserLogin(Resource):
         self.user_schema = user_schema
         self.user_login_schema = user_login_schema
         self.user_follow_list_schema = user_follow_list_schema
+        self.idea_list_schema = idea_list_schema
 
     def post(self):
         credentials = request.get_json()
@@ -158,8 +164,9 @@ class UserLogin(Resource):
             return {
                "user": {
                    **self.user_schema.dump(user),
-                   "following": self.user_follow_list_schema.dump(following)
-               },
+                   "following": self.user_follow_list_schema.dump(following),
+                   "ideas": self.idea_list_schema.dump(user.ideas.all())
+                },
                "accessToken": access_token,
             }, 200
 
