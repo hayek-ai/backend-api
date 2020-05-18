@@ -1,8 +1,6 @@
 import io
 from app.main.model.idea import IdeaModel
-from app.main.model.user import UserModel
 from app.main.service.idea_service import IdeaService
-from app.main.service.user_service import UserService
 
 
 def camelcase(s):

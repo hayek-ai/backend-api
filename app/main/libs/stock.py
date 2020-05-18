@@ -71,7 +71,8 @@ class Stock:
             "Real Estate Investment Trusts": "Real Estate"
         }
 
-        company_info["sector"] = sector_map[company_info["sector"]]
+        if company_info["sector"] in sector_map:
+            company_info["sector"] = sector_map[company_info["sector"]]
         for tag in company_info["tags"]:
             if tag in tag_map:
                 company_info["sector"] = tag_map[tag]

@@ -34,3 +34,5 @@ class TestEndpointsConfiguration(unittest.TestCase):
         assert '/idea/<int:idea_id>/downvote' in self.endpoints
         assert '/idea/<int:idea_id>/bookmark' in self.endpoints
         assert '/user/<string:username>/bookmarks' in self.endpoints
+        assert '/stock/<string:symbol>' in self.endpoints
+        assert '/autosearch' in self.endpoints
