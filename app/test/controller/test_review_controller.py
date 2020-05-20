@@ -62,7 +62,7 @@ class TestReviewController(unittest.TestCase):
         assert response_data["analystId"] == analyst_id
 
         # make sure can access imageUrl property on user
-        assert response_data["user"]["imageUrl"] is not None
+        assert "imageUrl" in response_data["user"]
 
         # missing fields
         response = self.client.post(

@@ -13,7 +13,7 @@ class UserModel(db.Model):
     email = db.Column(db.String(80), nullable=False, unique=True)
     username = db.Column(db.String(80), nullable=False, unique=True)
     password_hash = db.Column(db.String(100), nullable=False)
-    image_url = db.Column(db.String(256), nullable=False)
+    image_url = db.Column(db.String(256))
     is_analyst = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     is_confirmed = db.Column(db.Boolean, default=False)

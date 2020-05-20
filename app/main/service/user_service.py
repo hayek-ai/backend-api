@@ -13,7 +13,6 @@ class UserService:
             email=email,
             username=username,
             password=password,
-            image_url="https://hayek-image-assets.s3.amazonaws.com/user_images/no-img.svg",
             **kwargs
         )
         self.save_changes(new_user)

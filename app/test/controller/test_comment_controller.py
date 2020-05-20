@@ -54,7 +54,7 @@ class TestCommentController(unittest.TestCase):
         response_data = json.loads(response.data)
         assert response.status_code == 201
         assert response_data["comment"]["body"] == "Test Comment"
-        assert response_data["comment"]["user"]["imageUrl"] is not None
+        assert "imageUrl" in response_data["comment"]["user"]
         assert response_data["comment"]["user"]["username"] == "user"
         assert response_data["idea"]["id"] == idea.id
 
