@@ -61,6 +61,7 @@ class NewIdea(Resource):
 class Idea(Resource):
     def __init__(self, **kwargs):
         self.idea_service = kwargs['idea_service']
+        self.user_service = kwargs['user_service']
         self.idea_schema = idea_schema
 
     @jwt_required
@@ -69,6 +70,22 @@ class Idea(Resource):
         if not idea:
             return get_error(404, get_text("not_found").format("Idea"))
         return self.idea_schema.dump(idea), 200
+
+    @jwt_required
+    def delete(self, idea_id: int):
+        """Only Admin can delete idea"""
+        user_id = get_jwt_identity()
+        user = self.user_service.get_user_by_id(user_id)
+        if not user.is_admin:
+            return get_error(400, get_text("unauthorized_delete"))
+        idea = self.idea_service.get_idea_by_id(idea_id)
+        if not idea:
+            return get_error(404, get_text("not_found").format("Idea"))
+        try:
+            self.idea_service.delete_idea_by_id(idea_id)
+            return {"message": get_text("successfully_deleted").format("Idea")}, 200
+        except Exception as e:
+            return get_error(500, str(e))
 
 
 class IdeaFeed(Resource):

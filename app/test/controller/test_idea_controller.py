@@ -241,6 +241,32 @@ class TestIdeaController(unittest.TestCase):
         assert "fullReport" not in response_data
         assert "exhibits" not in response_data
 
+    def test_delete_idea(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
+        analyst_dict = self.create_user("email1@email.com", "username1", is_analyst=True)
+        idea = create_idea(analyst_dict["user"].id, "aapl", False)
+        response = self.client.delete(
+            f'/idea/{idea.id}',
+            headers={"Authorization": "Bearer {}".format(analyst_dict["access_token"])})
+        # only admin can delete idea
+        assert response.status_code == 400
+        response_data = json.loads(response.data)
+        assert response_data["errors"][0]["detail"] == get_text("unauthorized_delete")
+
+        admin_dict = self.create_user("email2@email.com", "username2", is_admin=True)
+        response = self.client.delete(
+            f'/idea/{idea.id}',
+            headers={"Authorization": "Bearer {}".format(admin_dict["access_token"])})
+        assert response.status_code == 200
+        response_data = json.loads(response.data)
+        assert response_data["message"] == get_text("successfully_deleted").format("Idea")
+
+        idea = self.idea_service.get_idea_by_id(idea.id)
+        assert idea is None
+
+
     def test_get_idea_feed(self, mock) -> None:
         register_mock_iex(mock)
 

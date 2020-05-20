@@ -9,6 +9,10 @@ from app.main.libs.strings import get_text
 from app.main.db import db
 from app.main.model.user import UserModel
 from app.main.model.idea import IdeaModel
+from app.main.model.upvote import UpvoteModel
+from app.main.model.downvote import DownvoteModel
+from app.main.model.bookmark import BookmarkModel
+from app.main.model.download import DownloadModel
 from app.main.service.user_service import UserService
 
 
@@ -183,6 +187,33 @@ class IdeaService:
             return Stock.fetch_financial_metrics(symbol)
         except StockException as e:
             return {"error": str(e)}
+
+    def delete_idea_by_id(self, idea_id: int) -> None:
+        idea = self.get_idea_by_id(idea_id)
+        comments = idea.comments.all()
+        for comment in comments:
+            self.delete_from_db(comment)
+        downloads = DownloadModel.query.filter_by(idea_id=idea.id).all()
+        for download in downloads:
+            self.delete_from_db(download)
+        upvotes = UpvoteModel.query.filter_by(idea_id=idea.id).all()
+        for upvote in upvotes:
+            self.delete_from_db(upvote)
+        downvotes = DownvoteModel.query.filter_by(idea_id=idea.id).all()
+        for downvote in downvotes:
+            self.delete_from_db(downvote)
+        bookmarks = BookmarkModel.query.filter_by(idea_id=idea.id).all()
+        for bookmark in bookmarks:
+            self.delete_from_db((bookmark))
+        analyst = UserModel.query.filter_by(id=idea.analyst_id).first()
+        analyst.num_ideas = analyst.num_ideas - 1
+        self.save_changes(analyst)
+        self.delete_from_db(idea)
+
+    @classmethod
+    def delete_from_db(cls, data) -> None:
+        db.session.delete(data)
+        db.session.commit()
 
     @classmethod
     def save_changes(cls, data) -> None:

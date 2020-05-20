@@ -80,7 +80,10 @@ def create_app(services, config_name):
                      resource_class_kwargs={
                          'user_service': services["user"],
                          'idea_service': services['idea']})
-    api.add_resource(Idea, '/idea/<int:idea_id>', resource_class_kwargs={'idea_service': services['idea']})
+    api.add_resource(Idea, '/idea/<int:idea_id>',
+                     resource_class_kwargs={
+                        'user_service': services['user'],
+                        'idea_service': services['idea']})
     api.add_resource(IdeaFeed, '/ideas/<string:feed_type>',
                      resource_class_kwargs={
                          'idea_service': services['idea'],
