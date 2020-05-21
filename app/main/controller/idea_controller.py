@@ -115,7 +115,7 @@ class IdeaFeed(Resource):
             following = self.follow_service.get_following(user_id)
             analyst_ids = [analyst.id for analyst in following]
             analyst_ids.append(user_id) # if analyst, own ideas should show in follow feed
-            ideas = self.idea_service.query_ideas(analyst_ids=analyst_ids, query_string={})
+            ideas = self.idea_service.query_ideas(analyst_ids=analyst_ids, query_string=query_string)
             return self.idea_list_schema.dump(ideas), 200
         elif feed_type == "discover":
             ideas = self.idea_service.query_ideas(query_string=query_string)
