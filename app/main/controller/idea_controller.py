@@ -99,7 +99,8 @@ class IdeaFeed(Resource):
     def get(self, feed_type: str):
         """
         Returns idea feed for user.  feed_type can be either 'following' or 'discover'.
-        Can be filtered with a querystring.
+        Can be filtered with a querystring
+        (sort, symbol, positionType, timePeriod, marketCap, sector)
         """
         user_id = get_jwt_identity()
         query_string = {}
@@ -113,8 +114,7 @@ class IdeaFeed(Resource):
         if feed_type == "following":
             following = self.follow_service.get_following(user_id)
             analyst_ids = [analyst.id for analyst in following]
-            # if user following 0 analysts, set analyst_id filter to 0 (no analyst has id 0)
-            analyst_ids = analyst_ids if len(analyst_ids) > 0 else [0]
+            analyst_ids.append(user_id) # if analyst, own ideas should show in follow feed
             ideas = self.idea_service.query_ideas(analyst_ids=analyst_ids, query_string={})
             return self.idea_list_schema.dump(ideas), 200
         elif feed_type == "discover":
