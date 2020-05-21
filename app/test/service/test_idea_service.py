@@ -35,6 +35,7 @@ class TestIdeaService(unittest.TestCase):
             analyst_id=analyst.id,
             symbol="AAPL",
             position_type="long",
+            agreed_to_terms=True,
             bull_target=420,
             bull_probability=0.2,
             base_target=400,

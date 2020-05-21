@@ -18,8 +18,8 @@ from app.main.service.user_service import UserService
 
 class IdeaService:
     def save_new_idea(self, analyst_id: int, symbol: str, position_type: str,
-                      bull_target: float, bull_probability: float, base_target: float,
-                      base_probability: float, bear_target: float,
+                      agreed_to_terms: bool, bull_target: float, bull_probability: float,
+                      base_target: float, base_probability: float, bear_target: float,
                       bear_probability: float, entry_price: float, thesis_summary: str,
                       full_report: str, exhibits=[], exhibit_title_map=None):
         analyst = UserService.get_user_by_id(analyst_id)
@@ -57,6 +57,7 @@ class IdeaService:
             analyst_id=analyst_id,
             symbol=symbol.upper(),
             position_type=position_type.lower(),
+            agreed_to_terms=agreed_to_terms,
             price_target=price_target,
             bull_target=bull_target,
             bull_probability=bull_probability,

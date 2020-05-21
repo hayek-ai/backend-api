@@ -40,6 +40,7 @@ class NewIdea(Resource):
             analyst_id=analyst_id,
             symbol=request.form.get("symbol"),
             position_type=request.form.get("positionType"),
+            agreed_to_terms=True,  # verified in schema
             bull_target=request.form.get("bullTarget"),
             bull_probability=request.form.get("bullProbability"),
             base_target=request.form.get("baseTarget"),

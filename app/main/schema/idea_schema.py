@@ -28,6 +28,7 @@ class IdeaSchema(ma.SQLAlchemyAutoSchema):
 class NewIdeaSchema(Schema):
     symbol = fields.Str(required=True, validate=Length(min=1, max=10))
     positionType = fields.Str(required=True, validate=Length(min=1))
+    agreedToTerms = fields.Bool(required=True)
     bullTarget = fields.Float(required=True, validate=Range(min=0))
     bullProbability = fields.Float(required=True, validate=Range(min=0, max=1))
     baseTarget = fields.Float(required=True, validate=Range(min=0))
@@ -44,6 +45,11 @@ class NewIdeaSchema(Schema):
         position_type = value.strip().lower()
         if position_type != "long" and position_type != "short":
             raise ValidationError(get_text("invalid_position_type"))
+
+    @validates('agreedToTerms')
+    def must_agree_to_terms(self, value):
+        if value is not True:
+            raise ValidationError(get_text("must_agree_to_terms"))
 
     @validates_schema
     def validate_price_target(self, data, **kwargs):

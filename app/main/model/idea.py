@@ -10,6 +10,7 @@ class IdeaModel(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     symbol = db.Column(db.String(10), nullable=False)
     position_type = db.Column(db.String(10), nullable=False)
+    agreed_to_terms = db.Column(db.Boolean, nullable=False)
     price_target = db.Column(db.Float, nullable=False)
     bull_target = db.Column(db.Float, nullable=False)
     bull_probability = db.Column(db.Float, nullable=False)

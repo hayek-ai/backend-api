@@ -48,6 +48,7 @@ class TestIdeaController(unittest.TestCase):
         data = {
             'symbol': "AAPL",
             "positionType": "long",
+            "agreedToTerms": True,
             "bullTarget": 420,
             "bullProbability": 0.2,
             "baseTarget": 400,
@@ -73,6 +74,7 @@ class TestIdeaController(unittest.TestCase):
         # returns new idea
         assert response_data["symbol"] == "AAPL"
         assert response_data["positionType"] == "long"
+        assert response_data["agreedToTerms"] is True
         assert response_data["priceTarget"] == 400
         assert response_data["companyName"] == "Apple, Inc."
         assert response_data["marketCap"] > 500000000000  # $500bn
@@ -98,6 +100,7 @@ class TestIdeaController(unittest.TestCase):
         data = {
             'symbol': "AAPL",
             "positionType": "long",
+            "agreedToTerms": True,
             "bullTarget": 420,
             "bullProbability": 0.2,
             "baseTarget": 400,
@@ -120,10 +123,35 @@ class TestIdeaController(unittest.TestCase):
         # returns new idea
         assert response_data["symbol"] == "AAPL"
 
+        # throws error if don't agree to terms
+        data = {
+            'symbol': "AAPL",
+            "positionType": "long",
+            "agreedToTerms": False,
+            "bullTarget": 420,
+            "bullProbability": 0.2,
+            "baseTarget": 400,
+            "baseProbability": 0.6,
+            "bearTarget": 380,
+            "bearProbability": 0.2,
+            "entryPrice": 313.40,
+            "thesisSummary": "Test Thesis Summary",
+            "fullReport": "Test Full Report"
+        }
+        response = self.client.post(
+            '/new-idea',
+            data=data,
+            follow_redirects=True,
+            content_type="multipart/form-data",
+            headers={"Authorization": "Bearer {}".format(access_token)}
+        )
+        assert response.status_code == 400
+
         # invalid entry price error (must be within 1% of last price)
         data = {
             'symbol': "AAPL",
             "positionType": "long",
+            "agreedToTerms": True,
             "bullTarget": 420,
             "bullProbability": 0.2,
             "baseTarget": 400,
@@ -147,6 +175,7 @@ class TestIdeaController(unittest.TestCase):
         data = {
             'symbol': "AAPL",
             "positionType": "long",
+            "agreedToTerms": True,
             "bullTarget": 420,
             "bullProbability": 0.2,
             "baseTarget": 400,
@@ -170,6 +199,7 @@ class TestIdeaController(unittest.TestCase):
         data = {
             'symbol': "AAPL",
             "positionType": "long",
+            "agreedToTerms": True,
             "bullTarget": 420,
             "bullProbability": 0.2,
             "baseTarget": 400,
@@ -206,6 +236,7 @@ class TestIdeaController(unittest.TestCase):
         data = {
             'symbol': "AAPL",
             "positionType": "market weight",
+            "agreedToTerms": True,
             "bullTarget": 420,
             "bullProbability": 0.2,
             "baseTarget": 400,
