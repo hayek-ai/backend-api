@@ -183,11 +183,17 @@ class IdeaService:
         return query.all()
 
     @classmethod
-    def get_idea_financial_metrics(cls, symbol):
+    def get_idea_financial_metrics(cls, symbol) -> dict:
         try:
             return Stock.fetch_financial_metrics(symbol)
         except StockException as e:
             return {"error": str(e)}
+
+    def close_idea_by_id(self, idea_id: int) -> None:
+        idea = self.get_idea_by_id(idea_id)
+        idea.closed_date = datetime.datetime.utcnow()
+        idea.last_price = Stock.fetch_stock_quote(idea.symbol)["latestPrice"]
+        self.save_changes(idea)
 
     def delete_idea_by_id(self, idea_id: int) -> None:
         idea = self.get_idea_by_id(idea_id)

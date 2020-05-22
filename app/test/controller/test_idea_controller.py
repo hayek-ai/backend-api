@@ -272,6 +272,22 @@ class TestIdeaController(unittest.TestCase):
         assert "fullReport" not in response_data
         assert "exhibits" not in response_data
 
+    def test_close_idea(self, mock) -> None:
+        register_mock_iex(mock)
+        register_mock_mailgun(mock)
+
+        analyst_dict = self.create_user("email@email.com", "username", is_analyst=True)
+        idea = create_idea(analyst_dict["user"].id, "aapl", False)
+        response = self.client.put(
+            f'/idea/{idea.id}',
+            data=json.dumps(dict(closedDate="abc")),  # text doesn't matter
+            content_type='application/json',
+            headers={"Authorization": "Bearer {}".format(analyst_dict["access_token"])})
+        assert response.status_code == 200
+        response_data = json.loads(response.data)
+        assert response_data["closedDate"] is not None
+        assert response_data["lastPrice"] is not None
+
     def test_delete_idea(self, mock) -> None:
         register_mock_iex(mock)
         register_mock_mailgun(mock)

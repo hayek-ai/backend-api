@@ -73,6 +73,24 @@ class Idea(Resource):
         return self.idea_schema.dump(idea), 200
 
     @jwt_required
+    def put(self, idea_id: int):
+        request_json = request.get_json()
+        analyst_id = get_jwt_identity()
+        idea = self.idea_service.get_idea_by_id(idea_id)
+        if not idea:
+            return get_error(404, get_text("not_found").format("Idea"))
+        if idea.analyst_id != analyst_id:
+            return get_error(400, get_text("unauthorized"))
+        if "closedDate" in request_json:
+            if idea.closed_date:
+                return get_error(400, get_text("idea_already_closed"))
+            try:
+                self.idea_service.close_idea_by_id(idea_id)
+            except Exception as e:
+                return get_error(500, str(e))
+        return self.idea_schema.dump(idea)
+
+    @jwt_required
     def delete(self, idea_id: int):
         """Only Admin can delete idea"""
         user_id = get_jwt_identity()

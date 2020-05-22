@@ -95,6 +95,19 @@ class TestIdeaService(unittest.TestCase):
         assert idea is None
 
     @requests_mock.Mocker()
+    def test_close_idea_by_id(self, mock) -> None:
+        register_mock_iex(mock)
+
+        analyst = self.user_service \
+            .save_new_user("email@email.com", "analyst", "password", is_analyst=True)
+
+        new_idea = create_idea(analyst.id, "aapl", False)
+        self.idea_service.close_idea_by_id(new_idea.id)
+        assert new_idea.closed_date is not None
+        # mock returns same price for all requests so can just compare last with entry
+        assert new_idea.last_price == new_idea.entry_price
+
+    @requests_mock.Mocker()
     def delete_idea_by_id(self, mock) -> None:
         register_mock_iex(mock)
 

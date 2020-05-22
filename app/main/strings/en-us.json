@@ -12,6 +12,7 @@
   "error_saving": "Error saving {} to database.",
   "unauthorized_delete": "Unauthorized attempt to delete.",
   "must_agree_to_terms": "Must agree to terms and conditions.",
+  "unauthorized": "User is not authorized to  make this request.",
 
   "email_exists": "A user with that email address already exists",
   "username_exists": "A user with that username already exists",
@@ -31,6 +32,7 @@
   "invalid_position_type": "Position type can be either 'long' or 'short'",
   "incorrect_price": "That price doesn't match our records",
   "invalid_feed_type": "Invalid feed type. Use 'following' or 'discover'.",
+  "idea_already_closed": "This idea has already been closed.",
 
   "non_pro_tier_review": "Only customers who are subscribed to the pro tier are permitted to leave a review.",
   "already_reviewed": "Users are only permitted to review a plan or analyst once.",
