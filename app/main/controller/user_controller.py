@@ -6,7 +6,11 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 from app.main.libs.strings import get_text
 from app.main.libs.util import get_error
 from app.main.schema.user_schema import (
-    user_schema, user_register_schema, user_login_schema, user_follow_list_schema
+    user_schema,
+    user_register_schema,
+    user_login_schema,
+    user_follow_list_schema,
+    analyst_leaderboard_schema
 )
 from app.main.schema.idea_schema import idea_list_schema
 
@@ -171,3 +175,37 @@ class UserLogin(Resource):
             }, 200
 
         return get_error(401, get_text("user_invalid_credentials"), field="general")
+
+
+class AnalystLeaderboard(Resource):
+    def __init__(self, **kwargs):
+        self.user_service = kwargs['user_service']
+        self.analyst_leaderboard_schema = analyst_leaderboard_schema
+
+    def get(self):
+        """
+        Takes a query string and returns a list of analysts for leaderboard
+        parameters:
+            sortColumn (str) -> "analyst_rank", "success_rate", "avg_return",
+                "num_ideas", "avg_holding_period", "num_followers"
+            orderType (str) -> "desc" or "asc
+            page (int)
+            pageSize (int)
+        """
+        query_string = request.args
+        page = 0
+        page_size = None
+        if "page" in query_string:
+            page = int(query_string["page"])
+        if "pageSize" in query_string:
+            page_size = int(query_string["pageSize"])
+
+        try:
+            analysts = self.user_service.get_analysts_for_leaderboard(
+                query_string=query_string,
+                page=page,
+                page_size=page_size)
+            return self.analyst_leaderboard_schema.dump(analysts), 200
+        except Exception as e:
+            return get_error(500, str(e))
+

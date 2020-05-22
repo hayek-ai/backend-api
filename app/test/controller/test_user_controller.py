@@ -123,7 +123,6 @@ class TestUserController(unittest.TestCase):
         assert data["errors"][1]["detail"] == get_text("username_invalid")
         assert data["errors"][1]["field"] == 'username'
 
-
     def test_get_user(self, mock) -> None:
         register_mock_mailgun(mock)
 
@@ -297,6 +296,39 @@ class TestUserController(unittest.TestCase):
         data = json.loads(response.data)
         assert data["errors"][0]["detail"] == get_text("incorrect_fields")
         assert response.status_code == 400
+
+    def test_get_analysts_for_leaderboard(self, mock) -> None:
+        register_mock_mailgun(mock)
+        user1 = self.user_service.save_new_user("user1@email.com", "user1", "password")
+        analyst1 = self.user_service.save_new_user("analyst1@email.com", "analyst1", "password", is_analyst=True)
+        analyst2 = self.user_service.save_new_user("analyst2@email.com", "analyst2", "password", is_analyst=True)
+        analyst3 = self.user_service.save_new_user("analyst3@email.com", "analyst3", "password", is_analyst=True)
+
+        analyst1.num_ideas = 10
+        analyst1.analyst_rank = 10
+        analyst2.num_ideas = 9
+        analyst2.analyst_rank = 1
+        self.user_service.save_changes(analyst1)
+        self.user_service.save_changes(analyst2)
+
+        access_token = self.login("user1", "password")
+        response = self.client.get(
+            '/leaderboard',
+            headers={'Authorization': 'Bearer {}'.format(access_token)})
+        assert response.status_code == 200
+        analysts = json.loads(response.data)
+        assert len(analysts) == 2
+        # sorts by analyst_rank by default
+        assert analysts[0]["id"] == analyst2.id
+        assert analysts[1]["id"] == analyst1.id
+
+        response = self.client.get(
+            '/leaderboard?sortColumn=num_ideas&orderType=desc',
+            headers={'Authorization': 'Bearer {}'.format(access_token)})
+        assert response.status_code == 200
+        analysts = json.loads(response.data)
+        assert analysts[0]["id"] == analyst1.id
+        assert analysts[1]["id"] == analyst2.id
 
     def tearDown(self) -> None:
         db.session.remove()

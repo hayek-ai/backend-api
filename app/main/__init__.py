@@ -10,7 +10,7 @@ from app.main.db import db
 from app.main.ma import ma
 
 # Controllers
-from app.main.controller.user_controller import UserRegister, UserLogin, User
+from app.main.controller.user_controller import UserRegister, UserLogin, User, AnalystLeaderboard
 from app.main.controller.confirmation_controller import Confirmation, ResendConfirmation
 from app.main.controller.idea_controller import NewIdea, Idea, IdeaFeed, DownloadReport
 from app.main.controller.follow_controller import Follow, FollowingList, FollowerList
@@ -68,6 +68,8 @@ def create_app(services, config_name):
                          'user_service': services["user"],
                          'follow_service': services['follow']
                      })
+    api.add_resource(AnalystLeaderboard, '/leaderboard',
+                     resource_class_kwargs={'user_service': services["user"]})
     api.add_resource(Confirmation, '/user/confirm/<string:confirmation_code>',
                      resource_class_kwargs={
                          'user_service': services["user"],

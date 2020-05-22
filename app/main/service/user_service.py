@@ -1,5 +1,5 @@
 from typing import List, TextIO
-from sqlalchemy import func
+from sqlalchemy import func, desc, asc, and_
 
 from app.main.db import db
 from app.main.libs.s3 import S3
@@ -57,6 +57,28 @@ class UserService:
         user.image_url = f"{S3.S3_ENDPOINT_URL}/user_images/{filename}"
         self.save_changes(user)
         return user.image_url
+
+    @classmethod
+    def get_analysts_for_leaderboard(cls, query_string={}, page=0, page_size=None) -> List["UserModel"]:
+        direction = asc
+        if "orderType" in query_string:
+            if query_string["orderType"] == "desc":
+                direction = desc
+
+        query_filters = []
+        query_filters.append(UserModel.is_analyst == True)
+        query_filters.append(UserModel.num_ideas > 0)
+
+        sort_column = "analyst_rank"
+        if "sortColumn" in query_string:
+            sort_column = query_string["sortColumn"]
+        query = UserModel.query.filter(and_(*query_filters))\
+            .order_by(direction(getattr(UserModel, sort_column)))
+        if page_size:
+            query = query.limit(page_size)
+        if page:
+            query = query.offset(page*page_size)
+        return query.all()
 
     @classmethod
     def save_changes(cls, data) -> None:

@@ -15,6 +15,7 @@ class TestEndpointsConfiguration(unittest.TestCase):
         assert '/register' in self.endpoints
         assert '/login' in self.endpoints
         assert '/user/<username_or_id>' in self.endpoints
+        assert '/leaderboard' in self.endpoints
         assert '/user/confirm/<string:confirmation_code>' in self.endpoints
         assert '/resend-confirmation' in self.endpoints
         assert '/new-idea' in self.endpoints
