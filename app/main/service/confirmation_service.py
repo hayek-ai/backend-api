@@ -18,7 +18,7 @@ class ConfirmationService:
         user = UserModel.query.filter_by(id=user_id).first()
         subject = f"Hi {user.username}! Please confirm your registration"
         code = user.most_recent_confirmation.code
-        text = "Welcome to hayek.ai! Your signup passcode is {code}"
+        text = f"Welcome to hayek.ai! Your signup passcode is {code}"
         html = f"<html>Welcome to hayek.ai! Your signup passcode is {code}</html>"
         return Email.send_email([user.email], subject, text, html)
 

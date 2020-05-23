@@ -18,6 +18,8 @@ class TestEndpointsConfiguration(unittest.TestCase):
         assert '/leaderboard' in self.endpoints
         assert '/user/confirm/<string:confirmation_code>' in self.endpoints
         assert '/resend-confirmation' in self.endpoints
+        assert '/user/reset-password' in self.endpoints
+        assert '/user/reset-password/<string:password_reset_code>' in self.endpoints
         assert '/new-idea' in self.endpoints
         assert '/idea/<int:idea_id>' in self.endpoints
         assert '/idea/<int:idea_id>/download' in self.endpoints

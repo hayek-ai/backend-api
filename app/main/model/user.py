@@ -3,6 +3,7 @@ from typing import List
 from app.main.db import db
 from app.main.libs.security import encrypt_password, check_encrypted_password
 from app.main.model.confirmation import ConfirmationModel
+from app.main.model.password_reset import PasswordResetModel
 
 
 class UserModel(db.Model):
@@ -42,6 +43,7 @@ class UserModel(db.Model):
     num_reviews = db.Column(db.Integer, default=0)
 
     confirmation = db.relationship("ConfirmationModel", lazy="dynamic", cascade="all, delete-orphan")
+    password_reset = db.relationship("PasswordResetModel", lazy="dynamic", cascade="all, delete-orphan")
     ideas = db.relationship("IdeaModel", lazy="dynamic", cascade="all, delete-orphan")
     upvotes = db.relationship("UpvoteModel", lazy="dynamic", cascade="all, delete-orphan")
     downvotes = db.relationship("DownvoteModel", lazy="dynamic", cascade="all, delete-orphan")
@@ -55,12 +57,16 @@ class UserModel(db.Model):
     def password(self, password) -> bool:
         self.password_hash = encrypt_password(password)
 
-    def check_password(self, password):
+    def check_password(self, password) -> bool:
         return check_encrypted_password(password, self.password_hash)
 
     @property
     def most_recent_confirmation(self) -> "ConfirmationModel":
         return self.confirmation.order_by(db.desc(ConfirmationModel.expire_at)).first()
+
+    @property
+    def most_recent_password_reset(self) -> "PasswordResetModel":
+        return self.password_reset.order_by(db.desc(PasswordResetModel.expire_at)).first()
 
     def __repr__(self):
         return "<User '{}'>".format(self.username)

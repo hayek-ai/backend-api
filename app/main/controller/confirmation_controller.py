@@ -17,7 +17,7 @@ class Confirmation(Resource):
         user = self.user_service.get_user_by_id(user_id)
         confirmation = user.most_recent_confirmation
         if not confirmation:
-            return get_error(404, get_text("not_found").format("confirmation"))
+            return get_error(404, get_text("not_found").format("Confirmation"))
 
         if user.is_confirmed:
             return get_error(400, get_text("user_already_confirmed"))
@@ -56,8 +56,8 @@ class ResendConfirmation(Resource):
             confirmation = user.most_recent_confirmation
             if confirmation:
                 self.confirmation_service.force_to_expire(confirmation.id)
-                self.confirmation_service.save_new_confirmation(user_id)
-                self.confirmation_service.send_confirmation_email(user_id)
-                return {"message": get_text("confirmation_resend_successful")}, 201
+            self.confirmation_service.save_new_confirmation(user_id)
+            self.confirmation_service.send_confirmation_email(user_id)
+            return {"message": get_text("confirmation_resend_successful")}, 201
         except Exception as e:
             return get_error(500, str(e))

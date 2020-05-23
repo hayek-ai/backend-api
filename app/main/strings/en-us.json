@@ -23,8 +23,12 @@
   "user_confirmed": "User has been confirmed successfully.",
   "user_already_confirmed": "User is already confirmed.",
   "confirmation_code_expired": "Your confirmation code has expired.  We sent you another one.  Please check your email.",
+  "password_reset_expired": "This password reset link has expired.  We sent you another one.  Please check your email.",
   "incorrect_confirmation_code": "That confirmation code is incorrect.",
+  "incorrect_password_reset_code": "Incorrect password reset link.",
   "confirmation_resend_successful": "Confirmation email successfully resent.",
+  "password_reset_sent": "We emailed you a link to reset your password.",
+  "password_changed": "Your password has been successfully changed.",
 
   "not_an_analyst": "Only analysts can upload ideas.",
   "negative_implied_return": "Implied return cannot be negative.",

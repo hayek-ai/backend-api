@@ -17,16 +17,13 @@ class TestConfirmationService(unittest.TestCase):
 
     def test_send_confirmation_email(self, mock) -> None:
         register_mock_mailgun(mock)
-
-        self.user_service.save_new_user("michaelmcguiness123@gmail.com", "user1", "password")
+        self.user_service.save_new_user("email@email.com", "user1", "password")
         response = self.confirmation_service.send_confirmation_email(1)
         assert response.status_code == 200
 
     def test_get_confirmation_by_id(self, mock) -> None:
         register_mock_mailgun(mock)
-
-        new_user = self.user_service.save_new_user("email@email.com", "username", "password")
-
+        self.user_service.save_new_user("email@email.com", "username", "password")
         confirmation = self.confirmation_service.get_confirmation_by_id(1)
         assert confirmation.id == 1
         assert len(confirmation.code) == 6

@@ -29,7 +29,7 @@ class TestConfirmationController(unittest.TestCase):
     def test_confirm_user(self, mock) -> None:
         register_mock_mailgun(mock)
 
-        user = self.user_service.save_new_user("michaelmcguiness123@gmail.com", "username", "password")
+        user = self.user_service.save_new_user("email@email.com", "username", "password")
         assert user.is_confirmed is False
         code = user.most_recent_confirmation.code
 

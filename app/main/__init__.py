@@ -12,6 +12,7 @@ from app.main.ma import ma
 # Controllers
 from app.main.controller.user_controller import UserRegister, UserLogin, User, AnalystLeaderboard
 from app.main.controller.confirmation_controller import Confirmation, ResendConfirmation
+from app.main.controller.password_reset_controller import SendPasswordReset, PasswordReset
 from app.main.controller.idea_controller import NewIdea, Idea, IdeaFeed, DownloadReport
 from app.main.controller.follow_controller import Follow, FollowingList, FollowerList
 from app.main.controller.review_controller import NewReview, Review, AnalystReviews
@@ -24,6 +25,7 @@ from app.main.controller.stock_data_controller import StockData, SearchAutocompl
 # Services
 from app.main.service.user_service import UserService
 from app.main.service.confirmation_service import ConfirmationService
+from app.main.service.password_reset_service import PasswordResetService
 from app.main.service.idea_service import IdeaService
 from app.main.service.download_service import DownloadService
 from app.main.service.follow_service import FollowService
@@ -78,6 +80,14 @@ def create_app(services, config_name):
                      resource_class_kwargs={
                          'user_service': services["user"],
                          'confirmation_service': services["confirmation"]})
+    api.add_resource(SendPasswordReset, '/user/reset-password',
+                     resource_class_kwargs={
+                         'user_service': services["user"],
+                         'password_reset_service': services["password_reset"]})
+    api.add_resource(PasswordReset, '/user/reset-password/<string:password_reset_code>',
+                     resource_class_kwargs={
+                         'user_service': services["user"],
+                         'password_reset_service': services["password_reset"]})
     api.add_resource(NewIdea, '/new-idea',
                      resource_class_kwargs={
                          'user_service': services["user"],

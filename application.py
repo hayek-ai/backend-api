@@ -4,6 +4,7 @@ from app.main import create_app
 from app.main.service.bookmark_service import BookmarkService
 from app.main.service.comment_service import CommentService
 from app.main.service.confirmation_service import ConfirmationService
+from app.main.service.password_reset_service import PasswordResetService
 from app.main.service.download_service import DownloadService
 from app.main.service.downvote_service import DownvoteService
 from app.main.service.follow_service import FollowService
@@ -17,6 +18,7 @@ def create_services():
     services = {
         "user": UserService(),
         "confirmation": ConfirmationService(),
+        "password_reset": PasswordResetService(),
         "idea": IdeaService(),
         "download": DownloadService(),
         "follow": FollowService(),
