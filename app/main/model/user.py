@@ -37,7 +37,7 @@ class UserModel(db.Model):
     success_rate = db.Column(db.Float)
     success_rate_percentile = db.Column(db.Float)
     num_ideas = db.Column(db.Integer, default=0)
-    num_ideas_percentile = db.Column(db.Integer)
+    num_ideas_percentile = db.Column(db.Float)
     review_star_total = db.Column(db.Integer, default=0)
     num_reviews = db.Column(db.Integer, default=0)
 
