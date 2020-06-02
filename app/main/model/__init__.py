@@ -8,3 +8,5 @@ from app.main.model.comment import CommentModel
 from app.main.model.upvote import UpvoteModel
 from app.main.model.downvote import DownvoteModel
 from app.main.model.bookmark import BookmarkModel
+from app.main.model.password_reset import PasswordResetModel
+from app.main.model.subscription import SubscriptionModel

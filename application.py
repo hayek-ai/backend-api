@@ -12,6 +12,7 @@ from app.main.service.idea_service import IdeaService
 from app.main.service.review_service import ReviewService
 from app.main.service.upvote_service import UpvoteService
 from app.main.service.user_service import UserService
+from app.main.service.subscription_service import SubscriptionService
 
 
 def create_services():
@@ -26,7 +27,8 @@ def create_services():
         'comment': CommentService(),
         'upvote': UpvoteService(),
         'downvote': DownvoteService(),
-        'bookmark': BookmarkService()
+        'bookmark': BookmarkService(),
+        'subscription': SubscriptionService()
     }
     return services
 

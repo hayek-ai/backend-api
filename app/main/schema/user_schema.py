@@ -17,7 +17,7 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
 
     class Meta:
         model = UserModel
-        load_only = ("password_hash", "email", "is_admin", "connected_stripe_acct_id", "stripe_cust_id")
+        load_only = ("password_hash", "email", "is_admin", "connected_stripe_acct_id")
 
     @classmethod
     def on_bind_field(cls, field_name, field_obj):

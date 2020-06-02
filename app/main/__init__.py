@@ -21,6 +21,7 @@ from app.main.controller.upvote_controller import Upvote, UpvoteFeed
 from app.main.controller.downvote_controller import Downvote
 from app.main.controller.bookmark_controller import Bookmark, BookmarkFeed
 from app.main.controller.stock_data_controller import StockData, SearchAutocomplete
+from app.main.controller.subscription_controller import CreateSubscription
 
 # Services
 from app.main.service.user_service import UserService
@@ -34,6 +35,7 @@ from app.main.service.comment_service import CommentService
 from app.main.service.upvote_service import UpvoteService
 from app.main.service.downvote_service import DownvoteService
 from app.main.service.bookmark_service import BookmarkService
+from app.main.service.subscription_service import SubscriptionService
 
 
 def create_app(services, config_name):
@@ -163,5 +165,7 @@ def create_app(services, config_name):
                          "user_service": services["user"]})
     api.add_resource(StockData, '/stock/<string:symbol>')
     api.add_resource(SearchAutocomplete, '/autosearch')
+    api.add_resource(CreateSubscription, '/create-subscription',
+                     resource_class_kwargs={"subscription_service": services["subscription"]})
 
     return app

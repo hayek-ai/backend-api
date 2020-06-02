@@ -1,5 +1,4 @@
 import datetime
-from typing import List
 from app.main.db import db
 from app.main.libs.security import encrypt_password, check_encrypted_password
 from app.main.model.confirmation import ConfirmationModel
@@ -33,18 +32,22 @@ class UserModel(db.Model):
     brier_score_percentile = db.Column(db.Float)
     avg_return = db.Column(db.Float)
     avg_return_percentile = db.Column(db.Float)
-    avg_holding_period = db.Column(db.Float)
-    avg_holding_period_percentile = db.Column(db.Float)
     success_rate = db.Column(db.Float)
     success_rate_percentile = db.Column(db.Float)
+    statistical_significance = db.Column(db.Float)
+    statistical_significance_percentile = db.Column(db.Float)
+    avg_holding_period = db.Column(db.Float)
+    avg_holding_period_percentile = db.Column(db.Float)
     num_ideas = db.Column(db.Integer, default=0)
     num_ideas_percentile = db.Column(db.Float)
     review_star_total = db.Column(db.Integer, default=0)
     num_reviews = db.Column(db.Integer, default=0)
+    percent_buys = db.Column(db.Float)
 
     confirmation = db.relationship("ConfirmationModel", lazy="dynamic", cascade="all, delete-orphan")
     password_reset = db.relationship("PasswordResetModel", lazy="dynamic", cascade="all, delete-orphan")
     ideas = db.relationship("IdeaModel", lazy="dynamic", cascade="all, delete-orphan")
+    subscriptions = db.relationship("SubscriptionModel", lazy="dynamic", cascade="all, delete-orphan")
     upvotes = db.relationship("UpvoteModel", lazy="dynamic", cascade="all, delete-orphan")
     downvotes = db.relationship("DownvoteModel", lazy="dynamic", cascade="all, delete-orphan")
     bookmarks = db.relationship("BookmarkModel", lazy="dynamic", cascade="all, delete-orphan")
