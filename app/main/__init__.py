@@ -6,6 +6,7 @@ from flask_jwt_extended import JWTManager
 from marshmallow import ValidationError
 
 from app.main.config import app_config
+from app.main.controller.performance_controller import UpdatePerformance
 from app.main.db import db
 from app.main.ma import ma
 
@@ -167,5 +168,7 @@ def create_app(services, config_name):
     api.add_resource(SearchAutocomplete, '/autosearch')
     api.add_resource(CreateSubscription, '/create-subscription',
                      resource_class_kwargs={"subscription_service": services["subscription"]})
+    api.add_resource(UpdatePerformance, '/performance',
+                     resource_class_kwargs={"performance_service": services['performance']})
 
     return app

@@ -9,6 +9,7 @@ from app.main.service.download_service import DownloadService
 from app.main.service.downvote_service import DownvoteService
 from app.main.service.follow_service import FollowService
 from app.main.service.idea_service import IdeaService
+from app.main.service.performance_service import PerformanceService
 from app.main.service.review_service import ReviewService
 from app.main.service.upvote_service import UpvoteService
 from app.main.service.user_service import UserService
@@ -28,7 +29,8 @@ def create_services():
         'upvote': UpvoteService(),
         'downvote': DownvoteService(),
         'bookmark': BookmarkService(),
-        'subscription': SubscriptionService()
+        'subscription': SubscriptionService(),
+        'performance': PerformanceService()
     }
     return services
 
