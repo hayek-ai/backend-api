@@ -42,6 +42,10 @@ class UserService:
     def get_user_by_email(cls, email: str) -> "UserModel":
         return UserModel.query.filter(func.lower(UserModel.email) == email.lower()).first()
 
+    @classmethod
+    def get_user_by_stripe_cust_id(cls, stripe_cust_id: str) -> "UserModel":
+        return UserModel.query.filter(func.lower(UserModel.stripe_cust_id) == stripe_cust_id.lower()).first()
+
     def change_user_image(self, user_id: int, image: TextIO, filename: str) -> str:
         client = S3.get_client()
 

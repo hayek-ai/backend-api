@@ -3,6 +3,7 @@ from app.main.db import db
 from app.main.libs.security import encrypt_password, check_encrypted_password
 from app.main.model.confirmation import ConfirmationModel
 from app.main.model.password_reset import PasswordResetModel
+from app.main.model.subscription import SubscriptionModel
 
 
 class UserModel(db.Model):
@@ -70,6 +71,10 @@ class UserModel(db.Model):
     @property
     def most_recent_password_reset(self) -> "PasswordResetModel":
         return self.password_reset.order_by(db.desc(PasswordResetModel.expire_at)).first()
+
+    @property
+    def most_recent_subscription(self) -> "SubscriptionModel":
+        return self.subscriptions.order_by(db.desc(SubscriptionModel.current_period_end)).first()
 
     def __repr__(self):
         return "<User '{}'>".format(self.username)

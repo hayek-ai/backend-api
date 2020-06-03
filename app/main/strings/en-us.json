@@ -13,6 +13,7 @@
   "unauthorized_delete": "Unauthorized attempt to delete.",
   "must_agree_to_terms": "Must agree to terms and conditions.",
   "unauthorized": "User is not authorized to  make this request.",
+  "already_subscribed": "User is already subscribed to Hayek Pro.",
 
   "email_exists": "A user with that email address already exists",
   "username_exists": "A user with that username already exists",
