@@ -22,7 +22,12 @@ from app.main.controller.upvote_controller import Upvote, UpvoteFeed
 from app.main.controller.downvote_controller import Downvote
 from app.main.controller.bookmark_controller import Bookmark, BookmarkFeed
 from app.main.controller.stock_data_controller import StockData, SearchAutocomplete
-from app.main.controller.subscription_controller import CreateSubscription, RetryInvoice, StripeWebhook
+from app.main.controller.subscription_controller import (
+    CreateSubscription,
+    RetryInvoice,
+    StripeWebhook,
+    CancelSubscription
+)
 
 # Services
 from app.main.service.user_service import UserService
@@ -37,6 +42,7 @@ from app.main.service.upvote_service import UpvoteService
 from app.main.service.downvote_service import DownvoteService
 from app.main.service.bookmark_service import BookmarkService
 from app.main.service.subscription_service import SubscriptionService
+from app.main.service.performance_service import PerformanceService
 
 
 def create_app(services, config_name):
@@ -170,6 +176,8 @@ def create_app(services, config_name):
                      resource_class_kwargs={"subscription_service": services["subscription"]})
     api.add_resource(RetryInvoice, '/retry-invoice',
                      resource_class_kwargs={"subscription_service": services["subscription"]})
+    api.add_resource(CancelSubscription, '/cancel-subscription',
+                     resource_class_kwargs={"user_service": services["user"]})
     api.add_resource(StripeWebhook, '/stripe-webhook',
                      resource_class_kwargs={"user_service": services["user"]})
     api.add_resource(UpdatePerformance, '/performance',

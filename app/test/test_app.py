@@ -39,3 +39,8 @@ class TestEndpointsConfiguration(unittest.TestCase):
         assert '/user/<string:username>/bookmarks' in self.endpoints
         assert '/stock/<string:symbol>' in self.endpoints
         assert '/autosearch' in self.endpoints
+        assert '/create-subscription' in self.endpoints
+        assert '/retry-invoice' in self.endpoints
+        assert '/cancel-subscription' in self.endpoints
+        assert '/stripe-webhook' in self.endpoints
+        assert '/performance' in self.endpoints

@@ -52,6 +52,30 @@ class RetryInvoice(Resource):
             return get_error(400, str(e))
 
 
+class CancelSubscription(Resource):
+    def __init__(self, **kwargs):
+        self.user_service = kwargs['user_service']
+
+    @jwt_required
+    def post(self):
+        user_id = get_jwt_identity()
+        user = self.user_service.get_user_by_id(user_id)
+        if not user:
+            return get_text(404, get_text("not_found").format("User"))
+        if user.pro_tier_status != "succeeded":
+            return get_text(400, get_text("subscription_not_active"))
+        sub = user.subscriptions.first()
+        if not sub:
+            return get_text(404, get_text("not_found").format("Subscription"))
+        try:
+            deleted_subscription = stripe.Subscription.delete(sub.stripe_subscription_id)
+            user.pro_tier_status = "deleted"
+            self.user_service.save_changes(user)
+            return deleted_subscription, 200
+        except Exception as e:
+            return get_error(403, str(e))
+
+
 class StripeWebhook(Resource):
     def __init__(self, **kwargs):
         self.user_service = kwargs['user_service']

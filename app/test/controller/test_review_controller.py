@@ -45,7 +45,7 @@ class TestReviewController(unittest.TestCase):
     def test_new_review_post(self, mock) -> None:
         register_mock_mailgun(mock)
 
-        user_dict = self.create_user("user@email.com", "user", is_pro_tier=True)
+        user_dict = self.create_user("user@email.com", "user", pro_tier_status="succeeded")
         user_id = user_dict["user"].id
         analyst_dict = self.create_user("analyst@email.com", "analyst", is_analyst=True)
         analyst_id = analyst_dict["user"].id
@@ -76,7 +76,7 @@ class TestReviewController(unittest.TestCase):
     def test_get_and_delete_review(self, mock) -> None:
         register_mock_mailgun(mock)
 
-        user_dict = self.create_user("user@email.com", "user", is_pro_tier=True)
+        user_dict = self.create_user("user@email.com", "user", pro_tier_status="succeeded")
         analyst_dict = self.create_user("analyst@email.com", "analyst", is_analyst=True)
 
         # simple review submit
@@ -104,8 +104,8 @@ class TestReviewController(unittest.TestCase):
     def test_get_analyst_reviews(self, mock) -> None:
         register_mock_mailgun(mock)
 
-        user1_dict = self.create_user("user1@email.com", "user1", is_pro_tier=True)
-        user2_dict = self.create_user("user2@email.com", "user2", is_pro_tier=True)
+        user1_dict = self.create_user("user1@email.com", "user1", pro_tier_status="succeeded")
+        user2_dict = self.create_user("user2@email.com", "user2", pro_tier_status="succeeded")
         analyst_dict = self.create_user("analyst@email.com", "analyst", is_analyst=True)
         analyst_id = analyst_dict["user"].id
 

@@ -10,7 +10,7 @@ from app.main.schema.user_schema import (
     user_register_schema,
     user_login_schema,
     user_follow_list_schema,
-    analyst_leaderboard_schema
+    analyst_leaderboard_schema,
 )
 from app.main.schema.idea_schema import idea_list_schema
 
@@ -19,8 +19,6 @@ class UserRegister(Resource):
     def __init__(self, **kwargs):
         self.user_service = kwargs['user_service']
         self.confirmation_service = kwargs['confirmation_service']
-        self.user_schema = user_schema
-        self.user_register_schema = user_register_schema
 
     def post(self):
         """
@@ -28,7 +26,7 @@ class UserRegister(Resource):
         Then sends confirmation email and returns new user.
         """
         user_json = request.get_json()
-        errors = self.user_register_schema.validate(user_json)
+        errors = user_register_schema.validate(user_json)
         if errors:
             response_errors = []
             for key, value in errors.items():
@@ -58,7 +56,7 @@ class UserRegister(Resource):
             access_token = create_access_token(identity=new_user.id, expires_delta=expires, fresh=True)
             return {
                        "user": {
-                           **self.user_schema.dump(new_user),
+                           **user_schema.dump(new_user),
                            "following": [],
                             "ideas": []
                        },
@@ -73,9 +71,6 @@ class User(Resource):
     def __init__(self, **kwargs):
         self.user_service = kwargs['user_service']
         self.follow_service = kwargs['follow_service']
-        self.user_follow_list_schema = user_follow_list_schema
-        self.user_schema = user_schema
-        self.idea_list_schema = idea_list_schema
 
     @jwt_required
     def get(self, username_or_id):
@@ -87,9 +82,9 @@ class User(Resource):
         if user:
             following = self.follow_service.get_following(user.id)
             return {
-                **self.user_schema.dump(user),
-                "following": self.user_follow_list_schema.dump(following),
-                "ideas": self.idea_list_schema.dump(user.ideas.all())
+                **user_schema.dump(user),
+                "following": user_follow_list_schema.dump(following),
+                "ideas": idea_list_schema.dump(user.ideas.all())
             }, 200
         else:
             return get_error(404, get_text("not_found").format("User"))
@@ -135,9 +130,9 @@ class User(Resource):
         self.user_service.save_changes(user)
         following = self.follow_service.get_following(user.id)
         return {
-            **self.user_schema.dump(user),
-            "following": self.user_follow_list_schema.dump(following),
-            "ideas": self.idea_list_schema.dump(user.ideas.all())
+            **user_schema.dump(user),
+            "following": user_follow_list_schema.dump(following),
+            "ideas": idea_list_schema.dump(user.ideas.all())
         }, 201
 
 
@@ -145,14 +140,10 @@ class UserLogin(Resource):
     def __init__(self, **kwargs):
         self.user_service = kwargs['user_service']
         self.follow_service = kwargs['follow_service']
-        self.user_schema = user_schema
-        self.user_login_schema = user_login_schema
-        self.user_follow_list_schema = user_follow_list_schema
-        self.idea_list_schema = idea_list_schema
 
     def post(self):
         credentials = request.get_json()
-        errors = self.user_login_schema.validate(credentials)
+        errors = user_login_schema.validate(credentials)
         if errors:
             return get_error(400, get_text("incorrect_fields"), **errors)
 
@@ -167,9 +158,9 @@ class UserLogin(Resource):
             following = self.follow_service.get_following(user.id)
             return {
                "user": {
-                   **self.user_schema.dump(user),
-                   "following": self.user_follow_list_schema.dump(following),
-                   "ideas": self.idea_list_schema.dump(user.ideas.all())
+                   **user_schema.dump(user),
+                   "following": user_follow_list_schema.dump(following),
+                   "ideas": idea_list_schema.dump(user.ideas.all())
                 },
                "accessToken": access_token,
             }, 200
@@ -180,7 +171,6 @@ class UserLogin(Resource):
 class AnalystLeaderboard(Resource):
     def __init__(self, **kwargs):
         self.user_service = kwargs['user_service']
-        self.analyst_leaderboard_schema = analyst_leaderboard_schema
 
     def get(self):
         """
@@ -205,7 +195,7 @@ class AnalystLeaderboard(Resource):
                 query_string=query_string,
                 page=page,
                 page_size=page_size)
-            return self.analyst_leaderboard_schema.dump(analysts), 200
+            return analyst_leaderboard_schema.dump(analysts), 200
         except Exception as e:
             return get_error(500, str(e))
 

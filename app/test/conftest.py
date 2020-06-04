@@ -12,7 +12,8 @@ ALPHA_ADVANTAGE_URL = 'https://www.alphavantage.co/query?function=SYMBOL_SEARCH'
 
 def services_for_test(user=None, confirmation=None, password_reset=None, idea=None,
                       download=None, follow=None, review=None, comment=None,\
-                      upvote=None, downvote=None, bookmark=None):
+                      upvote=None, downvote=None, bookmark=None, subscription=None,\
+                      performance=None):
     return {
         'user': user or create_autospec(app.main.UserService, spec_set=True, instance=True),
         'confirmation': confirmation or create_autospec(app.main.ConfirmationService, spec_set=True, instance=True),
@@ -24,7 +25,9 @@ def services_for_test(user=None, confirmation=None, password_reset=None, idea=No
         'comment': comment or create_autospec(app.main.CommentService, spec_set=True, instance=True),
         'upvote': upvote or create_autospec(app.main.UpvoteService, spec_set=True, instance=True),
         'downvote': downvote or create_autospec(app.main.DownvoteService, spec_set=True, instance=True),
-        'bookmark': bookmark or create_autospec(app.main.BookmarkService, spec_set=True, instance=True)
+        'bookmark': bookmark or create_autospec(app.main.BookmarkService, spec_set=True, instance=True),
+        'subscription': subscription or create_autospec(app.main.SubscriptionService, spec_set=True, instance=True),
+        'performance': performance or create_autospec(app.main.PerformanceService, spec_set=True, instance=True)
     }
 
 
@@ -52,6 +55,5 @@ def register_mock_iex(requests_mock):
     requests_mock.get(IEX_URL + '/GM/advanced-stats', json=gm_advanced_stats)
 
 
-def register_mock_alpha_advantage(requests_mock):
-    requests_mock.get(ALPHA_ADVANTAGE_URL + '&keywords=AAPL', json=aapl_alpha_advantage)
-    requests_mock.get(ALPHA_ADVANTAGE_URL + '&keywords=GM', json=gm_alpha_advantage)
+def register_mock_stripe(requests_mock):
+    requests_mock.pos

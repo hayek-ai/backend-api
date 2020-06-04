@@ -35,7 +35,7 @@ class NewReview(Resource):
 
         # only pro-tier users are permitted to review
         user = self.user_service.get_user_by_id(user_id)
-        if not user.is_pro_tier:
+        if user.pro_tier_status != "succeeded":
             return get_error(400, get_text("non_pro_tier_review"))
 
         # user can only review analysts once
