@@ -63,6 +63,11 @@ class SubscriptionService:
         return invoice
 
     @classmethod
+    def delete_from_db(cls, data) -> None:
+        db.session.delete(data)
+        db.session.commit()
+
+    @classmethod
     def save_changes(cls, data) -> None:
         db.session.add(data)
         db.session.commit()

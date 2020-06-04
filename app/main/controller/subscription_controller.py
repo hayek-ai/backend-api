@@ -55,6 +55,7 @@ class RetryInvoice(Resource):
 class CancelSubscription(Resource):
     def __init__(self, **kwargs):
         self.user_service = kwargs['user_service']
+        self.subscription_service = kwargs['subscription_service']
 
     @jwt_required
     def post(self):
@@ -71,6 +72,7 @@ class CancelSubscription(Resource):
             deleted_subscription = stripe.Subscription.delete(sub.stripe_subscription_id)
             user.pro_tier_status = "deleted"
             self.user_service.save_changes(user)
+            self.subscription_service.delete_from_db(sub)
             return deleted_subscription, 200
         except Exception as e:
             return get_error(403, str(e))

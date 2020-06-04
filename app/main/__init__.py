@@ -177,7 +177,8 @@ def create_app(services, config_name):
     api.add_resource(RetryInvoice, '/retry-invoice',
                      resource_class_kwargs={"subscription_service": services["subscription"]})
     api.add_resource(CancelSubscription, '/cancel-subscription',
-                     resource_class_kwargs={"user_service": services["user"]})
+                     resource_class_kwargs={"user_service": services["user"],
+                                            "subscription_service": services["subscription"]})
     api.add_resource(StripeWebhook, '/stripe-webhook',
                      resource_class_kwargs={"user_service": services["user"]})
     api.add_resource(UpdatePerformance, '/performance',
