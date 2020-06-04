@@ -38,7 +38,6 @@ class RetryInvoice(Resource):
     def post(self):
         """Retries subscription creation if initial payment method fails"""
         payment_method_id = request.json.get('paymentMethodId', None)
-        invoice_id = request.json.get('invoiceId', None)
         if not payment_method_id:
             return get_error(400, get_text("incorrect_fields"))
 
@@ -46,8 +45,7 @@ class RetryInvoice(Resource):
         try:
             invoice = self.subscription_service.retry_invoice(
                 user_id=user_id,
-                payment_method_id=payment_method_id,
-                invoice_id=invoice_id
+                payment_method_id=payment_method_id
             )
             return invoice, 201
         except Exception as e:
@@ -70,7 +68,7 @@ class StripeWebhook(Resource):
             signature = request.headers.get('stripe-signature')
             try:
                 event = stripe.Webhook.construct_event(
-                    payload=request_data.data, sigheader=signature, secret=webhook_secret)
+                    payload=request.data, sig_header=signature, secret=webhook_secret)
                 data = event['data']
             except Exception as e:
                 return e
@@ -81,16 +79,22 @@ class StripeWebhook(Resource):
             event_type = request_data['type']
 
         data_object = data['object']
-        stripe_cust_id = data_object['customer']
-        user = self.user_service.get_user_by_stripe_cust_id(stripe_cust_id)
 
-        if event_type == 'invoice.payment_succeeded':
-            user.isProTier = True
+        if "customer" in data_object:
+            stripe_cust_id = data_object['customer']
+            user = self.user_service.get_user_by_stripe_cust_id(stripe_cust_id)
+            if not user:
+                return get_error(404, get_text("not_found").format("User"))
 
-        if event_type == 'invoice.payment_failed':
-            user.isProTier = False
+            if event_type == 'invoice.payment_succeeded':
+                user.pro_tier_status = "succeeded"
 
-        self.user_service.save_changes(user)
+            if event_type == 'invoice.payment_failed':
+                user.pro_tier_status = "requires_payment_method"
+
+            self.user_service.save_changes(user)
+
+        return {'status': 'success'}, 200
 
 
 

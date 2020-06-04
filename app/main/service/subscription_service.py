@@ -7,7 +7,7 @@ from app.main.model.subscription import SubscriptionModel
 from app.main.model.user import UserModel
 
 stripe.api_key = os.environ.get("STRIPE_TEST_SECRET_API_KEY")
-hayek_pro_price_id = "price_1Gq3mdCXANgFLlKVwCQwEquQ"
+hayek_pro_price_id = "price_1GqJySCXANgFLlKVAM0EEtvx"
 
 
 class SubscriptionService:
@@ -15,7 +15,7 @@ class SubscriptionService:
         user = UserModel.query.filter_by(id=user_id).first()
         if not user:
             raise ValueError(get_text("not_found").format("User"))
-        if user.is_pro_tier is True:
+        if user.subscriptions.first():
             raise ValueError(get_text("already_subscribed"))
         stripe_cust_id = user.stripe_cust_id
         # attach the payment method to the customer
@@ -35,16 +35,15 @@ class SubscriptionService:
             stripe_subscription_id=subscription.id,
             current_period_end=subscription.current_period_end,
             stripe_price_id=subscription["items"]["data"][0]["price"]["id"],
-            status=status,
+            latest_invoice_id=subscription["latest_invoice"]["id"],
             user_id=user_id
         )
         self.save_changes(new_subscription)
-        if status == "succeeded":
-            user.is_pro_tier = True
-            self.save_changes(user)
+        user.pro_tier_status = status
+        self.save_changes(user)
         return subscription
 
-    def retry_invoice(self, user_id: int, payment_method_id: str, invoice_id: str) -> dict:
+    def retry_invoice(self, user_id: int, payment_method_id: str) -> dict:
         """
         Updates customer with the new payment method, and assigns it as
         new default payment method for subscription invoices.
@@ -52,22 +51,15 @@ class SubscriptionService:
         user = UserModel.query.filter_by(id=user_id).first()
         if not user:
             raise ValueError(get_text("not_found").format("User"))
-        if user.is_pro_tier is True:
-            raise ValueError(get_text("already_subscribed"))
+        sub = user.subscriptions.first()
         stripe_cust_id = user.stripe_cust_id
         stripe.PaymentMethod.attach(payment_method_id, customer=stripe_cust_id)
         # set the default payment method on the customer
         stripe.Customer.modify(stripe_cust_id, invoice_settings={
             'default_payment_method': payment_method_id
         })
-        invoice = stripe.Invoice.retrieve(invoice_id, expand=['payment_intent'])
-        print(invoice.error)
-        if not invoice.error:
-            user.is_pro_tier = True
-            sub = user.most_recent_subscription
-            sub.status = "succeeded"
-            self.save_changes(user)
-            self.save_changes(sub)
+        invoice = stripe.Invoice.retrieve(sub.latest_invoice_id, expand=['payment_intent'])
+
         return invoice
 
     @classmethod
