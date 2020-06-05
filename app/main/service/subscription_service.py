@@ -6,8 +6,8 @@ from app.main.libs.strings import get_text
 from app.main.model.subscription import SubscriptionModel
 from app.main.model.user import UserModel
 
-stripe.api_key = os.environ.get("STRIPE_TEST_SECRET_API_KEY")
-hayek_pro_price_id = "price_1GqJySCXANgFLlKVAM0EEtvx"
+stripe.api_key = os.environ.get("STRIPE_SECRET_API_KEY")
+hayek_pro_price_id = os.environ.get("STRIPE_HAYEK_PRO_PRICE_ID")
 
 
 class SubscriptionService:
