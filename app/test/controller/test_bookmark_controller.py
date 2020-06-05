@@ -2,7 +2,7 @@ import unittest
 import json
 import requests_mock
 
-from app.test.conftest import flask_test_client, services_for_test,register_mock_mailgun, register_mock_iex
+from app.test.conftest import flask_test_client, services_for_test, register_mock_mailgun, register_mock_iex
 from app.main.service.user_service import UserService
 from app.main.service.idea_service import IdeaService
 from app.main.service.bookmark_service import BookmarkService
