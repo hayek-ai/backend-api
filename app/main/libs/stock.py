@@ -1,7 +1,16 @@
 import os
 from typing import List
-from requests import Response, get
+from requests import get
 from app.main.libs.strings import get_text
+
+
+def to_float(s):
+    if s:
+        try:
+            return float(s)
+        except ValueError:
+            return 0
+    return 0
 
 
 class StockException(Exception):
@@ -129,9 +138,9 @@ class Stock:
         metrics["forwardPE"] = advanced_stats["forwardPERatio"]
         metrics["evToEBITDA"] = ev_to_ebitda
         metrics["priceToSales"] = advanced_stats["priceToSales"]
-        metrics["netDebt"] = (float(advanced_stats["currentDebt"]) - float(advanced_stats["totalCash"])) / 1000000
+        metrics["netDebt"] = (to_float(advanced_stats["currentDebt"]) - to_float(advanced_stats["totalCash"])) / 1000000
         metrics["putCallRatio"] = advanced_stats["putCallRatio"]
-        metrics["marketCap"] = float(quote_info["marketCap"]) / 1000000
+        metrics["marketCap"] = to_float(quote_info["marketCap"]) / 1000000
         metrics["latestPrice"] = quote_info["latestPrice"]
         metrics["week52High"] = quote_info["week52High"]
         metrics["week52Low"] = quote_info["week52Low"]
