@@ -104,19 +104,6 @@ class Stock:
         return response.json()
 
     @classmethod
-    def search_symbol(cls, query: str) -> List[dict]:
-        """Returns the best-matching symbols/companies based on query. (for searchbar autocomplete)"""
-        if cls.ALPHA_VANTAGE_API_KEY is None:
-            raise StockException(get_text("env_fail").format("Alpha Vantage API Key"))
-
-        response = get(url=f"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={query}&apikey={cls.ALPHA_VANTAGE_API_KEY}")
-
-        if response.status_code != 200:
-            raise StockException(response.content)
-
-        return response.json()
-
-    @classmethod
     def fetch_financial_metrics(cls, symbol: str) -> dict:
         """Returns key financial metrics for a given symbol"""
         if cls.IEX_API_KEY is None:
