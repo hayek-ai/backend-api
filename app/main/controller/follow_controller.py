@@ -27,9 +27,14 @@ class Follow(Resource):
         if follow:
             try:
                 self.follow_service.delete_follow(follow.id)
+                analyst_followers = self.follow_service.get_followers(analyst_id)
                 return {
                     "message": get_text("successfully_deleted").format("Follow"),
-                    "analyst": user_schema.dump(analyst)
+                    "analyst":
+                        {
+                            **user_schema.dump(analyst),
+                            "followers": user_follow_list_schema.dump(analyst_followers)
+                        }
                 }, 201
             except Exception as e:
                 return get_error(500, str(e))
@@ -37,9 +42,14 @@ class Follow(Resource):
         # else, create follow
         try:
             self.follow_service.save_new_follow(user_id=user_id, analyst_id=analyst_id)
+            analyst_followers = self.follow_service.get_followers(analyst_id)
             return {
                 "message": get_text("successfully_created").format("Follow"),
-                "analyst": self.user_schema.dump(analyst)
+                "analyst":
+                    {
+                        **self.user_schema.dump(analyst),
+                        "followers": user_follow_list_schema.dump(analyst_followers)
+                    }
             }, 201
         except Exception as e:
             return get_error(500, str(e))
