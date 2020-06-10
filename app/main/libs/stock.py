@@ -1,5 +1,7 @@
 import os
 from typing import List
+
+import requests_cache
 from requests import get
 from app.main.libs.strings import get_text
 
@@ -22,6 +24,13 @@ class Stock:
     IEX_API_KEY = os.environ.get("IEX_API_KEY", None)
     IEX_URI = os.environ.get("IEX_URI", None)
 
+    CACHE_SESSION = requests_cache.CachedSession(
+            cache_name="stock_cache",
+            backend='sqlite',
+            allowable_methods='GET',
+            allowable_codes=[200],
+            expire_after=86_400)
+
     @classmethod
     def fetch_stock_quote(cls, symbol: str) -> dict:
         if cls.IEX_API_KEY is None or cls.IEX_URI is None:
@@ -39,7 +48,7 @@ class Stock:
         if cls.IEX_API_KEY is None or cls.IEX_URI is None:
             raise StockException(get_text("env_fail").format("IEX API Key"))
 
-        response = get(url=f"{cls.IEX_URI}v1/stock/{symbol}/company?token={cls.IEX_API_KEY}")
+        response = cls.CACHE_SESSION.get(url=f"{cls.IEX_URI}v1/stock/{symbol}/company?token={cls.IEX_API_KEY}")
 
         if response.status_code != 200:
             raise StockException(response.content)
@@ -96,7 +105,8 @@ class Stock:
         if cls.IEX_API_KEY is None:
             raise StockException(get_text("env_fail").format("IEX API Key"))
 
-        response = get(url=f"{cls.IEX_URI}v1/stock/{symbol}/chart/{date}?token={cls.IEX_API_KEY}&chartCloseOnly=true")
+        response = cls.CACHE_SESSION.get(
+            url=f"{cls.IEX_URI}v1/stock/{symbol}/chart/{date}?token={cls.IEX_API_KEY}&chartCloseOnly=true")
 
         if response.status_code != 200:
             raise StockException(response.content)
@@ -115,13 +125,15 @@ class Stock:
             raise StockException(quote_info.content)
         quote_info = quote_info.json()
 
-        advanced_stats = get(url=f"{cls.IEX_URI}v1/stock/{symbol}/advanced-stats?token={cls.IEX_API_KEY}")
+        advanced_stats = cls.CACHE_SESSION.get(
+            url=f"{cls.IEX_URI}v1/stock/{symbol}/advanced-stats?token={cls.IEX_API_KEY}")
 
         if advanced_stats.status_code != 200:
             raise StockException(advanced_stats.content)
 
         advanced_stats = advanced_stats.json()
-        ev_to_ebitda = advanced_stats["enterpriseValue"] / advanced_stats["EBITDA"] if advanced_stats["EBITDA"] > 0 else "n/a"
+        ev_to_ebitda = advanced_stats["enterpriseValue"] / advanced_stats["EBITDA"] if advanced_stats[
+                                                                                           "EBITDA"] > 0 else "n/a"
         metrics["forwardPE"] = advanced_stats["forwardPERatio"]
         metrics["evToEBITDA"] = ev_to_ebitda
         metrics["priceToSales"] = advanced_stats["priceToSales"]
