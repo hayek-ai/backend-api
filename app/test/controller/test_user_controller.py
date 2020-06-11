@@ -45,6 +45,7 @@ class TestUserController(unittest.TestCase):
         assert new_user["isAnalyst"] is False
         assert new_user["isConfirmed"] is False
         assert len(new_user["following"]) == 0
+        assert len(new_user["followers"]) == 0
         assert response.status_code == 201
         assert data["confirmationEmailSent"] is True
 
@@ -152,11 +153,13 @@ class TestUserController(unittest.TestCase):
 
         # get by username
         response = self.client.get(
-            '/user/username2',
+            '/user/analyst',
             headers={'Authorization': 'Bearer {}'.format(access_token)})
         assert response.status_code == 200
         user = json.loads(response.data)
-        assert user["username"] == "username2"
+        assert user["username"] == "analyst"
+        assert len(user["followers"]) == 2
+        assert user["followers"][0]["id"] == 2
 
         # user not found
         response = self.client.get(
@@ -197,7 +200,6 @@ class TestUserController(unittest.TestCase):
         data = json.loads(response.data)
         assert data["errors"][0]["detail"] == get_text("unauthorized_user_edit")
         assert response.status_code == 403
-
 
         # handle user not found
         response = self.client.put(
@@ -269,6 +271,7 @@ class TestUserController(unittest.TestCase):
         assert "accessToken" in data
         assert data["user"]["username"] == "username"
         assert len(data["user"]["following"]) == 0
+        assert len(data["user"]["followers"]) == 0
         assert response.status_code == 200
 
         # invalid username/email

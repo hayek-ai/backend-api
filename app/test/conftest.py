@@ -3,7 +3,7 @@ from unittest.mock import create_autospec
 
 import app
 from app.main import create_app
-from app.test.mock_responses import aapl_quote, aapl_company, aapl_chart, aapl_advanced_stats, aapl_alpha_advantage, \
+from app.test.mock_responses import aapl_quote, aapl_company, aapl_chart, aapl_advanced_stats, \
     gm_advanced_stats, gm_chart, gm_quote, gm_company
 
 MAILGUN_URL = "https://api.mailgun.net/v3/{}/messages".format(os.environ.get("MAILGUN_DOMAIN", None))

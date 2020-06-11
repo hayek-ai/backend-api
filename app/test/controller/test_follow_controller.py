@@ -43,6 +43,7 @@ class TestFollowController(unittest.TestCase):
         assert response_data["message"] == get_text("successfully_created").format("Follow")
         assert response_data["analyst"]["id"] == analyst.id
         assert response_data["analyst"]["numFollowers"] == 1
+        assert len(response_data["analyst"]["followers"]) == 1
 
         # unfollow
         response = self.client.post(
@@ -53,6 +54,8 @@ class TestFollowController(unittest.TestCase):
         assert response_data["message"] == get_text("successfully_deleted").format("Follow")
         assert response_data["analyst"]["id"] == analyst.id
         assert response_data["analyst"]["numFollowers"] == 0
+        assert len(response_data["analyst"]["followers"]) == 0
+
 
     def test_following_get_and_followers_get(self, mock) -> None:
         register_mock_mailgun(mock)

@@ -29,26 +29,26 @@ class IdeaService:
             + (float(bear_target) * float(bear_probability))
 
         stock_data = {}
-        try:
-            stock_data.update(Stock.fetch_company_info(symbol))
-            stock_data.update(Stock.fetch_stock_quote(symbol))
-        except StockException as e:
-            return {"error": str(e)}
+        stock_data.update(Stock.fetch_company_info(symbol))
+        stock_data.update(Stock.fetch_stock_quote(symbol))
 
         # make sure the price isn't too far off from what API says before committing
         if abs(float(entry_price) - stock_data["latestPrice"])/stock_data["latestPrice"] > 0.01:
-            return {"error": get_text("incorrect_price")}
+            raise ValueError(get_text("incorrect_price"))
 
         exhibit_dict_list = []
         for image_file in exhibits:
             title = exhibit_title_map[image_file.filename]
-            image_extension = image_file.filename.split('.')[len(image_file.filename.split(".")) - 1]
+            image_extension = image_file.filename.split('.')[len(image_file.filename.split(".")) - 1].lower()
+            valid_extensions = ['jpg', 'png', 'jpeg']
+            if image_extension not in valid_extensions:
+                raise ValueError(get_text("invalid_file_extension"))
             suffix = datetime.datetime.now().strftime("%y%m%d-%H%M%S")
             title_for_url = title.replace(" ", "-")
             filename = f"{analyst.username}-{symbol}-{title_for_url}-{suffix}.{image_extension}"
             response_dict = self.upload_exhibit(title, filename, image_file)
             if "error" in response_dict:
-                return {"error": response_dict["error"]}
+                raise ValueError(response_dict["error"])
             exhibit_dict_list.append(response_dict)
 
         exhibit_dict_list = json.dumps(exhibit_dict_list)

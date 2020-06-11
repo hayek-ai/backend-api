@@ -58,7 +58,8 @@ class UserRegister(Resource):
                        "user": {
                            **user_schema.dump(new_user),
                            "following": [],
-                            "ideas": []
+                           "followers": [],
+                           "ideas": []
                        },
                        "accessToken": access_token,
                        "confirmationEmailSent": email_success
@@ -81,9 +82,11 @@ class User(Resource):
 
         if user:
             following = self.follow_service.get_following(user.id)
+            followers = self.follow_service.get_followers(user.id)
             return {
                 **user_schema.dump(user),
                 "following": user_follow_list_schema.dump(following),
+                "followers": user_follow_list_schema.dump(followers),
                 "ideas": idea_list_schema.dump(user.ideas.all())
             }, 200
         else:
@@ -118,7 +121,7 @@ class User(Resource):
             try:
                 # get file and rename
                 image = request.files['profileImage']
-                image_extension = image.filename.split('.')[len(image.filename.split(".")) - 1]
+                image_extension = image.filename.split('.')[len(image.filename.split(".")) - 1].lower()
                 valid_extensions = ['jpg', 'png', 'jpeg']
                 if image_extension not in valid_extensions:
                     return get_error(400, get_text("invalid_file_extension"))
@@ -129,9 +132,11 @@ class User(Resource):
 
         self.user_service.save_changes(user)
         following = self.follow_service.get_following(user.id)
+        followers = self.follow_service.get_followers(user.id)
         return {
             **user_schema.dump(user),
             "following": user_follow_list_schema.dump(following),
+            "followers": user_follow_list_schema.dump(followers),
             "ideas": idea_list_schema.dump(user.ideas.all())
         }, 201
 
@@ -156,10 +161,12 @@ class UserLogin(Resource):
             expires = datetime.timedelta(days=30)
             access_token = create_access_token(identity=user.id, expires_delta=expires, fresh=True)
             following = self.follow_service.get_following(user.id)
+            followers = self.follow_service.get_followers(user.id)
             return {
                "user": {
                    **user_schema.dump(user),
                    "following": user_follow_list_schema.dump(following),
+                   "followers": user_follow_list_schema.dump(followers),
                    "ideas": idea_list_schema.dump(user.ideas.all())
                 },
                "accessToken": access_token,
