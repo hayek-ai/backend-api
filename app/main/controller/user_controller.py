@@ -121,7 +121,7 @@ class User(Resource):
             try:
                 # get file and rename
                 image = request.files['profileImage']
-                image_extension = image.filename.split('.')[len(image.filename.split(".")) - 1]
+                image_extension = image.filename.split('.')[len(image.filename.split(".")) - 1].lower()
                 valid_extensions = ['jpg', 'png', 'jpeg']
                 if image_extension not in valid_extensions:
                     return get_error(400, get_text("invalid_file_extension"))

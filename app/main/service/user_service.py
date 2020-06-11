@@ -13,12 +13,12 @@ stripe.api_key = os.environ.get("STRIPE_SECRET_API_KEY")
 
 class UserService:
     def save_new_user(self, email: str, username: str, password: str, **kwargs) -> "UserModel":
-        customer = stripe.Customer.create(email=email)
+        # customer = stripe.Customer.create(email=email)
         new_user = UserModel(
             email=email,
             username=username,
             password=password,
-            stripe_cust_id=customer.id,
+            # stripe_cust_id=customer.id,
             **kwargs
         )
         self.save_changes(new_user)
