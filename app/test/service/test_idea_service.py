@@ -9,8 +9,7 @@ from app.main.libs.s3 import S3
 from app.main.libs.util import create_image_file
 from app.main.service.idea_service import IdeaService
 from app.main.service.user_service import UserService
-from app.test.conftest import flask_test_client
-from app.test.conftest import register_mock_iex
+from app.test.conftest import flask_test_client, register_mock_iex
 from app.main.libs.util import create_idea
 
 
