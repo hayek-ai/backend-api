@@ -1,10 +1,10 @@
 import os
 import stripe
 
-from app.main.db import db
-from app.main.libs.strings import get_text
-from app.main.model.subscription import SubscriptionModel
-from app.main.model.user import UserModel
+from main.db import db
+from main.libs.strings import get_text
+from main.model.subscription import SubscriptionModel
+from main.model.user import UserModel
 
 stripe.api_key = os.environ.get("STRIPE_SECRET_API_KEY")
 hayek_pro_price_id = os.environ.get("STRIPE_HAYEK_PRO_PRICE_ID")

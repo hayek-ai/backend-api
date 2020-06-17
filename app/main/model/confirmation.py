@@ -1,7 +1,7 @@
 from time import time
 import random
 
-from app.main.db import db
+from main.db import db
 
 CONFIRMATION_EXPIRATION_DELTA = 1800 # 30 minutes
 

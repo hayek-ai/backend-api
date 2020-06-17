@@ -1,8 +1,8 @@
 import unittest
 import requests_mock
 
-from app.main.libs.email import Email
-from app.test.conftest import register_mock_mailgun
+from main.libs.email import Email
+from test.conftest import register_mock_mailgun
 
 
 class TestEmailLib(unittest.TestCase):

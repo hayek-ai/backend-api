@@ -1,6 +1,6 @@
-from app.main.db import db
-from app.main.model.idea import IdeaModel
-from app.main.model.download import DownloadModel
+from main.db import db
+from main.model.idea import IdeaModel
+from main.model.download import DownloadModel
 from sqlalchemy import and_
 
 

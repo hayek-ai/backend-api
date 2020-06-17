@@ -1,6 +1,6 @@
 import unittest
 import os
-from app.test.conftest import flask_test_client
+from test.conftest import flask_test_client
 
 
 class TestTestingConfig(unittest.TestCase):

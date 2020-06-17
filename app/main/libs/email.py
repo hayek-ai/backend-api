@@ -3,7 +3,7 @@ from typing import List
 
 from requests import Response, post
 
-from app.main.libs.strings import get_text
+from main.libs.strings import get_text
 
 
 class EmailException(Exception):

@@ -1,9 +1,9 @@
 from flask_restful import Resource
 
-from app.main.libs.strings import get_text
-from app.main.libs.util import get_error
+from main.libs.strings import get_text
+from main.libs.util import get_error
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from app.main.schema.user_schema import user_schema, user_follow_list_schema
+from main.schema.user_schema import user_schema, user_follow_list_schema
 
 
 class Follow(Resource):

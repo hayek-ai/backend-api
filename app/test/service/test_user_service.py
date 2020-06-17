@@ -1,11 +1,11 @@
 import unittest
 import requests_mock
-from app.main.db import db
-from app.main.libs.s3 import S3
-from app.main.libs.util import create_image_file
-from app.main.service.user_service import UserService
-from app.test.conftest import flask_test_client
-from app.test.conftest import register_mock_mailgun
+from main.db import db
+from main.libs.s3 import S3
+from main.libs.util import create_image_file
+from main.service.user_service import UserService
+from test.conftest import flask_test_client
+from test.conftest import register_mock_mailgun
 
 
 @requests_mock.Mocker()
@@ -24,7 +24,7 @@ class TestUserService(unittest.TestCase):
         assert new_user.email == "email@email.com"
         assert new_user.password_hash != "password"
         assert new_user.is_analyst is False
-        assert str(type(new_user.most_recent_confirmation)) == "<class 'app.main.model.confirmation.ConfirmationModel'>"
+        assert str(type(new_user.most_recent_confirmation)) == "<class 'main.model.confirmation.ConfirmationModel'>"
 
         # try creating analyst
         new_analyst = self.service \

@@ -1,7 +1,7 @@
 from typing import List
-from app.main.db import db
-from app.main.model.user import UserModel
-from app.main.model.review import ReviewModel
+from main.db import db
+from main.model.user import UserModel
+from main.model.review import ReviewModel
 from sqlalchemy import and_
 
 

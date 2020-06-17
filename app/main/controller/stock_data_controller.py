@@ -3,11 +3,11 @@ from flask import request
 from flask_jwt_extended import jwt_required
 from sqlalchemy import or_, func
 
-from app.main.libs.util import get_error
-from app.main.libs.stock import Stock, StockException
-from app.main.model.user import UserModel
-from app.main.model.idea import IdeaModel
-from app.main.schema.user_schema import UserSchema
+from main.libs.util import get_error
+from main.libs.stock import Stock, StockException
+from main.model.user import UserModel
+from main.model.idea import IdeaModel
+from main.schema.user_schema import UserSchema
 
 user_list_schema = UserSchema(many=True, only=("username",))
 

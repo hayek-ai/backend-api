@@ -1,7 +1,7 @@
 from uuid import uuid4
 from time import time
 
-from app.main.db import db
+from main.db import db
 
 RESET_EXPIRATION_DELTA = 1800  # 30 minutes
 

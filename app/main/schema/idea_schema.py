@@ -1,12 +1,12 @@
 from marshmallow import Schema, fields, validates, validates_schema, ValidationError
 from marshmallow.validate import Length, Range
 
-from app.main.libs.strings import get_text
-from app.main.libs.util import camelcase
-from app.main.ma import ma
-from app.main.model.idea import IdeaModel
-from app.main.schema.user_schema import UserSchema
-from app.main.schema.comment_schema import CommentSchema
+from main.libs.strings import get_text
+from main.libs.util import camelcase
+from main.ma import ma
+from main.model.idea import IdeaModel
+from main.schema.user_schema import UserSchema
+from main.schema.comment_schema import CommentSchema
 
 
 class IdeaSchema(ma.SQLAlchemyAutoSchema):
@@ -29,12 +29,7 @@ class NewIdeaSchema(Schema):
     symbol = fields.Str(required=True, validate=Length(min=1, max=10))
     positionType = fields.Str(required=True, validate=Length(min=1))
     agreedToTerms = fields.Bool(required=True)
-    bullTarget = fields.Float(required=True, validate=Range(min=0))
-    bullProbability = fields.Float(required=True, validate=Range(min=0, max=1))
-    baseTarget = fields.Float(required=True, validate=Range(min=0))
-    baseProbability = fields.Float(required=True, validate=Range(min=0, max=1))
-    bearTarget = fields.Float(required=True, validate=Range(min=0))
-    bearProbability = fields.Float(required=True, validate=Range(min=0, max=1))
+    priceTarget = fields.Float(required=True, validate=Range(min=0))
     entryPrice = fields.Float(required=True, validate=Range(min=0))
     thesisSummary = fields.Str(required=True, validate=Length(min=1))
     fullReport = fields.Str(required=True, validate=Length(min=1))
@@ -53,12 +48,7 @@ class NewIdeaSchema(Schema):
 
     @validates_schema
     def validate_price_target(self, data, **kwargs):
-        if data["bullProbability"] + data["baseProbability"] + data["bearProbability"] != 1:
-            raise ValidationError(get_text("incorrect_target_probabilities"))
-
-        price_target = (data["bullTarget"] * data["bullProbability"])\
-            + (data["baseTarget"] * data["baseProbability"])\
-            + (data["bearTarget"] * data["bearProbability"])
+        price_target = data["priceTarget"]
         position_type = data["positionType"].strip().lower()
         if position_type == "long":
             implied_return = (price_target / data["entryPrice"]) - 1

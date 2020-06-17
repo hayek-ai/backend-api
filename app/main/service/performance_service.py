@@ -1,10 +1,10 @@
 import datetime
 from functools import reduce
-from app.main.db import db
-from app.main.libs.stock import Stock, StockException
-from app.main.libs.strings import get_text
-from app.main.model.user import UserModel
-from app.main.model.idea import IdeaModel
+from main.db import db
+from main.libs.stock import Stock, StockException
+from main.libs.strings import get_text
+from main.model.user import UserModel
+from main.model.idea import IdeaModel
 
 
 def calc_idea_return(idea: dict) -> float:

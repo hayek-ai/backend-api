@@ -1,6 +1,6 @@
 import io
-from app.main.model.idea import IdeaModel
-from app.main.service.idea_service import IdeaService
+from main.model.idea import IdeaModel
+from main.service.idea_service import IdeaService
 
 
 def camelcase(s):
@@ -38,12 +38,7 @@ def create_idea(analyst_id: int, symbol: str, with_image: bool) -> "IdeaModel":
                 symbol="AAPL",
                 position_type="long",
                 agreed_to_terms=True,
-                bull_target=420,
-                bull_probability=0.2,
-                base_target=400,
-                base_probability=0.6,
-                bear_target=380,
-                bear_probability=0.2,
+                price_target=400,
                 entry_price=313.49,
                 thesis_summary="Test Thesis Summary",
                 full_report="Test Full Report",
@@ -55,12 +50,7 @@ def create_idea(analyst_id: int, symbol: str, with_image: bool) -> "IdeaModel":
                 symbol="AAPL",
                 position_type="long",
                 agreed_to_terms=True,
-                bull_target=420,
-                bull_probability=0.2,
-                base_target=400,
-                base_probability=0.6,
-                bear_target=380,
-                bear_probability=0.2,
+                price_target=400,
                 entry_price=313.49,
                 thesis_summary="Test Thesis Summary",
                 full_report="Test Full Report")
@@ -71,12 +61,7 @@ def create_idea(analyst_id: int, symbol: str, with_image: bool) -> "IdeaModel":
                 symbol="GM",
                 position_type="short",
                 agreed_to_terms=True,
-                bull_target=20,
-                bull_probability=0.2,
-                base_target=15,
-                base_probability=0.6,
-                bear_target=10,
-                bear_probability=0.2,
+                price_target=15,
                 entry_price=23.21,
                 thesis_summary="Test Thesis Summary",
                 full_report="Test Full Report",
@@ -88,12 +73,7 @@ def create_idea(analyst_id: int, symbol: str, with_image: bool) -> "IdeaModel":
                 symbol="GM",
                 position_type="short",
                 agreed_to_terms=True,
-                bull_target=20,
-                bull_probability=0.2,
-                base_target=15,
-                base_probability=0.6,
-                bear_target=10,
-                bear_probability=0.2,
+                price_target=15,
                 entry_price=23.21,
                 thesis_summary="Test Thesis Summary",
                 full_report="Test Full Report")

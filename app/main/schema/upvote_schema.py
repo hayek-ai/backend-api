@@ -1,7 +1,7 @@
-from app.main.ma import ma
+from main.ma import ma
 
-from app.main.libs.util import camelcase
-from app.main.model.upvote import UpvoteModel
+from main.libs.util import camelcase
+from main.model.upvote import UpvoteModel
 
 
 class UpvoteSchema(ma.SQLAlchemyAutoSchema):

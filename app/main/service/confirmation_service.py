@@ -1,10 +1,10 @@
 from requests import Response
 from time import time
 
-from app.main.db import db
-from app.main.model.user import UserModel
-from app.main.model.confirmation import ConfirmationModel
-from app.main.libs.email import Email
+from main.db import db
+from main.model.user import UserModel
+from main.model.confirmation import ConfirmationModel
+from main.libs.email import Email
 
 
 class ConfirmationService:

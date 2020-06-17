@@ -2,7 +2,7 @@ import os
 
 import requests_cache
 from requests import get
-from app.main.libs.strings import get_text
+from main.libs.strings import get_text
 
 
 def to_float(s):

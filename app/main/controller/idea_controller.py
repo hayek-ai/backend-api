@@ -3,9 +3,9 @@ from flask_restful import Resource, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 
-from app.main.libs.strings import get_text
-from app.main.libs.util import get_error
-from app.main.schema.idea_schema import (
+from main.libs.strings import get_text
+from main.libs.util import get_error
+from main.schema.idea_schema import (
     idea_schema,
     new_idea_schema,
     idea_list_schema,
@@ -42,12 +42,7 @@ class NewIdea(Resource):
                 symbol=request.form.get("symbol"),
                 position_type=request.form.get("positionType"),
                 agreed_to_terms=True,  # verified in schema
-                bull_target=request.form.get("bullTarget"),
-                bull_probability=request.form.get("bullProbability"),
-                base_target=request.form.get("baseTarget"),
-                base_probability=request.form.get("baseProbability"),
-                bear_target=request.form.get("bearTarget"),
-                bear_probability=request.form.get("bearProbability"),
+                price_target=request.form.get("priceTarget"),
                 entry_price=request.form.get("entryPrice"),
                 thesis_summary=request.form.get("thesisSummary"),
                 full_report=request.form.get("fullReport"),

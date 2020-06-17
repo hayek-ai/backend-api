@@ -1,7 +1,7 @@
-from app.main.ma import ma
+from main.ma import ma
 
-from app.main.libs.util import camelcase
-from app.main.model.bookmark import BookmarkModel
+from main.libs.util import camelcase
+from main.model.bookmark import BookmarkModel
 
 
 class BookmarkSchema(ma.SQLAlchemyAutoSchema):

@@ -1,5 +1,5 @@
 import unittest
-from app.main.libs.security import encrypt_password, check_encrypted_password
+from main.libs.security import encrypt_password, check_encrypted_password
 
 
 class TestSecurityLib(unittest.TestCase):

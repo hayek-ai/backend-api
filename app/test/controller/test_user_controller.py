@@ -2,13 +2,13 @@ import json
 import unittest
 import requests_mock
 
-from app.main.db import db
-from app.main.libs.s3 import S3
-from app.main.libs.strings import get_text
-from app.main.libs.util import create_image_file
-from app.main.service.user_service import UserService
-from app.main.service.follow_service import FollowService
-from app.test.conftest import flask_test_client, services_for_test, register_mock_mailgun
+from main.db import db
+from main.libs.s3 import S3
+from main.libs.strings import get_text
+from main.libs.util import create_image_file
+from main.service.user_service import UserService
+from main.service.follow_service import FollowService
+from test.conftest import flask_test_client, services_for_test, register_mock_mailgun
 
 
 @requests_mock.Mocker()

@@ -2,13 +2,13 @@ import unittest
 import json
 import requests_mock
 
-from app.test.conftest import flask_test_client, services_for_test,register_mock_iex, register_mock_mailgun
-from app.main.service.user_service import UserService
-from app.main.service.idea_service import IdeaService
-from app.main.service.comment_service import CommentService
-from app.main.db import db
-from app.main.libs.strings import get_text
-from app.main.libs.util import create_idea
+from test.conftest import flask_test_client, services_for_test,register_mock_iex, register_mock_mailgun
+from main.service.user_service import UserService
+from main.service.idea_service import IdeaService
+from main.service.comment_service import CommentService
+from main.db import db
+from main.libs.strings import get_text
+from main.libs.util import create_idea
 
 
 @requests_mock.Mocker()

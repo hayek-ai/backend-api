@@ -1,7 +1,7 @@
 import unittest
 import json
-from app.test.conftest import flask_test_client
-from app.main.db import db
+from test.conftest import flask_test_client
+from main.db import db
 
 
 class TestHealthController(unittest.TestCase):

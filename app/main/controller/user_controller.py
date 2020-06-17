@@ -3,16 +3,16 @@ import datetime
 from flask_restful import Resource, request
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
-from app.main.libs.strings import get_text
-from app.main.libs.util import get_error
-from app.main.schema.user_schema import (
+from main.libs.strings import get_text
+from main.libs.util import get_error
+from main.schema.user_schema import (
     user_schema,
     user_register_schema,
     user_login_schema,
     user_follow_list_schema,
     analyst_leaderboard_schema,
 )
-from app.main.schema.idea_schema import idea_list_schema
+from main.schema.idea_schema import idea_list_schema
 
 
 class UserRegister(Resource):
