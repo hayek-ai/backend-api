@@ -1,44 +1,43 @@
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_cors import CORS
-from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from marshmallow import ValidationError
 
-from app.main.config import app_config
-from app.main.controller.performance_controller import UpdatePerformance
-from app.main.db import db
-from app.main.ma import ma
+from main.config import app_config
+from main.controller.performance_controller import UpdatePerformance
+from main.db import db
+from main.ma import ma
 
 # Controllers
-from app.main.controller.user_controller import UserRegister, UserLogin, User, AnalystLeaderboard
-from app.main.controller.confirmation_controller import Confirmation, ResendConfirmation
-from app.main.controller.password_reset_controller import SendPasswordReset, PasswordReset
-from app.main.controller.idea_controller import NewIdea, Idea, IdeaFeed, DownloadReport
-from app.main.controller.follow_controller import Follow, FollowingList, FollowerList
-from app.main.controller.review_controller import NewReview, Review, AnalystReviews
-from app.main.controller.comment_controller import NewComment, Comment, IdeaComments
-from app.main.controller.upvote_controller import Upvote, UpvoteFeed
-from app.main.controller.downvote_controller import Downvote
-from app.main.controller.bookmark_controller import Bookmark, BookmarkFeed
-from app.main.controller.stock_data_controller import StockData, SearchAutocomplete
-from app.main.controller.subscription_controller import CreateSubscription, RetryInvoice, StripeWebhook, CancelSubscription
-from app.main.controller.health_controller import HealthCheck
+from main.controller.user_controller import UserRegister, UserLogin, User, AnalystLeaderboard
+from main.controller.confirmation_controller import Confirmation, ResendConfirmation
+from main.controller.password_reset_controller import SendPasswordReset, PasswordReset
+from main.controller.idea_controller import NewIdea, Idea, IdeaFeed, DownloadReport
+from main.controller.follow_controller import Follow, FollowingList, FollowerList
+from main.controller.review_controller import NewReview, Review, AnalystReviews
+from main.controller.comment_controller import NewComment, Comment, IdeaComments
+from main.controller.upvote_controller import Upvote, UpvoteFeed
+from main.controller.downvote_controller import Downvote
+from main.controller.bookmark_controller import Bookmark, BookmarkFeed
+from main.controller.stock_data_controller import StockData, SearchAutocomplete
+from main.controller.subscription_controller import CreateSubscription, RetryInvoice, StripeWebhook, CancelSubscription
+from main.controller.health_controller import HealthCheck
 
 # Services
-from app.main.service.user_service import UserService
-from app.main.service.confirmation_service import ConfirmationService
-from app.main.service.password_reset_service import PasswordResetService
-from app.main.service.idea_service import IdeaService
-from app.main.service.download_service import DownloadService
-from app.main.service.follow_service import FollowService
-from app.main.service.review_service import ReviewService
-from app.main.service.comment_service import CommentService
-from app.main.service.upvote_service import UpvoteService
-from app.main.service.downvote_service import DownvoteService
-from app.main.service.bookmark_service import BookmarkService
-from app.main.service.subscription_service import SubscriptionService
-from app.main.service.performance_service import PerformanceService
+from main.service.user_service import UserService
+from main.service.confirmation_service import ConfirmationService
+from main.service.password_reset_service import PasswordResetService
+from main.service.idea_service import IdeaService
+from main.service.download_service import DownloadService
+from main.service.follow_service import FollowService
+from main.service.review_service import ReviewService
+from main.service.comment_service import CommentService
+from main.service.upvote_service import UpvoteService
+from main.service.downvote_service import DownvoteService
+from main.service.bookmark_service import BookmarkService
+from main.service.subscription_service import SubscriptionService
+from main.service.performance_service import PerformanceService
 
 
 def create_app(services, config_name):
@@ -56,7 +55,6 @@ def create_app(services, config_name):
         return jsonify(err.messages), 400
 
     jwt = JWTManager(app)  # not creating /auth
-    migrate = Migrate(app, db)
 
     db.init_app(app)
     ma.init_app(app)

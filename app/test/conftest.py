@@ -1,9 +1,9 @@
 import os
 from unittest.mock import create_autospec
 
-import app
-from app.main import create_app
-from app.test.mock_responses import aapl_quote, aapl_company, aapl_chart, aapl_advanced_stats, \
+import main
+from main import create_app
+from test.mock_responses import aapl_quote, aapl_company, aapl_chart, aapl_advanced_stats, \
     gm_advanced_stats, gm_chart, gm_quote, gm_company
 
 MAILGUN_URL = "https://api.mailgun.net/v3/{}/messages".format(os.environ.get("MAILGUN_DOMAIN", None))
@@ -15,19 +15,19 @@ def services_for_test(user=None, confirmation=None, password_reset=None, idea=No
                       upvote=None, downvote=None, bookmark=None, subscription=None,\
                       performance=None):
     return {
-        'user': user or create_autospec(app.main.UserService, spec_set=True, instance=True),
-        'confirmation': confirmation or create_autospec(app.main.ConfirmationService, spec_set=True, instance=True),
-        'password_reset': password_reset or create_autospec(app.main.PasswordResetService, spec_set=True, instance=True),
-        'idea': idea or create_autospec(app.main.IdeaService, spec_set=True, instance=True),
-        'download': download or create_autospec(app.main.DownloadService, spec_set=True, instance=True),
-        'follow': follow or create_autospec(app.main.FollowService, spec_set=True, instance=True),
-        'review': review or create_autospec(app.main.ReviewService, spec_set=True, instance=True),
-        'comment': comment or create_autospec(app.main.CommentService, spec_set=True, instance=True),
-        'upvote': upvote or create_autospec(app.main.UpvoteService, spec_set=True, instance=True),
-        'downvote': downvote or create_autospec(app.main.DownvoteService, spec_set=True, instance=True),
-        'bookmark': bookmark or create_autospec(app.main.BookmarkService, spec_set=True, instance=True),
-        'subscription': subscription or create_autospec(app.main.SubscriptionService, spec_set=True, instance=True),
-        'performance': performance or create_autospec(app.main.PerformanceService, spec_set=True, instance=True)
+        'user': user or create_autospec(main.UserService, spec_set=True, instance=True),
+        'confirmation': confirmation or create_autospec(main.ConfirmationService, spec_set=True, instance=True),
+        'password_reset': password_reset or create_autospec(main.PasswordResetService, spec_set=True, instance=True),
+        'idea': idea or create_autospec(main.IdeaService, spec_set=True, instance=True),
+        'download': download or create_autospec(main.DownloadService, spec_set=True, instance=True),
+        'follow': follow or create_autospec(main.FollowService, spec_set=True, instance=True),
+        'review': review or create_autospec(main.ReviewService, spec_set=True, instance=True),
+        'comment': comment or create_autospec(main.CommentService, spec_set=True, instance=True),
+        'upvote': upvote or create_autospec(main.UpvoteService, spec_set=True, instance=True),
+        'downvote': downvote or create_autospec(main.DownvoteService, spec_set=True, instance=True),
+        'bookmark': bookmark or create_autospec(main.BookmarkService, spec_set=True, instance=True),
+        'subscription': subscription or create_autospec(main.SubscriptionService, spec_set=True, instance=True),
+        'performance': performance or create_autospec(main.PerformanceService, spec_set=True, instance=True)
     }
 
 

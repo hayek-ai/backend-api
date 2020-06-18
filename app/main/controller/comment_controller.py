@@ -1,10 +1,10 @@
 from flask_restful import Resource, request
 
-from app.main.libs.strings import get_text
-from app.main.libs.util import get_error
+from main.libs.strings import get_text
+from main.libs.util import get_error
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from app.main.schema.comment_schema import comment_schema, new_comment_schema, comment_list_schema
-from app.main.schema.idea_schema import idea_with_report_schema
+from main.schema.comment_schema import comment_schema, new_comment_schema, comment_list_schema
+from main.schema.idea_schema import idea_with_report_schema
 
 
 class NewComment(Resource):

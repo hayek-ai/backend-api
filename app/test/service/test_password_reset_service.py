@@ -1,10 +1,10 @@
 import unittest
 import requests_mock
-from app.main.service.password_reset_service import PasswordResetService
-from app.main.service.user_service import UserService
-from app.main.db import db
-from app.test.conftest import flask_test_client
-from app.test.conftest import register_mock_mailgun
+from main.service.password_reset_service import PasswordResetService
+from main.service.user_service import UserService
+from main.db import db
+from test.conftest import flask_test_client
+from test.conftest import register_mock_mailgun
 
 
 @requests_mock.Mocker()

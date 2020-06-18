@@ -4,14 +4,13 @@ import unittest
 
 import requests_mock
 
-from app.main.db import db
-from app.main.libs.s3 import S3
-from app.main.libs.util import create_image_file
-from app.main.service.idea_service import IdeaService
-from app.main.service.user_service import UserService
-from app.test.conftest import flask_test_client
-from app.test.conftest import register_mock_iex
-from app.main.libs.util import create_idea
+from main.db import db
+from main.libs.s3 import S3
+from main.libs.util import create_image_file
+from main.service.idea_service import IdeaService
+from main.service.user_service import UserService
+from test.conftest import flask_test_client, register_mock_iex
+from main.libs.util import create_idea
 
 
 class TestIdeaService(unittest.TestCase):
@@ -36,12 +35,7 @@ class TestIdeaService(unittest.TestCase):
             symbol="AAPL",
             position_type="long",
             agreed_to_terms=True,
-            bull_target=420,
-            bull_probability=0.2,
-            base_target=400,
-            base_probability=0.6,
-            bear_target=380,
-            bear_probability=0.2,
+            price_target=400,
             entry_price=313.49,
             thesis_summary="My Thesis Summary",
             full_report="My Full Report",
@@ -71,7 +65,7 @@ class TestIdeaService(unittest.TestCase):
         assert new_idea.num_comments == 0
         assert new_idea.num_downloads == 0
         assert new_idea.created_at < datetime.datetime.utcnow()
-        assert str(type(new_idea.analyst)) == "<class 'app.main.model.user.UserModel'>"
+        assert str(type(new_idea.analyst)) == "<class 'main.model.user.UserModel'>"
 
     def test_upload_exhibit(self):
         image = create_image_file("test.png", "image/png")

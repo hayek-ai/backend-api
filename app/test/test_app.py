@@ -1,5 +1,5 @@
 import unittest
-from app.test.conftest import flask_test_client
+from test.conftest import flask_test_client
 
 flask_client = flask_test_client()
 

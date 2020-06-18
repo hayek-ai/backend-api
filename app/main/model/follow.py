@@ -1,6 +1,6 @@
 import datetime
 
-from app.main.db import db
+from main.db import db
 
 
 class FollowModel(db.Model):

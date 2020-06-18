@@ -1,7 +1,7 @@
 from typing import List
-from app.main.db import db
-from app.main.model.upvote import UpvoteModel
-from app.main.model.idea import IdeaModel
+from main.db import db
+from main.model.upvote import UpvoteModel
+from main.model.idea import IdeaModel
 
 
 class UpvoteService:

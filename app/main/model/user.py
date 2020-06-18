@@ -1,9 +1,9 @@
 import datetime
-from app.main.db import db
-from app.main.libs.security import encrypt_password, check_encrypted_password
-from app.main.model.confirmation import ConfirmationModel
-from app.main.model.password_reset import PasswordResetModel
-from app.main.model.subscription import SubscriptionModel
+from main.db import db
+from main.libs.security import encrypt_password, check_encrypted_password
+from main.model.confirmation import ConfirmationModel
+from main.model.password_reset import PasswordResetModel
+from main.model.subscription import SubscriptionModel
 
 
 class UserModel(db.Model):

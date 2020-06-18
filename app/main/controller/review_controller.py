@@ -1,9 +1,9 @@
 from flask_restful import Resource, request
 
-from app.main.libs.strings import get_text
-from app.main.libs.util import get_error
+from main.libs.strings import get_text
+from main.libs.util import get_error
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from app.main.schema.review_schema import review_schema, review_list_schema, new_review_schema
+from main.schema.review_schema import review_schema, review_list_schema, new_review_schema
 
 
 class NewReview(Resource):

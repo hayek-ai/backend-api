@@ -1,6 +1,6 @@
 import datetime
 
-from app.main.db import db
+from main.db import db
 
 
 class IdeaModel(db.Model):
@@ -12,12 +12,6 @@ class IdeaModel(db.Model):
     position_type = db.Column(db.String(10), nullable=False)
     agreed_to_terms = db.Column(db.Boolean, nullable=False)
     price_target = db.Column(db.Float, nullable=False)
-    bull_target = db.Column(db.Float, nullable=False)
-    bull_probability = db.Column(db.Float, nullable=False)
-    base_target = db.Column(db.Float, nullable=False)
-    base_probability = db.Column(db.Float, nullable=False)
-    bear_target = db.Column(db.Float, nullable=False)
-    bear_probability = db.Column(db.Float, nullable=False)
     company_name = db.Column(db.String, nullable=False)
     market_cap = db.Column(db.BigInteger, nullable=False)
     sector = db.Column(db.String(80), nullable=False)

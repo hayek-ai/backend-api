@@ -3,30 +3,25 @@ import json
 from typing import List, TextIO
 from sqlalchemy import or_, and_, func
 
-from app.main.libs.s3 import S3
-from app.main.libs.stock import Stock, StockException
-from app.main.libs.strings import get_text
-from app.main.db import db
-from app.main.model.user import UserModel
-from app.main.model.idea import IdeaModel
-from app.main.model.upvote import UpvoteModel
-from app.main.model.downvote import DownvoteModel
-from app.main.model.bookmark import BookmarkModel
-from app.main.model.download import DownloadModel
-from app.main.service.user_service import UserService
+from main.libs.s3 import S3
+from main.libs.stock import Stock, StockException
+from main.libs.strings import get_text
+from main.db import db
+from main.model.user import UserModel
+from main.model.idea import IdeaModel
+from main.model.upvote import UpvoteModel
+from main.model.downvote import DownvoteModel
+from main.model.bookmark import BookmarkModel
+from main.model.download import DownloadModel
+from main.service.user_service import UserService
 
 
 class IdeaService:
     def save_new_idea(self, analyst_id: int, symbol: str, position_type: str,
-                      agreed_to_terms: bool, bull_target: float, bull_probability: float,
-                      base_target: float, base_probability: float, bear_target: float,
-                      bear_probability: float, entry_price: float, thesis_summary: str,
-                      full_report: str, exhibits=[], exhibit_title_map=None):
+                      agreed_to_terms: bool, price_target: float, entry_price: float,
+                      thesis_summary: str, full_report: str, exhibits=[],
+                      exhibit_title_map=None):
         analyst = UserService.get_user_by_id(analyst_id)
-
-        price_target = (float(bull_target) * float(bull_probability))\
-            + (float(base_target) * float(base_probability))\
-            + (float(bear_target) * float(bear_probability))
 
         stock_data = {}
         stock_data.update(Stock.fetch_company_info(symbol))
@@ -59,12 +54,6 @@ class IdeaService:
             position_type=position_type.lower(),
             agreed_to_terms=agreed_to_terms,
             price_target=price_target,
-            bull_target=bull_target,
-            bull_probability=bull_probability,
-            base_target=base_target,
-            base_probability=base_probability,
-            bear_target=bear_target,
-            bear_probability=bear_probability,
             company_name=stock_data["companyName"],
             market_cap=stock_data["marketCap"],
             sector=stock_data["sector"].lower(),

@@ -1,7 +1,7 @@
 from typing import List
-from app.main.db import db
-from app.main.model.comment import CommentModel
-from app.main.model.idea import IdeaModel
+from main.db import db
+from main.model.comment import CommentModel
+from main.model.idea import IdeaModel
 
 
 class CommentService:

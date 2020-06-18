@@ -2,8 +2,8 @@ import os
 import stripe
 from flask_restful import Resource, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.main.libs.strings import get_text
-from app.main.libs.util import get_error
+from main.libs.strings import get_text
+from main.libs.util import get_error
 
 
 class CreateSubscription(Resource):

@@ -1,7 +1,7 @@
 from flask_restful import Resource, request
 
-from app.main.libs.strings import get_text
-from app.main.libs.util import get_error
+from main.libs.strings import get_text
+from main.libs.util import get_error
 
 
 class SendPasswordReset(Resource):

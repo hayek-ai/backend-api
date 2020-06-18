@@ -1,10 +1,10 @@
 from marshmallow import Schema, fields, validates, ValidationError
 from marshmallow.validate import Length, Range
 
-from app.main.libs.util import camelcase
-from app.main.ma import ma
-from app.main.model.review import ReviewModel
-from app.main.schema.user_schema import UserSchema
+from main.libs.util import camelcase
+from main.ma import ma
+from main.model.review import ReviewModel
+from main.schema.user_schema import UserSchema
 
 
 class ReviewSchema(ma.SQLAlchemyAutoSchema):

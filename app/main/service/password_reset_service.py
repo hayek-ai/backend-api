@@ -2,10 +2,10 @@ import os
 from requests import Response
 from time import time
 
-from app.main.db import db
-from app.main.model.user import UserModel
-from app.main.model.password_reset import PasswordResetModel
-from app.main.libs.email import Email
+from main.db import db
+from main.model.user import UserModel
+from main.model.password_reset import PasswordResetModel
+from main.libs.email import Email
 
 
 class PasswordResetService:

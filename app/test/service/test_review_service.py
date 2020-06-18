@@ -1,9 +1,9 @@
 import unittest
 import requests_mock
-from app.main.db import db
-from app.test.conftest import flask_test_client, register_mock_mailgun
-from app.main.service.user_service import UserService
-from app.main.service.review_service import ReviewService
+from main.db import db
+from test.conftest import flask_test_client, register_mock_mailgun
+from main.service.user_service import UserService
+from main.service.review_service import ReviewService
 
 
 @requests_mock.Mocker()

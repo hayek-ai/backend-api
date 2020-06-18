@@ -3,15 +3,15 @@ import unittest
 import requests_mock
 import datetime
 
-from app.main.db import db
-from app.main.libs.util import create_image_file
-from app.main.libs.strings import get_text
-from app.main.service.download_service import DownloadService
-from app.main.service.idea_service import IdeaService
-from app.main.service.user_service import UserService
-from app.main.service.follow_service import FollowService
-from app.test.conftest import flask_test_client, services_for_test, register_mock_mailgun, register_mock_iex
-from app.main.libs.util import create_idea
+from main.db import db
+from main.libs.util import create_image_file
+from main.libs.strings import get_text
+from main.service.download_service import DownloadService
+from main.service.idea_service import IdeaService
+from main.service.user_service import UserService
+from main.service.follow_service import FollowService
+from test.conftest import flask_test_client, services_for_test, register_mock_mailgun, register_mock_iex
+from main.libs.util import create_idea
 
 
 @requests_mock.Mocker()
@@ -49,12 +49,7 @@ class TestIdeaController(unittest.TestCase):
             'symbol': "AAPL",
             "positionType": "long",
             "agreedToTerms": True,
-            "bullTarget": 420,
-            "bullProbability": 0.2,
-            "baseTarget": 400,
-            "baseProbability": 0.6,
-            "bearTarget": 380,
-            "bearProbability": 0.2,
+            "priceTarget": 400,
             "entryPrice": 313.40,
             "thesisSummary": "Test Thesis Summary",
             "fullReport": "Test Full Report",
@@ -101,12 +96,7 @@ class TestIdeaController(unittest.TestCase):
             'symbol': "AAPL",
             "positionType": "long",
             "agreedToTerms": True,
-            "bullTarget": 420,
-            "bullProbability": 0.2,
-            "baseTarget": 400,
-            "baseProbability": 0.6,
-            "bearTarget": 380,
-            "bearProbability": 0.2,
+            "priceTarget": 400,
             "entryPrice": 313.40,
             "thesisSummary": "Test Thesis Summary",
             "fullReport": "Test Full Report"
@@ -128,12 +118,7 @@ class TestIdeaController(unittest.TestCase):
             'symbol': "AAPL",
             "positionType": "long",
             "agreedToTerms": False,
-            "bullTarget": 420,
-            "bullProbability": 0.2,
-            "baseTarget": 400,
-            "baseProbability": 0.6,
-            "bearTarget": 380,
-            "bearProbability": 0.2,
+            "priceTarget": 400,
             "entryPrice": 313.40,
             "thesisSummary": "Test Thesis Summary",
             "fullReport": "Test Full Report"
@@ -152,12 +137,7 @@ class TestIdeaController(unittest.TestCase):
             'symbol': "AAPL",
             "positionType": "long",
             "agreedToTerms": True,
-            "bullTarget": 420,
-            "bullProbability": 0.2,
-            "baseTarget": 400,
-            "baseProbability": 0.6,
-            "bearTarget": 380,
-            "bearProbability": 0.2,
+            "priceTarget": 400,
             "entryPrice": 1,
             "thesisSummary": "Test Thesis Summary",
             "fullReport": "Test Full Report"
@@ -176,12 +156,7 @@ class TestIdeaController(unittest.TestCase):
             'symbol': "AAPL",
             "positionType": "long",
             "agreedToTerms": True,
-            "bullTarget": 420,
-            "bullProbability": 0.2,
-            "baseTarget": 400,
-            "baseProbability": 0.6,
-            "bearTarget": 380,
-            "bearProbability": 0.2,
+            "priceTarget": 400,
             "entryPrice": 1,
             "thesisSummary": "Test Thesis Summary",
             "fullReport": "Test Full Report"
@@ -200,12 +175,7 @@ class TestIdeaController(unittest.TestCase):
             'symbol': "AAPL",
             "positionType": "long",
             "agreedToTerms": True,
-            "bullTarget": 420,
-            "bullProbability": 0.2,
-            "baseTarget": 400,
-            "baseProbability": 0.6,
-            "bearTarget": 380,
-            "bearProbability": 0.2,
+            "priceTarget": 400,
             "entryPrice": 1,
             "thesisSummary": "Test Thesis Summary",
             "fullReport": "Test Full Report"
@@ -237,12 +207,7 @@ class TestIdeaController(unittest.TestCase):
             'symbol': "AAPL",
             "positionType": "market weight",
             "agreedToTerms": True,
-            "bullTarget": 420,
-            "bullProbability": 0.2,
-            "baseTarget": 400,
-            "baseProbability": 0.6,
-            "bearTarget": 380,
-            "bearProbability": 0.2,
+            "priceTarget": 400,
             "entryPrice": 313.40,
             "thesisSummary": "Test Thesis Summary",
             "fullReport": "Test Full Report"

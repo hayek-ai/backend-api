@@ -1,13 +1,13 @@
 from marshmallow import Schema, fields, validates, ValidationError
 from marshmallow.validate import Length
 
-from app.main.libs.strings import get_text
-from app.main.libs.util import camelcase
-from app.main.ma import ma
-from app.main.model.user import UserModel
-from app.main.schema.upvote_schema import UpvoteSchema
-from app.main.schema.downvote_schema import DownvoteSchema
-from app.main.schema.bookmark_schema import BookmarkSchema
+from main.libs.strings import get_text
+from main.libs.util import camelcase
+from main.ma import ma
+from main.model.user import UserModel
+from main.schema.upvote_schema import UpvoteSchema
+from main.schema.downvote_schema import DownvoteSchema
+from main.schema.bookmark_schema import BookmarkSchema
 
 
 class UserSchema(ma.SQLAlchemyAutoSchema):

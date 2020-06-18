@@ -1,7 +1,7 @@
 from typing import List
-from app.main.db import db
-from app.main.model.downvote import DownvoteModel
-from app.main.model.idea import IdeaModel
+from main.db import db
+from main.model.downvote import DownvoteModel
+from main.model.idea import IdeaModel
 
 class DownvoteService:
     def save_new_downvote(self, user_id: int, idea_id: int) -> "DownvoteModel":

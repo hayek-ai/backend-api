@@ -1,6 +1,6 @@
 import unittest
 
-from app.main.libs.s3 import S3
+from main.libs.s3 import S3
 
 
 class TestS3Lib(unittest.TestCase):
