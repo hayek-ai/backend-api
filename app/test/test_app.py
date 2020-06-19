@@ -43,4 +43,3 @@ class TestEndpointsConfiguration(unittest.TestCase):
         assert '/retry-invoice' in self.endpoints
         assert '/cancel-subscription' in self.endpoints
         assert '/stripe-webhook' in self.endpoints
-        assert '/performance' in self.endpoints

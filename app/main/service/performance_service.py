@@ -25,11 +25,15 @@ def calc_pt_capture(idea: dict) -> float:
     if idea.position_type.lower() == "long":
         expected_gain = idea.price_target / idea.entry_price - 1
         actual_gain = idea.last_price / idea.entry_price - 1
-        return max(0, min(1, expected_gain / actual_gain))
+        if expected_gain <= 0 or actual_gain <= 0:
+            return 0
+        return min(1, actual_gain / expected_gain)
     else:
         expected_gain = 1 - idea.price_target / idea.entry_price
         actual_gain = 1 - idea.last_price / idea.entry_price
-        return max(0, min(1, expected_gain / actual_gain))
+        if expected_gain <= 0 or actual_gain <= 0:
+            return 0
+        return min(1, actual_gain / expected_gain)
 
 
 def is_success(idea: dict) -> int:
@@ -43,10 +47,6 @@ def is_success(idea: dict) -> int:
             return 1
         else:
             return 0
-
-
-def sort_rank(analyst: dict) -> float:
-    return analyst.analyst_rank
 
 
 class PerformanceService:
@@ -98,12 +98,10 @@ class PerformanceService:
             analyst.num_ideas_percentile = num_ideas_percentiles[idx]
 
             # temporary score to keep track of analyst ranking
-            analyst.analyst_rank = analyst.avg_return_percentile + analyst.avg_price_target_capture_percentile \
-                + analyst.success_rate_percentile + analyst.avg_holding_period_percentile \
-                + analyst.num_ideas_percentile
+            analyst.analyst_rank = analyst.avg_return_percentile + 0.5 * analyst.avg_price_target_capture_percentile
 
         # sort list of analysts by ranking score, update percentile ranking, and save analyst changes
-        analysts.sort(key=sort_rank)
+        analysts.sort(key=lambda x: x.analyst_rank, reverse=True)
         all_analyst_ranks = [analyst.analyst_rank for analyst in analysts]
         analyst_rank_percentiles = stats.rankdata(all_analyst_ranks, "average") / num_analysts
 
