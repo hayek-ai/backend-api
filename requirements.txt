@@ -10,6 +10,7 @@ click==7.1.2
 coverage==5.1
 docutils==0.15.2
 Flask==1.1.2
+Flask-APScheduler==1.11.0
 Flask-Cors==3.0.8
 Flask-JWT-Extended==3.24.1
 flask-marshmallow==0.12.0
