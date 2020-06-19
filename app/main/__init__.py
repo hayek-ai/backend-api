@@ -3,7 +3,7 @@ from flask_restful import Api
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from marshmallow import ValidationError
-from apscheduler.schedulers.background import BackgroundScheduler
+# from apscheduler.schedulers.background import BackgroundScheduler
 
 from main.config import app_config
 from main.db import db
@@ -50,9 +50,9 @@ def create_app(services, config_name):
     app.config.from_object(app_config[config_name])
     api = Api(app)
 
-    sched = BackgroundScheduler(daemon=True)
-    sched.add_job(update_performance, 'cron', day_of_week='0-4', hour='10-16')
-    sched.start()
+    # sched = BackgroundScheduler(daemon=True)
+    # sched.add_job(update_performance, 'cron', day_of_week='0-4', hour='10-16')
+    # sched.start()
 
     @app.before_first_request
     def create_tables():
