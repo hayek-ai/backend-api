@@ -40,9 +40,6 @@ from main.service.subscription_service import SubscriptionService
 from main.service.performance_service import PerformanceService
 
 
-
-
-
 def create_app(services, config_name):
     app = Flask(__name__)
     CORS(app)
@@ -51,7 +48,8 @@ def create_app(services, config_name):
 
     scheduler = APScheduler()
 
-    @scheduler.task('cron', day_of_week='0-4', hour='10-16')
+    # @scheduler.task('cron', day_of_week='0-4', hour='10-16')
+    @scheduler.task('interval', seconds=60)
     def update_performance():
         with app.app_context():
             performance_service = services["performance"]
