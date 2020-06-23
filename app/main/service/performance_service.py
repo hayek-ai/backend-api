@@ -36,7 +36,7 @@ def calc_pt_capture(idea: dict) -> float:
         return min(1, actual_gain / expected_gain)
 
 
-def is_success(idea: dict) -> int:
+def calc_idea_profitability(idea: dict) -> int:
     if idea.position_type.lower() == "long":
         if idea.last_price / idea.entry_price - 1 > 0:
             return 1
@@ -72,7 +72,7 @@ class PerformanceService:
             total_price_target_capture = reduce((lambda x, y: x + y), map(calc_pt_capture, ideas_by_analyst))
             analyst.avg_price_target_capture = total_price_target_capture / analyst.num_ideas
 
-            successful_total = reduce((lambda x, y: x + y), map(is_success, ideas_by_analyst))
+            successful_total = reduce((lambda x, y: x + y), map(calc_idea_profitability, ideas_by_analyst))
             analyst.success_rate = successful_total / analyst.num_ideas
 
             cumulative_holding_period = reduce((lambda x, y: x + y), map(calc_holding_period, ideas_by_analyst))
