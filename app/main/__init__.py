@@ -3,9 +3,9 @@ from flask_restful import Api
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from marshmallow import ValidationError
+from flask_apscheduler import APScheduler
 
 from main.config import app_config
-from main.controller.performance_controller import UpdatePerformance
 from main.db import db
 from main.ma import ma
 
@@ -45,6 +45,18 @@ def create_app(services, config_name):
     CORS(app)
     app.config.from_object(app_config[config_name])
     api = Api(app)
+
+    scheduler = APScheduler()
+
+    # @scheduler.task('interval', seconds=60)   *** use for testing ***
+    @scheduler.task('cron', day_of_week='0-4', hour='10-16')
+    def update_performance():
+        with app.app_context():
+            performance_service = services["performance"]
+            performance_service.update_performance()
+
+    scheduler.init_app(app)
+    scheduler.start()
 
     @app.before_first_request
     def create_tables():
@@ -175,8 +187,6 @@ def create_app(services, config_name):
                                             "subscription_service": services["subscription"]})
     api.add_resource(StripeWebhook, '/stripe-webhook',
                      resource_class_kwargs={"user_service": services["user"]})
-    api.add_resource(UpdatePerformance, '/performance',
-                     resource_class_kwargs={"performance_service": services['performance']})
     api.add_resource(HealthCheck, '/health')
 
     return app
