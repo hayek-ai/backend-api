@@ -48,7 +48,6 @@ def create_app(services, config_name):
 
     scheduler = APScheduler()
 
-    # @scheduler.task('interval', seconds=60)   *** use for testing ***
     @scheduler.task('cron', day_of_week='0-4', hour='10-16')
     def update_performance():
         with app.app_context():
